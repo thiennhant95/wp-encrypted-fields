@@ -76,6 +76,12 @@ final class UserHooks
             return $data;
         }
 
+        $userId = (int) $userId;
+
+        if ($userId <= 0 && isset($data['ID'])) {
+            $userId = (int) $data['ID'];
+        }
+
         $targets = array(
             'user_login' => ColumnStore::LOGIN,
             'user_email' => ColumnStore::EMAIL,
@@ -87,7 +93,24 @@ final class UserHooks
             }
 
             $value = $data[$key];
+
             if (!is_string($value) || '' === trim($value)) {
+                // Partial updates (for example a password-only update) can
+                // arrive with an empty email/login. Rebuild the token from the
+                // encrypted plaintext meta so the column is never blanked.
+                if ($userId > 0) {
+                    $plain = $store->readPlain($userId, $name);
+
+                    if (is_string($plain) && '' !== $plain && !$store->isToken($plain, $name)) {
+                        $token = $store->lookupToken($plain, $name);
+
+                        if (is_string($token) && '' !== $token) {
+                            $data[$key] = $token;
+                            self::$pending[$name] = $plain;
+                        }
+                    }
+                }
+
                 continue;
             }
 

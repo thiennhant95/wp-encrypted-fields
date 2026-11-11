@@ -4,7 +4,7 @@ Tags: encryption, security, privacy, gdpr, woocommerce
 Requires at least: 6.4
 Tested up to: 7.1
 Requires PHP: 8.0
-Stable tag: 0.2.0
+Stable tag: 0.2.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -61,6 +61,10 @@ storage is disabled by default.
 
 == Changelog ==
 
+= 0.2.1 =
+* Fixed password-only/partial user updates blanking tokenized login/email
+  columns; the token is rebuilt from encrypted user meta.
+
 = 0.2.0 =
 * Added serialized meta encryption, full row verification, search-index checks,
   WooCommerce lookup safeguards, CLI aliases and adapter contract validation.
@@ -72,6 +76,10 @@ storage is disabled by default.
 Initial implementation.
 
 == Upgrade Notice ==
+
+= 0.2.1 =
+Recommended for sites that update users/passwords from CLI or third-party
+plugins: partial updates no longer blank tokenized login/email columns.
 
 = 0.2.0 =
 Update custom table adapters to implement table(), primaryKey() and

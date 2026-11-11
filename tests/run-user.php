@@ -396,6 +396,12 @@ namespace {
     same('Alice@Example.COM', $againMeta['_kec_user_login'] ?? null, 'token resolves plaintext from existing meta');
     same('Alice@Example.COM', $againMeta['_kec_user_email'] ?? null, 'token resolves email from existing meta');
 
+    $blank = $hooks->filterPreInsert(array('ID' => 7, 'user_email' => ''), true, 7);
+    same($emailToken, $blank['user_email'], 'blank email rebuilt from meta on partial update');
+
+    $blankMeta = $hooks->filterInsertUserMeta(array(), new WP_User(7, array()), true);
+    same('Alice@Example.COM', $blankMeta['_kec_user_email'] ?? null, 'rebuilt email meta is preserved');
+
     $emailOnlyPlugin = make_plugin(array(
         'user' => array(
             'columns' => array(

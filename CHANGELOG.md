@@ -2,6 +2,19 @@
 
 All notable changes to this project are documented here.
 
+## [0.2.1] - 2026-11-11
+
+### Fixed
+
+- Password-only or partial `wp_update_user()` calls no longer blank the
+  tokenized `user_email` / `user_login` columns; the token is rebuilt from the
+  encrypted user meta.
+- Admin/email lookups keep working after a password-only update.
+
+### Tests
+
+- Added a regression test for blank-email partial updates.
+
 ## [0.2.0] - 2026-11-11
 
 ### Added

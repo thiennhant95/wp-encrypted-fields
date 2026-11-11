@@ -46,6 +46,8 @@
 - `get_user_by()` and raw equality/`IN` queries are rewritten to tokens.
 - Supported hooks decrypt `WP_User` objects for auth, current user, `wp_login`,
   REST and password reset.
+- Partial user updates rebuild a missing login/email token from the encrypted
+  user meta so password-only updates cannot blank the columns.
 
 ## Storage
 
