@@ -9,6 +9,12 @@ All notable changes to this project are documented here.
 - GitHub Pages landing page under `docs/` with real database/API screenshots
   from the test lab. English is the default at `/`, Vietnamese at `/vi/`.
 
+### Changed
+
+- Landing now explains the problem, concrete outcomes, use cases and FAQ;
+  added hero terminal proof, canonical/OG/Twitter metadata, favicon, sitemap
+  and robots.txt.
+
 ## [0.2.3] - 2026-11-11
 
 ### Added

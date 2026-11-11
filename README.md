@@ -11,6 +11,11 @@ Encrypt only the fields you declare, keep normal WordPress APIs working, and
 search encrypted identifiers through blind indexes. Keys live outside the
 database; no core or third-party plugin patches are required.
 
+**Website:** [English](https://thiennhant95.github.io/wp-encrypted-fields/) ·
+[Tiếng Việt](https://thiennhant95.github.io/wp-encrypted-fields/vi/)
+
+[![Database only sees ciphertext](docs/assets/db-ciphertext.png)](https://thiennhant95.github.io/wp-encrypted-fields/#evidence)
+
 ## Features
 
 - Transparent encryption/decryption for post, user, term and comment meta.

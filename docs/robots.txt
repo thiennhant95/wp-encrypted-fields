@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://thiennhant95.github.io/wp-encrypted-fields/sitemap.xml

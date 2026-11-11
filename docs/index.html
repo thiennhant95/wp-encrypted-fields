@@ -8,8 +8,26 @@
 <meta property="og:title" content="Encrypted Fields — Field-level encryption for WordPress">
 <meta property="og:description" content="Encrypt declared fields, keep normal WordPress APIs, search through a blind index. AES-256-GCM, WooCommerce, multisite, WP-CLI.">
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://thiennhant95.github.io/wp-encrypted-fields/">
+<meta property="og:site_name" content="Encrypted Fields">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="vi_VN">
+<meta property="og:image" content="https://thiennhant95.github.io/wp-encrypted-fields/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Encrypted Fields — field-level encryption for WordPress">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Encrypted Fields — Field-level encryption for WordPress">
+<meta name="twitter:description" content="AES-256-GCM, blind-index search, user token mode, WooCommerce, WP-CLI.">
+<meta name="twitter:image" content="https://thiennhant95.github.io/wp-encrypted-fields/assets/og-image.png">
+<meta name="robots" content="index,follow">
+<meta name="theme-color" content="#070b12">
+<link rel="canonical" href="https://thiennhant95.github.io/wp-encrypted-fields/">
+<link rel="sitemap" type="application/xml" title="Sitemap" href="https://thiennhant95.github.io/wp-encrypted-fields/sitemap.xml">
 <link rel="alternate" hreflang="en" href="https://thiennhant95.github.io/wp-encrypted-fields/">
 <link rel="alternate" hreflang="vi" href="https://thiennhant95.github.io/wp-encrypted-fields/vi/">
+<link rel="alternate" hreflang="x-default" href="https://thiennhant95.github.io/wp-encrypted-fields/">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <link rel="stylesheet" href="assets/landing.css">
 </head>
 <body>
@@ -17,10 +35,12 @@
   <div class="wrap nav">
     <div class="brand"><span class="logo">EF</span> Encrypted Fields</div>
     <nav class="navlinks">
+      <a href="#why">Why</a>
       <a href="#evidence">DB evidence</a>
       <a href="#features">Features</a>
+      <a href="#usecases">Use cases</a>
       <a href="#install">Install</a>
-      <a href="#tests">Test results</a>
+      <a href="#faq">FAQ</a>
       <a href="https://github.com/thiennhant95/wp-encrypted-fields/blob/main/README.md" target="_blank" rel="noopener">Docs</a>
       <a href="https://github.com/thiennhant95/wp-encrypted-fields/releases" target="_blank" rel="noopener">Releases</a>
       <span class="lang"><a class="on" href="./">EN</a><a href="vi/">VI</a></span>
@@ -30,41 +50,76 @@
 
 <main>
   <div class="wrap hero">
-    <span class="badge">v0.2.3 · WordPress 7.1.4 · GPL-2.0-or-later</span>
-    <h1>Field-level encryption.<br><span class="grad">The database only sees ciphertext.</span></h1>
-    <p class="lead">
-      Registry-driven encryption for WordPress &amp; WooCommerce: declare the fields to protect,
-      keep the normal WordPress APIs, search through a blind index, and rotate keys safely.
-      The screenshots below are <b>real data</b> from the test database.
-    </p>
-    <div class="cta">
-      <a class="btn primary" href="#install">Install</a>
-      <a class="btn" href="https://github.com/thiennhant95/wp-encrypted-fields" target="_blank" rel="noopener">Source on GitHub</a>
-      <a class="btn" href="https://github.com/thiennhant95/wp-encrypted-fields/releases/tag/v0.2.3" target="_blank" rel="noopener">Release v0.2.3</a>
+    <div class="hero-grid">
+      <div>
+        <span class="badge">v0.2.3 · WordPress 7.1.4 · GPL-2.0-or-later</span>
+        <h1>Field-level encryption.<br><span class="grad">The database only sees ciphertext.</span></h1>
+        <p class="lead">
+          Protect customer PII at rest without rewriting your site. Declare the fields to encrypt,
+          keep normal WordPress APIs, search through a blind index, and rotate keys safely.
+          The screenshots below are <b>real data</b> from the test database.
+        </p>
+        <div class="cta">
+          <a class="btn primary" href="#install">Install</a>
+          <a class="btn" href="https://github.com/thiennhant95/wp-encrypted-fields" target="_blank" rel="noopener">Source on GitHub</a>
+          <a class="btn" href="https://github.com/thiennhant95/wp-encrypted-fields/releases/tag/v0.2.3" target="_blank" rel="noopener">Release v0.2.3</a>
+        </div>
+      </div>
+      <div class="mini-term" aria-label="Database ciphertext and API plaintext example">
+        <div class="dots"><i></i><i></i><i></i><span>live proof</span></div>
+        <div class="cmd">$ wp db get _billing_email</div>
+        <div class="enc">enc:v2:det:505bf129:eGLUsgYsUp2mHnofiUMcc1bP00bid7...</div>
+        <div class="cmd">$ get_post_meta(2185, "_billing_email")</div>
+        <div class="plain">woo.kec@example.com</div>
+        <div class="caption">DB: ciphertext · API: plaintext</div>
+      </div>
     </div>
     <div class="stats">
       <div class="stat"><b>75</b><span>plugins tested for compatibility</span></div>
       <div class="stat"><b>27</b><span>encrypted rows in the test lab</span></div>
-      <div class="stat"><b>AES-256-GCM</b><span>randomized + deterministic SIV</span></div>
+      <div class="stat"><b>0</b><span>plaintext samples in verify --full</span></div>
       <div class="stat"><b>2</b><span>multisite sites verified</span></div>
     </div>
   </div>
+
+  <section id="why">
+    <div class="wrap">
+      <span class="kicker">The problem</span>
+      <h2>Backups leak more than you think.</h2>
+      <p class="sub">HTTPS protects data in transit. A database dump, stolen backup or SQL injection exposes the data at rest — unless the fields themselves are encrypted.</p>
+      <div class="grid g3">
+        <div class="card bad"><div class="tag">Without Encrypted Fields</div><h3>Emails and orders in plaintext</h3><p>Every DB dump, backup and analytics export contains customer names, emails and phone numbers in readable form.</p></div>
+        <div class="card bad"><div class="tag">Hashing isn't enough</div><h3>Search and login break</h3><p>One-way hashing protects values, but you still need exact/partial search and <code>get_user_by()</code> to work.</p></div>
+        <div class="card bad"><div class="tag">DIY crypto</div><h3>Rotation and migration are risky</h3><p>Rolling your own key handling makes rotation, migration and rollback easy to get wrong.</p></div>
+      </div>
+      <h2 style="margin-top:40px">What you get</h2>
+      <p class="sub">Concrete outcomes, not just a crypto library.</p>
+      <div class="grid g3">
+        <div class="card good"><div class="tag">At rest</div><h3>PII unreadable in DB dumps</h3><p>Declared fields are stored as <code>enc:v2:…</code>; the key stays in wp-config or a file outside the database.</p></div>
+        <div class="card good"><div class="tag">No rewrites</div><h3>WordPress APIs keep working</h3><p><code>get_post_meta()</code>, <code>get_user_meta()</code>, WooCommerce and ACF return plaintext to the app.</p></div>
+        <div class="card good"><div class="tag">Searchable</div><h3>Blind-index search and logins</h3><p>Exact and partial search, <code>get_user_by()</code>, <code>email_exists()</code> and tokenized logins keep working.</p></div>
+        <div class="card good"><div class="tag">Operations</div><h3>Migrate and rotate safely</h3><p>Scan, dry-run, migrate, <code>verify --full</code>, rollback, reindex and two-phase key rotation via WP-CLI.</p></div>
+        <div class="card good"><div class="tag">Integrations</div><h3>WooCommerce, forms, multilingual</h3><p>Order meta/address index, CF7+Flamingo, ACF, Polylang and multisite tested in the lab.</p></div>
+        <div class="card good"><div class="tag">Open source</div><h3>GPL-2.0, no lock-in</h3><p>Source, changelog and releases on GitHub. No core patches; keys are yours.</p></div>
+      </div>
+    </div>
+  </section>
 
   <section id="evidence">
     <div class="wrap">
       <h2>Real evidence from the database</h2>
       <p class="sub">Synthetic test data, no real PII. The key ID is shown; the key never is.</p>
       <figure class="shot">
-        <img src="assets/db-ciphertext.png" alt="Database rows showing enc:v2 ciphertext">
+        <img src="assets/db-ciphertext.png" alt="Database rows showing enc:v2 ciphertext" width="1180" height="310" loading="lazy">
         <figcaption>1. Database: the same order — email, name and address index are all <code>enc:v2:…</code>.</figcaption>
       </figure>
       <div class="grid g2">
         <figure class="shot">
-          <img src="assets/api-plaintext.png" alt="WordPress APIs returning plaintext">
+          <img src="assets/api-plaintext.png" alt="WordPress APIs returning plaintext" width="1180" height="364" loading="lazy">
           <figcaption>2. API: <code>get_post_meta()</code> and <code>get_user_meta()</code> return plaintext as usual.</figcaption>
         </figure>
         <figure class="shot">
-          <img src="assets/search-verify.png" alt="WP-CLI blind-index search and verify output">
+          <img src="assets/search-verify.png" alt="WP-CLI blind-index search and verify output" width="1180" height="364" loading="lazy">
           <figcaption>3. Blind-index search and <code>verify --full</code> on the test server.</figcaption>
         </figure>
       </div>
@@ -94,10 +149,29 @@
     </div>
   </section>
 
+  <section id="usecases">
+    <div class="wrap">
+      <span class="kicker">Who it's for</span>
+      <h2>Built for real WordPress data.</h2>
+      <p class="sub">Agencies, store owners and membership sites that need PII protection without giving up search, logins or the normal admin experience.</p>
+      <div class="grid g2">
+        <div class="card"><h3>WooCommerce stores</h3><p>Encrypt billing/shipping fields and the address index while order search and customer lookup keep working.</p></div>
+        <div class="card"><h3>Membership &amp; user sites</h3><p>Tokenize login/email columns and keep authentication, password reset and WP-CLI user management working.</p></div>
+        <div class="card"><h3>Forms, ACF and CRM meta</h3><p>Encrypt declared form/ACF fields and search emails through the blind index; keep Flamingo submissions usable.</p></div>
+        <div class="card"><h3>Legacy migrations</h3><p>Read EC-KOYO ciphertext, migrate to v2, verify every row and rotate keys in two phases.</p></div>
+      </div>
+    </div>
+  </section>
+
   <section id="install">
     <div class="wrap">
       <h2>Install</h2>
       <p class="sub">Requires PHP 8.0+, WordPress 6.4+ and OpenSSL. Back up the database before migrating existing data.</p>
+      <div class="steps">
+        <div class="step"><b>01</b><p>Install the plugin and set <code>KEC_KEY</code> + <code>KEC_TOKEN_SECRET</code>.</p></div>
+        <div class="step"><b>02</b><p>Declare only the fields you need in <code>KEC_FIELDS</code> (default deny).</p></div>
+        <div class="step"><b>03</b><p>Run scan → migrate → <code>verify --full</code>; reindex search.</p></div>
+      </div>
       <pre><code>git clone https://github.com/thiennhant95/wp-encrypted-fields.git
 cp -r wp-encrypted-fields wp-content/plugins/
 wp plugin activate wp-encrypted-fields
@@ -154,6 +228,51 @@ wp kec verify --full</code></pre>
         Known limits: <code>post_content</code>/<code>post_title</code> are not encrypted;
         custom tables without an adapter (WP Mail Logging, MailPoet, FluentCRM…) remain plaintext;
         HPOS is not supported in v1.
+      </div>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="wrap faq">
+      <span class="kicker">FAQ</span>
+      <h2>Questions buyers ask</h2>
+      <details open>
+        <summary>Does this replace HTTPS/SSL?</summary>
+        <p>No. HTTPS protects data in transit. Encrypted Fields protects the declared fields at rest, so a database dump or stolen backup does not expose them.</p>
+      </details>
+      <details>
+        <summary>Does WooCommerce order search still work?</summary>
+        <p>Yes for declared searchable fields: the plugin removes encrypted columns from WooCommerce's SQL search and merges blind-index results. HPOS must be disabled in v1.</p>
+      </details>
+      <details>
+        <summary>Do get_user_by(), email_exists() and logins still work?</summary>
+        <p>Yes. Login/email columns store blind-index tokens, raw equality/IN lookups are rewritten, and the authentication hooks resolve tokens back to plaintext.</p>
+      </details>
+      <details>
+        <summary>What happens if I lose the key?</summary>
+        <p>Encrypted values are unrecoverable without the key. Keep backups of wp-config/key files, store keys outside the database, and rehearse rotation before changing them.</p>
+      </details>
+      <details>
+        <summary>What is not encrypted?</summary>
+        <p><code>post_content</code>/<code>post_title</code>, <code>wp_options</code>, and custom tables without an adapter. Declared meta that remains plaintext is reported by <code>wp kec verify --full</code>.</p>
+      </details>
+      <details>
+        <summary>Is it free?</summary>
+        <p>Yes. GPL-2.0-or-later, source and releases on GitHub. There is no paid tier or key escrow.</p>
+      </details>
+    </div>
+  </section>
+  <section id="start" style="border-top:0">
+    <div class="wrap" style="text-align:center">
+      <span class="kicker">Get started</span>
+      <h2>Ready to protect customer PII?</h2>
+      <p class="sub" style="margin-left:auto;margin-right:auto">Install the plugin, declare the fields you need, and run <code>verify --full</code> before going live.</p>
+      <div class="cta" style="justify-content:center">
+        <a class="btn primary" href="https://github.com/thiennhant95/wp-encrypted-fields/releases/tag/v0.2.3" target="_blank" rel="noopener">Download v0.2.3</a>
+        <a class="btn" href="https://github.com/thiennhant95/wp-encrypted-fields/blob/main/README.md" target="_blank" rel="noopener">Read the docs</a>
+      </div>
+      <div class="chips" style="justify-content:center;margin-top:18px">
+        <span class="chip">GPL-2.0</span><span class="chip">No telemetry</span><span class="chip">Keys stay with you</span>
       </div>
     </div>
   </section>
