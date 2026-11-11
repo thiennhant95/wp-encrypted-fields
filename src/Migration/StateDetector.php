@@ -81,11 +81,19 @@ final class StateDetector
             );
         }
 
+        $keySource = Env::keySource($this->plugin);
+        if (0 === stripos($keySource, 'option:')) {
+            $warnings[] = array(
+                'code' => 'db_key',
+                'message' => 'The master key is stored in the database. A database dump also exposes the key; use KEC_KEY/KEC_KEY_FILE instead.',
+            );
+        }
+
         return array(
             'state' => $state,
             'registry_enabled' => $registryEnabled,
             'key_configured' => Env::keyConfigured($this->plugin),
-            'key_source' => Env::keySource($this->plugin),
+            'key_source' => $keySource,
             'key_id' => Env::keyId($this->plugin),
             'hpos' => Env::hposEnabled(),
             'backup_ack' => $this->backupAck(),

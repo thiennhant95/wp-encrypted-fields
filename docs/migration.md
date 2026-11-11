@@ -92,3 +92,30 @@ wp kec migrate-table siteguard_history --backup-confirmed
 ## Rotation
 
 See [CLI rotation](cli.md#two-phase-rotation).
+
+## After an import or raw SQL write
+
+Plugins that write directly to meta/custom tables (for example WP All Import)
+can bypass the meta hooks. After every import or SQL sync:
+
+```bash
+wp kec scan
+wp kec migrate --backup-confirmed
+wp kec verify --full
+wp kec reindex --entity=all
+```
+
+Never treat the import as complete until `verify --full` passes.
+
+## Go-live checklist
+
+1. HPOS is disabled.
+2. `KEC_KEY` / `KEC_KEY_FILE` is outside the database and outside the repo.
+3. Sensitive Woo fields include `_billing_address_index` and
+   `_shipping_address_index`.
+4. `wp kec migrate-table customer_lookup --backup-confirmed` has been run
+   (it widens short lookup columns first).
+5. `wp kec verify --full` passes and the search index is not empty.
+6. A fresh backup exists and a restore has been rehearsed on staging.
+7. Key rotation has been rehearsed with `--dry-run` and a backup.
+8. `wp kec status` shows only expected warnings.

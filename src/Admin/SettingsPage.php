@@ -280,7 +280,13 @@ final class SettingsPage
                         $field['search'] = (bool) $config['search'];
                     }
                     if (isset($config['cipher'])) {
-                        $field['cipher'] = (string) $config['cipher'];
+                        $cipher = strtolower(trim((string) $config['cipher']));
+
+                        if (!in_array($cipher, array('sb', 'det', 'deterministic', 'siv', 'secretbox', 'random', 'randomized'), true)) {
+                            return null;
+                        }
+
+                        $field['cipher'] = $cipher;
                     }
                     if (isset($config['max_length'])) {
                         $field['max_length'] = (int) $config['max_length'];

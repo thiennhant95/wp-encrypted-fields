@@ -135,12 +135,19 @@ final class Registry
             $options['post_types'] = array_values($config['post_types']);
         }
 
+        $cipher = isset($config['cipher']) ? strtolower(trim((string) $config['cipher'])) : null;
+        $allowedCiphers = array('sb', 'det', 'deterministic', 'siv', 'secretbox', 'random', 'randomized');
+
+        if (null !== $cipher && !in_array($cipher, $allowedCiphers, true)) {
+            $cipher = null;
+        }
+
         $field = new Field(
             $entity,
             $key,
             isset($config['type']) ? (string) $config['type'] : 'text',
             !empty($config['search']),
-            isset($config['cipher']) ? (string) $config['cipher'] : null,
+            $cipher,
             $options
         );
 

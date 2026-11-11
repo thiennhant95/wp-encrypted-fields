@@ -54,6 +54,12 @@ final class Commands
         );
 
         $this->output($rows, $assoc);
+
+        foreach ($state['warnings'] as $warning) {
+            if (isset($warning['message'])) {
+                \WP_CLI::warning((string) $warning['message']);
+            }
+        }
     }
 
     /**

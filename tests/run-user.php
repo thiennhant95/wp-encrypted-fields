@@ -565,6 +565,12 @@ namespace {
     same('Alice', $search->terms[0][1] ?? null, 'UserLookup strips LIKE wildcards before searching');
     same('user', $search->terms[0][0] ?? null, 'UserLookup searches the user entity');
 
+    $underscoreSearch = new FakeSearch();
+    $underscoreSearch->idsToReturn = array(1);
+    $underscoreWhere = "WHERE user_email LIKE 'nhan\\\\_tt'";
+    $lookup->rewriteLikes($underscoreWhere, $underscoreSearch);
+    same('nhan_tt', $underscoreSearch->terms[0][1] ?? null, 'UserLookup unescapes LIKE underscores');
+
     $nullSearchPlugin = make_plugin($registry, $crypto, null);
     $nullSearchLookup = new UserLookup($nullSearchPlugin);
     $nullQuery = new class {
