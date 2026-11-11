@@ -36,6 +36,10 @@ final class LookupMigrator
             return $this->errorResult('invalid_table', 'Unknown lookup table: ' . $type);
         }
 
+        if (!$this->tableExists($definition)) {
+            return $this->emptyScan($definition, $options);
+        }
+
         $sample = isset($options['sample_limit']) ? max(1, (int) $options['sample_limit']) : 100;
         $full = !empty($options['full']);
         $limit = $full ? 500 : $sample;
@@ -135,6 +139,20 @@ final class LookupMigrator
         $definition = $this->definition($type);
         if (null === $definition) {
             return $this->errorResult('invalid_table', 'Unknown lookup table: ' . $type);
+        }
+
+        if (!$this->tableExists($definition)) {
+            return array(
+                'ok' => true,
+                'table' => $definition['table'],
+                'type' => $definition['type'],
+                'operation' => $definition['mode'],
+                'migrated' => 0,
+                'skipped' => 0,
+                'errors' => array(),
+                'stopped' => false,
+                'table_missing' => true,
+            );
         }
 
         $batch = isset($options['batch']) ? max(1, min(5000, (int) $options['batch'])) : 500;
@@ -681,6 +699,85 @@ final class LookupMigrator
     /**
      * @return array<string, mixed>
      */
+    /**
+     * Injected/fake DB objects are treated as already present; only the real
+     * global $wpdb is probed, so callers can skip optional tables cleanly.
+     *
+     * @param array<string, mixed> $definition
+     */
+    private function tableExists(array $definition): bool
+    {
+        if (null !== $this->db) {
+            return true;
+        }
+
+        $db = Env::db(null);
+        if (!is_object($db) || !method_exists($db, 'get_var')) {
+            return true;
+        }
+
+        $table = isset($definition['table']) ? (string) $definition['table'] : '';
+        if ('' === $table) {
+            return false;
+        }
+
+        try {
+            $sql = method_exists($db, 'prepare')
+                ? $db->prepare('SHOW TABLES LIKE %s', $table)
+                : "SHOW TABLES LIKE '" . $table . "'";
+            $found = $db->get_var($sql);
+        } catch (\Throwable $exception) {
+            return false;
+        }
+
+        return !empty($found);
+    }
+
+    /**
+     * @param array<string, mixed> $definition
+     * @param array<string, mixed> $options
+     * @return array<string, mixed>
+     */
+    private function emptyScan(array $definition, array $options): array
+    {
+        $columns = array();
+
+        foreach ($definition['columns'] as $column => $spec) {
+            $columns[] = array(
+                'column' => $column,
+                'type' => isset($spec['type']) ? (string) $spec['type'] : 'text',
+                'plaintext' => 0,
+                'legacy' => 0,
+                'v2' => 0,
+                'token' => 0,
+                'empty' => 0,
+                'rows' => 0,
+                'total' => 0,
+                'pending' => 0,
+            );
+        }
+
+        return array(
+            'ok' => true,
+            'table' => $definition['table'],
+            'type' => $definition['type'],
+            'mode' => $definition['mode'],
+            'columns' => $columns,
+            'totals' => array(
+                'plaintext' => 0,
+                'legacy' => 0,
+                'v2' => 0,
+                'token' => 0,
+                'empty' => 0,
+                'rows' => 0,
+                'pending' => 0,
+            ),
+            'backup_satisfied' => $this->backupSatisfied($options),
+            'backup_ack' => $this->plugin->option('kec_backup_ack'),
+            'table_missing' => true,
+        );
+    }
+
     private function errorResult(string $code, string $message): array
     {
         return array(

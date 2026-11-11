@@ -645,8 +645,15 @@ final class Commands
      * ## OPTIONS
      *
      * [--dry-run]
+     * : Print the rotation plan without re-encrypting.
+     *
      * [--batch=<batch>]
+     * : Rows per batch.
+     *
      * [--backup-confirmed]
+     * : Acknowledge that a database backup exists.
+     *
+     * @alias rotate-key
      */
     public function rotate_key($args = array(), $assoc = array()): void
     {
