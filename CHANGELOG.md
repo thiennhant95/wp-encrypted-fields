@@ -7,7 +7,7 @@ All notable changes to this project are documented here.
 ### Added
 
 - GitHub Pages landing page under `docs/` with real database/API screenshots
-  from the test lab.
+  from the test lab. English is the default at `/`, Vietnamese at `/vi/`.
 
 ## [0.2.3] - 2026-11-11
 

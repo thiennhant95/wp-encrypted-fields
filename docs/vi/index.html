@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Encrypted Fields — Field-level encryption cho WordPress &amp; WooCommerce</title>
+<meta name="description" content="Registry-driven field-level encryption cho WordPress và WooCommerce. AES-256-GCM, blind-index search, user token mode, WP-CLI migration và key rotation.">
+<meta property="og:title" content="Encrypted Fields — Field-level encryption cho WordPress">
+<meta property="og:description" content="Mã hoá field-level, giữ nguyên API WordPress, tìm kiếm qua blind index. AES-256-GCM, WooCommerce, multisite, WP-CLI.">
+<meta property="og:type" content="website">
+<link rel="alternate" hreflang="en" href="https://thiennhant95.github.io/wp-encrypted-fields/">
+<link rel="alternate" hreflang="vi" href="https://thiennhant95.github.io/wp-encrypted-fields/vi/">
+<link rel="stylesheet" href="../assets/landing.css">
+</head>
+<body>
+<header>
+  <div class="wrap nav">
+    <div class="brand"><span class="logo">EF</span> Encrypted Fields</div>
+    <nav class="navlinks">
+      <a href="#evidence">Bằng chứng DB</a>
+      <a href="#features">Tính năng</a>
+      <a href="#install">Cài đặt</a>
+      <a href="#tests">Kết quả test</a>
+      <a href="https://github.com/thiennhant95/wp-encrypted-fields/blob/main/README.md" target="_blank" rel="noopener">Docs</a>
+      <a href="https://github.com/thiennhant95/wp-encrypted-fields/releases" target="_blank" rel="noopener">Releases</a>
+      <span class="lang"><a href="../">EN</a><a class="on" href="./">VI</a></span>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap hero">
+    <span class="badge">v0.2.3 · WordPress 7.1.4 · GPL-2.0-or-later</span>
+    <h1>Field-level encryption.<br><span class="grad">DB chỉ thấy ciphertext.</span></h1>
+    <p class="lead">
+      Registry-driven encryption cho WordPress &amp; WooCommerce: khai báo field cần bảo vệ,
+      giữ nguyên API WordPress, tìm kiếm qua blind index, xoay key an toàn.
+      Ảnh bên dưới là dữ liệu <b>thực tế</b> từ database của bản test.
+    </p>
+    <div class="cta">
+      <a class="btn primary" href="#install">Cài đặt</a>
+      <a class="btn" href="https://github.com/thiennhant95/wp-encrypted-fields" target="_blank" rel="noopener">Mã nguồn GitHub</a>
+      <a class="btn" href="https://github.com/thiennhant95/wp-encrypted-fields/releases/tag/v0.2.3" target="_blank" rel="noopener">Release v0.2.3</a>
+    </div>
+    <div class="stats">
+      <div class="stat"><b>75</b><span>plugin đã test tương thích</span></div>
+      <div class="stat"><b>27</b><span>rows đã mã hoá trong bản test</span></div>
+      <div class="stat"><b>AES-256-GCM</b><span>randomized + deterministic SIV</span></div>
+      <div class="stat"><b>2</b><span>site multisite đã kiểm chứng</span></div>
+    </div>
+  </div>
+
+  <section id="evidence">
+    <div class="wrap">
+      <h2>Bằng chứng thực tế từ database</h2>
+      <p class="sub">Dữ liệu test tổng hợp, không chứa PII thật. Key ID được hiển thị, key thì không.</p>
+      <figure class="shot">
+        <img src="../assets/db-ciphertext.png" alt="Database rows showing enc:v2 ciphertext">
+        <figcaption>1. DB: cùng một order — email, tên và address index đều là <code>enc:v2:…</code>.</figcaption>
+      </figure>
+      <div class="grid g2">
+        <figure class="shot">
+          <img src="../assets/api-plaintext.png" alt="WordPress APIs returning plaintext">
+          <figcaption>2. API: <code>get_post_meta()</code> và <code>get_user_meta()</code> trả plaintext bình thường.</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="../assets/search-verify.png" alt="WP-CLI blind-index search and verify output">
+          <figcaption>3. Blind-index search và <code>verify --full</code> trên server test.</figcaption>
+        </figure>
+      </div>
+      <div class="note">Đây là landing quảng cáo plugin. Ảnh chỉ chứa dữ liệu test đã lọc PII. WordPress demo phía sau không nằm trong trang này.</div>
+    </div>
+  </section>
+
+  <section id="features">
+    <div class="wrap">
+      <h2>Thiết kế</h2>
+      <p class="sub">Default-deny: chỉ field được khai báo mới bị mã hoá. Không patch core, không patch plugin khác.</p>
+      <div class="grid g3">
+        <div class="card"><div class="icon">▦</div><h3>Registry-driven</h3><p>Khai báo entity/meta/column trong <code>wp-config.php</code>, file config, filter hoặc admin UI.</p></div>
+        <div class="card"><div class="icon">🔐</div><h3>AES-256-GCM</h3><p>Randomized cho text; SIV deterministic cho email/login để so sánh bằng mà không lộ plaintext.</p></div>
+        <div class="card"><div class="icon">🔎</div><h3>Blind index</h3><p>HMAC-SHA256 full token + trigram, tìm chính xác và tìm một phần mà DB không lưu plaintext.</p></div>
+        <div class="card"><div class="icon">👤</div><h3>User token mode</h3><p><code>user_login</code>/<code>user_email</code> lưu token 55 ký tự; plaintext reversible trong encrypted meta.</p></div>
+        <div class="card"><div class="icon">🛒</div><h3>WooCommerce</h3><p>Order meta, address index, customer lookup, order search; HPOS phải tắt ở v1.</p></div>
+        <div class="card"><div class="icon">🧰</div><h3>Vận hành</h3><p>Scan, migrate, verify <code>--full</code>, reindex, rollback, rotate key 2 pha, WP-CLI.</p></div>
+      </div>
+      <div class="flow">
+        <div class="node"><b>Registry</b>field → entity/type/search</div>
+        <div class="arrow">→</div>
+        <div class="node"><b>Hooks</b>meta / user / Woo / search</div>
+        <div class="arrow">→</div>
+        <div class="node"><b>Crypto</b>AES-256-GCM + HMAC blind index</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="install">
+    <div class="wrap">
+      <h2>Cài đặt</h2>
+      <p class="sub">Yêu cầu PHP 8.0+, WordPress 6.4+, OpenSSL. Sao lưu DB trước khi migrate dữ liệu cũ.</p>
+      <pre><code>git clone https://github.com/thiennhant95/wp-encrypted-fields.git
+cp -r wp-encrypted-fields wp-content/plugins/
+wp plugin activate wp-encrypted-fields
+
+# wp-config.php (trước require wp-settings.php)
+define('KEC_KEY', 'base64:REPLACE_WITH_32_BYTE_KEY');
+define('KEC_TOKEN_SECRET', 'base64:REPLACE_WITH_STABLE_SECRET');
+define('KEC_FIELDS', [
+    'user' => [
+        'columns' => [
+            'user_login' => ['type' => 'login', 'max_length' => 60, 'search' => true],
+            'user_email' => ['type' => 'email', 'max_length' => 100, 'search' => true],
+        ],
+        'meta' => ['first_name' => ['type' => 'text', 'search' => true]],
+    ],
+    'post' => [
+        'post_types' => ['shop_order'],
+        'meta' => [
+            '_billing_email' => ['type' => 'email', 'search' => true],
+            '_billing_address_index' => ['type' => 'text', 'search' => true],
+        ],
+    ],
+]);
+
+wp kec scan
+wp kec migrate --backup-confirmed
+wp kec verify --full</code></pre>
+    </div>
+  </section>
+
+  <section id="tests">
+    <div class="wrap">
+      <h2>Kết quả kiểm chứng</h2>
+      <p class="sub">Cùng một test lab: WordPress 7.1.4, PHP 8.1, MySQL 5.7, plugin 0.2.3.</p>
+      <table>
+        <thead><tr><th>Hạng mục</th><th>Kết quả</th></tr></thead>
+        <tbody>
+          <tr><td>Tương thích plugin</td><td>75 plugin (WooCommerce, CF7/Flamingo, ACF, Yoast, Rank Math, Elementor, WPForms, Polylang, cache/security/backup/CRM…). 74 pass; <code>encrypted-blog</code> fail do plugin lỗi.</td></tr>
+          <tr><td>Multisite</td><td>2 site: meta encryption + search index theo site; user columns dùng <code>wp_users</code>/<code>wp_usermeta</code> shared; user creation/role assignment đã fix ở 0.2.2.</td></tr>
+          <tr><td>Đa ngôn ngữ</td><td>Polylang en/vi: translated posts, encrypted meta, search, language filter — pass.</td></tr>
+          <tr><td>Vận hành</td><td>Backup/restore, rotate key 2 pha, verify <code>--full</code>, lock, backup-ack TTL — đã diễn tập trên server test.</td></tr>
+          <tr><td>Bảo mật dữ liệu</td><td>DB dump chứa ciphertext; key không nằm trong DB; email lookup/auth vẫn hoạt động qua token.</td></tr>
+        </tbody>
+      </table>
+      <div class="chips">
+        <span class="chip">WooCommerce</span><span class="chip">CF7 + Flamingo</span><span class="chip">ACF</span>
+        <span class="chip">Yoast</span><span class="chip">Rank Math</span><span class="chip">AIOSEO</span>
+        <span class="chip">Elementor</span><span class="chip">WPForms</span><span class="chip">Polylang</span>
+        <span class="chip">Wordfence</span><span class="chip">Solid Security</span><span class="chip">WP Mail SMTP</span>
+        <span class="chip">W3TC</span><span class="chip">WP Super Cache</span><span class="chip">UpdraftPlus</span>
+        <span class="chip">Duplicator</span><span class="chip">WP All Import</span><span class="chip">Redis Object Cache</span>
+      </div>
+      <div class="note" style="margin-top:22px">
+        Giới hạn đã biết: <code>post_content</code>/<code>post_title</code> không được mã hoá;
+        custom table không có adapter (WP Mail Logging, MailPoet, FluentCRM…) vẫn plaintext;
+        HPOS chưa hỗ trợ ở v1.
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap footer-row">
+    <div><b>Encrypted Fields</b> · GPL-2.0-or-later · thiennhant95<br><span>Landing quảng cáo plugin, dùng dữ liệu test đã lọc PII.</span></div>
+    <div>
+      <a href="https://github.com/thiennhant95/wp-encrypted-fields" target="_blank" rel="noopener">GitHub</a> ·
+      <a href="https://github.com/thiennhant95/wp-encrypted-fields/releases" target="_blank" rel="noopener">Releases</a> ·
+      <a href="https://github.com/thiennhant95/wp-encrypted-fields/blob/main/README.md" target="_blank" rel="noopener">Docs</a>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

@@ -1,71 +1,29 @@
 <!doctype html>
-<html lang="vi">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Encrypted Fields — Field-level encryption cho WordPress &amp; WooCommerce</title>
+<title>Encrypted Fields — Field-level encryption for WordPress &amp; WooCommerce</title>
 <meta name="description" content="Registry-driven field-level encryption for WordPress and WooCommerce. AES-256-GCM, blind-index search, user token mode, WP-CLI migration and key rotation.">
-<meta property="og:title" content="Encrypted Fields — Field-level encryption cho WordPress">
-<meta property="og:description" content="Mã hoá field-level, giữ nguyên API WordPress, tìm kiếm qua blind index. AES-256-GCM, WooCommerce, multisite, WP-CLI.">
+<meta property="og:title" content="Encrypted Fields — Field-level encryption for WordPress">
+<meta property="og:description" content="Encrypt declared fields, keep normal WordPress APIs, search through a blind index. AES-256-GCM, WooCommerce, multisite, WP-CLI.">
 <meta property="og:type" content="website">
-<style>
-  :root{--bg:#070b12;--panel:#0d1420;--panel2:#101a29;--line:#1e2d42;--text:#e6edf6;--muted:#93a4ba;--accent:#5cc8ff;--accent2:#7ee787;--warn:#ffb86b;--radius:18px}
-  *{box-sizing:border-box}html{scroll-behavior:smooth}
-  body{margin:0;background:radial-gradient(900px 500px at 15% -10%,rgba(92,200,255,.18),transparent 60%),radial-gradient(800px 500px at 100% 0%,rgba(126,231,135,.12),transparent 55%),var(--bg);color:var(--text);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
-  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
-  .wrap{max-width:1160px;margin:0 auto;padding:0 22px}
-  header{padding:22px 0;border-bottom:1px solid var(--line);position:sticky;top:0;backdrop-filter:blur(12px);background:rgba(7,11,18,.78);z-index:10}
-  .nav{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
-  .brand{display:flex;align-items:center;gap:12px;font-weight:800}
-  .logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#2b6cff);display:grid;place-items:center;font-size:17px;color:#04121e}
-  .navlinks{display:flex;gap:18px;flex-wrap:wrap;font-size:14px}.navlinks a{color:var(--muted)}
-  .hero{padding:78px 0 44px}
-  .badge{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:rgba(92,200,255,.08);color:var(--accent);padding:6px 12px;border-radius:999px;font-size:13px;font-weight:600}
-  h1{font-size:clamp(38px,6vw,68px);line-height:1.03;margin:20px 0 16px;letter-spacing:-1.5px}
-  .grad{background:linear-gradient(100deg,#fff 10%,var(--accent) 55%,var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
-  .lead{max-width:780px;color:var(--muted);font-size:clamp(17px,2vw,21px)}
-  .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
-  .btn{display:inline-flex;align-items:center;gap:9px;padding:12px 18px;border-radius:12px;font-weight:700;border:1px solid var(--line);background:var(--panel);color:var(--text)}
-  .btn.primary{background:linear-gradient(135deg,var(--accent),#3b82f6);border-color:transparent;color:#05111d}
-  .btn:hover{text-decoration:none;transform:translateY(-1px)}
-  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:44px 0 10px}
-  .stat{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:var(--radius);padding:18px}
-  .stat b{display:block;font-size:30px;line-height:1.1;letter-spacing:-.6px}.stat span{color:var(--muted);font-size:13px}
-  section{padding:56px 0;border-top:1px solid var(--line)}
-  h2{font-size:clamp(26px,3.5vw,40px);letter-spacing:-.8px;margin:0 0 10px}
-  .sub{color:var(--muted);max-width:820px;margin:0 0 26px}
-  .grid{display:grid;gap:16px}.g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:repeat(2,1fr)}
-  .card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:var(--radius);padding:22px}
-  .card h3{margin:0 0 8px;font-size:17px}.card p{margin:0;color:var(--muted);font-size:14.5px}
-  .icon{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:rgba(92,200,255,.12);color:var(--accent);margin-bottom:12px;font-size:17px}
-  .shot{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin-bottom:18px}
-  .shot img{display:block;width:100%;height:auto}.shot figcaption{padding:12px 16px;color:var(--muted);font-size:13.5px;border-top:1px solid var(--line)}
-  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
-  .chip{border:1px solid var(--line);background:var(--panel);color:var(--muted);padding:6px 11px;border-radius:999px;font-size:13px}
-  .note{border-left:3px solid var(--warn);background:rgba(255,184,107,.07);padding:14px 16px;border-radius:0 12px 12px 0;color:#ffd9ad;font-size:14px}
-  table{width:100%;border-collapse:collapse;font-size:14.5px;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
-  th,td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--muted);font-weight:600;background:var(--panel2)}tr:last-child td{border-bottom:0}
-  code,kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.92em}
-  pre{background:#0a1019;border:1px solid var(--line);border-radius:14px;padding:18px;overflow:auto;font-size:13.5px;line-height:1.55}
-  .flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:12px;align-items:center;margin-top:24px}
-  .node{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;text-align:center;font-size:14px;color:var(--muted)}.node b{display:block;color:var(--text);margin-bottom:4px}
-  .arrow{color:var(--accent);font-size:22px;text-align:center}
-  footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
-  .footer-row{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:24px}
-  @media(max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}.g3,.g2{grid-template-columns:1fr}.flow{grid-template-columns:1fr}.arrow{transform:rotate(90deg)}}
-</style>
+<link rel="alternate" hreflang="en" href="https://thiennhant95.github.io/wp-encrypted-fields/">
+<link rel="alternate" hreflang="vi" href="https://thiennhant95.github.io/wp-encrypted-fields/vi/">
+<link rel="stylesheet" href="assets/landing.css">
 </head>
 <body>
 <header>
   <div class="wrap nav">
     <div class="brand"><span class="logo">EF</span> Encrypted Fields</div>
     <nav class="navlinks">
-      <a href="#evidence">Bằng chứng DB</a>
-      <a href="#features">Tính năng</a>
-      <a href="#install">Cài đặt</a>
-      <a href="#tests">Kết quả test</a>
+      <a href="#evidence">DB evidence</a>
+      <a href="#features">Features</a>
+      <a href="#install">Install</a>
+      <a href="#tests">Test results</a>
       <a href="https://github.com/thiennhant95/wp-encrypted-fields/blob/main/README.md" target="_blank" rel="noopener">Docs</a>
       <a href="https://github.com/thiennhant95/wp-encrypted-fields/releases" target="_blank" rel="noopener">Releases</a>
+      <span class="lang"><a class="on" href="./">EN</a><a href="vi/">VI</a></span>
     </nav>
   </div>
 </header>
@@ -73,58 +31,58 @@
 <main>
   <div class="wrap hero">
     <span class="badge">v0.2.3 · WordPress 7.1.4 · GPL-2.0-or-later</span>
-    <h1>Field-level encryption.<br><span class="grad">DB chỉ thấy ciphertext.</span></h1>
+    <h1>Field-level encryption.<br><span class="grad">The database only sees ciphertext.</span></h1>
     <p class="lead">
-      Registry-driven encryption cho WordPress &amp; WooCommerce: khai báo field cần bảo vệ,
-      giữ nguyên API WordPress, tìm kiếm qua blind index, xoay key an toàn.
-      Ảnh bên dưới là dữ liệu <b>thực tế</b> từ database của bản test.
+      Registry-driven encryption for WordPress &amp; WooCommerce: declare the fields to protect,
+      keep the normal WordPress APIs, search through a blind index, and rotate keys safely.
+      The screenshots below are <b>real data</b> from the test database.
     </p>
     <div class="cta">
-      <a class="btn primary" href="#install">Cài đặt</a>
-      <a class="btn" href="https://github.com/thiennhant95/wp-encrypted-fields" target="_blank" rel="noopener">Mã nguồn GitHub</a>
+      <a class="btn primary" href="#install">Install</a>
+      <a class="btn" href="https://github.com/thiennhant95/wp-encrypted-fields" target="_blank" rel="noopener">Source on GitHub</a>
       <a class="btn" href="https://github.com/thiennhant95/wp-encrypted-fields/releases/tag/v0.2.3" target="_blank" rel="noopener">Release v0.2.3</a>
     </div>
     <div class="stats">
-      <div class="stat"><b>75</b><span>plugin đã test tương thích</span></div>
-      <div class="stat"><b>27</b><span>rows đã mã hoá trong bản test</span></div>
+      <div class="stat"><b>75</b><span>plugins tested for compatibility</span></div>
+      <div class="stat"><b>27</b><span>encrypted rows in the test lab</span></div>
       <div class="stat"><b>AES-256-GCM</b><span>randomized + deterministic SIV</span></div>
-      <div class="stat"><b>2</b><span>site multisite đã kiểm chứng</span></div>
+      <div class="stat"><b>2</b><span>multisite sites verified</span></div>
     </div>
   </div>
 
   <section id="evidence">
     <div class="wrap">
-      <h2>Bằng chứng thực tế từ database</h2>
-      <p class="sub">Dữ liệu test tổng hợp, không chứa PII thật. Key ID được hiển thị, key thì không.</p>
+      <h2>Real evidence from the database</h2>
+      <p class="sub">Synthetic test data, no real PII. The key ID is shown; the key never is.</p>
       <figure class="shot">
         <img src="assets/db-ciphertext.png" alt="Database rows showing enc:v2 ciphertext">
-        <figcaption>1. DB: cùng một order — email, tên và address index đều là <code>enc:v2:…</code>.</figcaption>
+        <figcaption>1. Database: the same order — email, name and address index are all <code>enc:v2:…</code>.</figcaption>
       </figure>
       <div class="grid g2">
         <figure class="shot">
           <img src="assets/api-plaintext.png" alt="WordPress APIs returning plaintext">
-          <figcaption>2. API: <code>get_post_meta()</code> và <code>get_user_meta()</code> trả plaintext bình thường.</figcaption>
+          <figcaption>2. API: <code>get_post_meta()</code> and <code>get_user_meta()</code> return plaintext as usual.</figcaption>
         </figure>
         <figure class="shot">
           <img src="assets/search-verify.png" alt="WP-CLI blind-index search and verify output">
-          <figcaption>3. Blind-index search và <code>verify --full</code> trên server test.</figcaption>
+          <figcaption>3. Blind-index search and <code>verify --full</code> on the test server.</figcaption>
         </figure>
       </div>
-      <div class="note">Đây là landing quảng cáo plugin. Ảnh chỉ chứa dữ liệu test đã lọc PII. WordPress demo phía sau không nằm trong trang này.</div>
+      <div class="note">This is the plugin's public landing page. Screenshots use synthetic test data with PII removed; the WordPress demo itself is not exposed here.</div>
     </div>
   </section>
 
   <section id="features">
     <div class="wrap">
-      <h2>Thiết kế</h2>
-      <p class="sub">Default-deny: chỉ field được khai báo mới bị mã hoá. Không patch core, không patch plugin khác.</p>
+      <h2>Design</h2>
+      <p class="sub">Default deny: only declared fields are encrypted. No core patches, no third-party plugin patches.</p>
       <div class="grid g3">
-        <div class="card"><div class="icon">▦</div><h3>Registry-driven</h3><p>Khai báo entity/meta/column trong <code>wp-config.php</code>, file config, filter hoặc admin UI.</p></div>
-        <div class="card"><div class="icon">🔐</div><h3>AES-256-GCM</h3><p>Randomized cho text; SIV deterministic cho email/login để so sánh bằng mà không lộ plaintext.</p></div>
-        <div class="card"><div class="icon">🔎</div><h3>Blind index</h3><p>HMAC-SHA256 full token + trigram, tìm chính xác và tìm một phần mà DB không lưu plaintext.</p></div>
-        <div class="card"><div class="icon">👤</div><h3>User token mode</h3><p><code>user_login</code>/<code>user_email</code> lưu token 55 ký tự; plaintext reversible trong encrypted meta.</p></div>
-        <div class="card"><div class="icon">🛒</div><h3>WooCommerce</h3><p>Order meta, address index, customer lookup, order search; HPOS phải tắt ở v1.</p></div>
-        <div class="card"><div class="icon">🧰</div><h3>Vận hành</h3><p>Scan, migrate, verify <code>--full</code>, reindex, rollback, rotate key 2 pha, WP-CLI.</p></div>
+        <div class="card"><div class="icon">▦</div><h3>Registry-driven</h3><p>Declare entity/meta/column fields in <code>wp-config.php</code>, a config file, a filter or the admin UI.</p></div>
+        <div class="card"><div class="icon">🔐</div><h3>AES-256-GCM</h3><p>Randomized for text; SIV deterministic for email/login so equality lookups work without exposing plaintext.</p></div>
+        <div class="card"><div class="icon">🔎</div><h3>Blind index</h3><p>HMAC-SHA256 full token + trigrams for exact and partial search while the database stores no plaintext.</p></div>
+        <div class="card"><div class="icon">👤</div><h3>User token mode</h3><p><code>user_login</code>/<code>user_email</code> store a 55-character token; reversible plaintext lives in encrypted meta.</p></div>
+        <div class="card"><div class="icon">🛒</div><h3>WooCommerce</h3><p>Order meta, address index, customer lookup and order search; HPOS must be off in v1.</p></div>
+        <div class="card"><div class="icon">🧰</div><h3>Operations</h3><p>Scan, migrate, <code>verify --full</code>, reindex, rollback, two-phase key rotation, WP-CLI.</p></div>
       </div>
       <div class="flow">
         <div class="node"><b>Registry</b>field → entity/type/search</div>
@@ -138,13 +96,13 @@
 
   <section id="install">
     <div class="wrap">
-      <h2>Cài đặt</h2>
-      <p class="sub">Yêu cầu PHP 8.0+, WordPress 6.4+, OpenSSL. Sao lưu DB trước khi migrate dữ liệu cũ.</p>
+      <h2>Install</h2>
+      <p class="sub">Requires PHP 8.0+, WordPress 6.4+ and OpenSSL. Back up the database before migrating existing data.</p>
       <pre><code>git clone https://github.com/thiennhant95/wp-encrypted-fields.git
 cp -r wp-encrypted-fields wp-content/plugins/
 wp plugin activate wp-encrypted-fields
 
-# wp-config.php (trước require wp-settings.php)
+# wp-config.php (before require wp-settings.php)
 define('KEC_KEY', 'base64:REPLACE_WITH_32_BYTE_KEY');
 define('KEC_TOKEN_SECRET', 'base64:REPLACE_WITH_STABLE_SECRET');
 define('KEC_FIELDS', [
@@ -172,16 +130,16 @@ wp kec verify --full</code></pre>
 
   <section id="tests">
     <div class="wrap">
-      <h2>Kết quả kiểm chứng</h2>
-      <p class="sub">Cùng một test lab: WordPress 7.1.4, PHP 8.1, MySQL 5.7, plugin 0.2.3.</p>
+      <h2>Verification results</h2>
+      <p class="sub">Same test lab: WordPress 7.1.4, PHP 8.1, MySQL 5.7, plugin 0.2.3.</p>
       <table>
-        <thead><tr><th>Hạng mục</th><th>Kết quả</th></tr></thead>
+        <thead><tr><th>Area</th><th>Result</th></tr></thead>
         <tbody>
-          <tr><td>Tương thích plugin</td><td>75 plugin (WooCommerce, CF7/Flamingo, ACF, Yoast, Rank Math, Elementor, WPForms, Polylang, cache/security/backup/CRM…). 74 pass; <code>encrypted-blog</code> fail do plugin lỗi.</td></tr>
-          <tr><td>Multisite</td><td>2 site: meta encryption + search index theo site; user columns dùng <code>wp_users</code>/<code>wp_usermeta</code> shared; user creation/role assignment đã fix ở 0.2.2.</td></tr>
-          <tr><td>Đa ngôn ngữ</td><td>Polylang en/vi: translated posts, encrypted meta, search, language filter — pass.</td></tr>
-          <tr><td>Vận hành</td><td>Backup/restore, rotate key 2 pha, verify <code>--full</code>, lock, backup-ack TTL — đã diễn tập trên server test.</td></tr>
-          <tr><td>Bảo mật dữ liệu</td><td>DB dump chứa ciphertext; key không nằm trong DB; email lookup/auth vẫn hoạt động qua token.</td></tr>
+          <tr><td>Plugin compatibility</td><td>75 plugins (WooCommerce, CF7/Flamingo, ACF, Yoast, Rank Math, Elementor, WPForms, Polylang, cache/security/backup/CRM…). 74 pass; <code>encrypted-blog</code> fails because of its own plugin error.</td></tr>
+          <tr><td>Multisite</td><td>2 sites: per-site meta encryption and search indexes; user columns use shared <code>wp_users</code>/<code>wp_usermeta</code>; user creation and role assignment fixed in 0.2.2.</td></tr>
+          <tr><td>Multilingual</td><td>Polylang en/vi: translated posts, encrypted meta, search and language filters pass.</td></tr>
+          <tr><td>Operations</td><td>Backup/restore, two-phase key rotation, <code>verify --full</code>, lock and backup-ack TTL rehearsed on the test server.</td></tr>
+          <tr><td>Data at rest</td><td>DB dumps contain ciphertext; the key is not in the database; email lookup and auth still work through tokens.</td></tr>
         </tbody>
       </table>
       <div class="chips">
@@ -193,9 +151,9 @@ wp kec verify --full</code></pre>
         <span class="chip">Duplicator</span><span class="chip">WP All Import</span><span class="chip">Redis Object Cache</span>
       </div>
       <div class="note" style="margin-top:22px">
-        Giới hạn đã biết: <code>post_content</code>/<code>post_title</code> không được mã hoá;
-        custom table không có adapter (WP Mail Logging, MailPoet, FluentCRM…) vẫn plaintext;
-        HPOS chưa hỗ trợ ở v1.
+        Known limits: <code>post_content</code>/<code>post_title</code> are not encrypted;
+        custom tables without an adapter (WP Mail Logging, MailPoet, FluentCRM…) remain plaintext;
+        HPOS is not supported in v1.
       </div>
     </div>
   </section>
@@ -203,7 +161,7 @@ wp kec verify --full</code></pre>
 
 <footer>
   <div class="wrap footer-row">
-    <div><b>Encrypted Fields</b> · GPL-2.0-or-later · thiennhant95<br><span>Landing quảng cáo plugin, dùng dữ liệu test đã lọc PII.</span></div>
+    <div><b>Encrypted Fields</b> · GPL-2.0-or-later · thiennhant95<br><span>Public landing page; screenshots use sanitized test data.</span></div>
     <div>
       <a href="https://github.com/thiennhant95/wp-encrypted-fields" target="_blank" rel="noopener">GitHub</a> ·
       <a href="https://github.com/thiennhant95/wp-encrypted-fields/releases" target="_blank" rel="noopener">Releases</a> ·
