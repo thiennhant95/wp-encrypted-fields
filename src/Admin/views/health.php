@@ -50,7 +50,7 @@ foreach (isset($state['warnings']) && is_array($state['warnings']) ? $state['war
         <tr>
             <td>Content directory writable</td>
             <td><?php echo $writable ? 'OK' : 'INFO'; ?></td>
-            <td>Needed only for optional safety dumps.</td>
+            <td>Needed for automatic safety dumps before migration.</td>
         </tr>
         <tr>
             <td>HPOS</td>

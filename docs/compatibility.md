@@ -14,6 +14,21 @@
 
 Most plugins that use standard WordPress/WooCommerce APIs work unchanged.
 
+## Tested matrix
+
+**100 plugins** tested on WordPress 7.1.4, PHP 8.1 and MySQL 5.7: **99 pass**.
+`encrypted-blog` is the only failure (it fatals on activation because of its own
+plugin error, not Encrypted Fields).
+
+Coverage includes WooCommerce, CF7/Flamingo, ACF, SEO/page builders, cache,
+security, backup, multilingual, forms, LMS, membership and CRM/helpdesk plugins.
+The latest 25-plugin round added bbPress, BuddyPress, FluentCRM, Fluent Support,
+Groundhogg, WP ERP, Ultimate Member, ProfilePress, Simple Membership, UsersWP,
+LearnPress, Sensei LMS, Forminator, Everest Forms, Happy Forms, WS Form,
+FluentSMTP, MC4WP, Newsletter, TranslatePress, Post SMTP, WPCode and
+WP Job Manager. BuddyPress now passes; it was not counted in the previous
+75-plugin total.
+
 | Family | Examples | Impact |
 |---|---|---|
 | Page builders | Elementor, WPBakery, Divi | None for unlisted content fields |

@@ -206,6 +206,7 @@ final class Commands
      * [--batch=<batch>]
      * [--backup-confirmed]
      * [--resume]
+     * [--no-safety-dump]
      */
     public function migrate($args = array(), $assoc = array()): void
     {
@@ -231,6 +232,7 @@ final class Commands
             'batch' => isset($assoc['batch']) ? max(1, (int) $assoc['batch']) : 500,
             'backup_confirmed' => !empty($assoc['backup-confirmed']),
             'resume' => !empty($assoc['resume']),
+            'safety_dump' => $this->safetyDumpEnabled($assoc),
         );
 
         $migrator = new Migrator($this->plugin);
@@ -269,6 +271,10 @@ final class Commands
             !empty($result['stopped']) ? ' (stopped on error)' : ''
         ));
 
+        if (!empty($result['safety_dump'])) {
+            \WP_CLI::log('Safety dump: ' . (string) $result['safety_dump']);
+        }
+
         if (!empty($result['stopped'])) {
             \WP_CLI::halt(2);
         }
@@ -287,6 +293,9 @@ final class Commands
      *
      * [--dry-run]
      * : Print what would change.
+     *
+     * [--no-safety-dump]
+     * : Skip the automatic safety dump.
      */
     public function decrypt($args = array(), $assoc = array()): void
     {
@@ -303,6 +312,7 @@ final class Commands
             'field' => $field,
             'batch' => isset($assoc['batch']) ? max(1, (int) $assoc['batch']) : 500,
             'dry_run' => !empty($assoc['dry-run']),
+            'safety_dump' => $this->safetyDumpEnabled($assoc),
         ));
 
         if (!empty($assoc['dry-run'])) {
@@ -316,6 +326,10 @@ final class Commands
         }
 
         \WP_CLI::success(sprintf('Decrypted %d rows, skipped %d.', (int) $result['decrypted'], (int) $result['skipped']));
+
+        if (!empty($result['safety_dump'])) {
+            \WP_CLI::log('Safety dump: ' . (string) $result['safety_dump']);
+        }
     }
 
     /**
@@ -331,6 +345,9 @@ final class Commands
      *
      * [--dry-run]
      * : Print what would change.
+     *
+     * [--no-safety-dump]
+     * : Skip the automatic safety dump.
      */
     public function rollback($args = array(), $assoc = array()): void
     {
@@ -345,6 +362,7 @@ final class Commands
             'dry_run' => !empty($assoc['dry-run']),
             'batch' => isset($assoc['batch']) ? max(1, (int) $assoc['batch']) : 500,
             'backup_confirmed' => !empty($assoc['backup-confirmed']),
+            'safety_dump' => $this->safetyDumpEnabled($assoc),
         ));
 
         $error = isset($result['error']) ? (string) $result['error'] : '';
@@ -375,6 +393,10 @@ final class Commands
         }
 
         \WP_CLI::success(sprintf('Rollback complete: %d decrypted, %d skipped.', (int) $result['decrypted'], (int) $result['skipped']));
+
+        if (!empty($result['safety_dump'])) {
+            \WP_CLI::log('Safety dump: ' . (string) $result['safety_dump']);
+        }
     }
 
     /**
@@ -553,6 +575,9 @@ final class Commands
      * [--resume]
      * : Continue a previous run.
      *
+     * [--no-safety-dump]
+     * : Skip the automatic safety dump.
+     *
      * @alias migrate-table
      */
     public function migrate_table($args = array(), $assoc = array()): void
@@ -568,6 +593,7 @@ final class Commands
             'batch' => isset($assoc['batch']) ? max(1, (int) $assoc['batch']) : 500,
             'backup_confirmed' => !empty($assoc['backup-confirmed']),
             'resume' => !empty($assoc['resume']),
+            'safety_dump' => $this->safetyDumpEnabled($assoc),
         );
 
         $result = (new LookupMigrator($this->plugin))->migrateTable($type, $options);
@@ -634,6 +660,10 @@ final class Commands
             count($result['errors']),
             (string) $result['type']
         ));
+
+        if (!empty($result['safety_dump'])) {
+            \WP_CLI::log('Safety dump: ' . (string) $result['safety_dump']);
+        }
     }
 
     /**
@@ -652,6 +682,9 @@ final class Commands
      *
      * [--backup-confirmed]
      * : Acknowledge that a database backup exists.
+     *
+     * [--no-safety-dump]
+     * : Skip the automatic safety dump.
      *
      * @alias rotate-key
      */
@@ -677,7 +710,7 @@ final class Commands
         $service = new RotationService($this->plugin);
         $result = $service->rotate($dryRun, $batch, function ($done, $total) {
             \WP_CLI::log(sprintf('Rotation phase %d/%d completed.', (int) $done, (int) $total));
-        }, !empty($assoc['backup-confirmed']));
+        }, !empty($assoc['backup-confirmed']), $this->safetyDumpEnabled($assoc));
 
         if (!empty($dryRun)) {
             if (empty($result['ok'])) {
@@ -715,6 +748,11 @@ final class Commands
             count($result['errors']),
             empty($result['errors']) ? 'passed' : 'needs attention'
         ));
+
+        foreach (isset($result['safety_dumps']) && is_array($result['safety_dumps']) ? $result['safety_dumps'] : array() as $safetyDump) {
+            \WP_CLI::log('Safety dump: ' . (string) $safetyDump);
+        }
+
         \WP_CLI::warning('After confirming success, set KEC_KEY to the value of KEC_KEY_NEXT and remove KEC_KEY_NEXT.');
     }
 
@@ -756,6 +794,22 @@ final class Commands
             \WP_CLI::warning('Backup confirmation is required before running the real migration.');
             \WP_CLI::halt(2);
         }
+    }
+
+    /**
+     * @param array<string, mixed> $assoc
+     */
+    private function safetyDumpEnabled(array $assoc): bool
+    {
+        if (!empty($assoc['no-safety-dump'])) {
+            return false;
+        }
+
+        if (isset($assoc['safety-dump'])) {
+            return (bool) $assoc['safety-dump'];
+        }
+
+        return true;
     }
 
     /**

@@ -52,7 +52,7 @@
   <div class="wrap hero">
     <div class="hero-grid">
       <div>
-        <span class="badge">v0.2.3 · WordPress 7.1.4 · GPL-2.0-or-later</span>
+        <span class="badge">v0.3.0 · WordPress 7.1.4 · GPL-2.0-or-later</span>
         <h1>Field-level encryption.<br><span class="grad">DB chỉ thấy ciphertext.</span></h1>
         <p class="lead">
           Bảo vệ PII khách hàng ngay trong database mà không phải viết lại site. Khai báo field cần mã hoá,
@@ -62,7 +62,7 @@
         <div class="cta">
           <a class="btn primary" href="#install">Cài đặt</a>
           <a class="btn" href="https://github.com/thiennhant95/wp-encrypted-fields" target="_blank" rel="noopener">Mã nguồn GitHub</a>
-          <a class="btn" href="https://github.com/thiennhant95/wp-encrypted-fields/releases/tag/v0.2.3" target="_blank" rel="noopener">Release v0.2.3</a>
+          <a class="btn" href="https://github.com/thiennhant95/wp-encrypted-fields/releases/tag/v0.3.0" target="_blank" rel="noopener">Release v0.3.0</a>
         </div>
       </div>
       <div class="mini-term" aria-label="Ví dụ ciphertext trong DB và plaintext qua API">
@@ -75,7 +75,7 @@
       </div>
     </div>
     <div class="stats">
-      <div class="stat"><b>75</b><span>plugin đã test tương thích</span></div>
+      <div class="stat"><b>100</b><span>plugin đã test tương thích</span></div>
       <div class="stat"><b>27</b><span>rows đã mã hoá trong bản test</span></div>
       <div class="stat"><b>0</b><span>plaintext samples khi verify --full</span></div>
       <div class="stat"><b>2</b><span>site multisite đã kiểm chứng</span></div>
@@ -137,7 +137,7 @@
         <div class="card"><div class="icon">🔎</div><h3>Blind index</h3><p>HMAC-SHA256 full token + trigram, tìm chính xác và tìm một phần mà DB không lưu plaintext.</p></div>
         <div class="card"><div class="icon">👤</div><h3>User token mode</h3><p><code>user_login</code>/<code>user_email</code> lưu token 55 ký tự; plaintext reversible trong encrypted meta.</p></div>
         <div class="card"><div class="icon">🛒</div><h3>WooCommerce</h3><p>Order meta, address index, customer lookup, order search; HPOS phải tắt ở v1.</p></div>
-        <div class="card"><div class="icon">🧰</div><h3>Vận hành</h3><p>Scan, migrate, verify <code>--full</code>, reindex, rollback, rotate key 2 pha, WP-CLI.</p></div>
+        <div class="card"><div class="icon">🧰</div><h3>Vận hành</h3><p>Scan, migrate, verify <code>--full</code>, reindex, rollback, safety dump tự động, rotate key 2 pha, WP-CLI.</p></div>
       </div>
       <div class="flow">
         <div class="node"><b>Registry</b>field → entity/type/search</div>
@@ -205,14 +205,14 @@ wp kec verify --full</code></pre>
   <section id="tests">
     <div class="wrap">
       <h2>Kết quả kiểm chứng</h2>
-      <p class="sub">Cùng một test lab: WordPress 7.1.4, PHP 8.1, MySQL 5.7, plugin 0.2.3.</p>
+      <p class="sub">Cùng một test lab: WordPress 7.1.4, PHP 8.1, MySQL 5.7, plugin 0.3.0.</p>
       <table>
         <thead><tr><th>Hạng mục</th><th>Kết quả</th></tr></thead>
         <tbody>
-          <tr><td>Tương thích plugin</td><td>75 plugin (WooCommerce, CF7/Flamingo, ACF, Yoast, Rank Math, Elementor, WPForms, Polylang, cache/security/backup/CRM…). 74 pass; <code>encrypted-blog</code> fail do plugin lỗi.</td></tr>
+          <tr><td>Tương thích plugin</td><td>100 plugin (WooCommerce, CF7/Flamingo, ACF, Yoast, Rank Math, Elementor, WPForms, Polylang, BuddyPress, bbPress, FluentCRM, membership/LMS/form/CRM/cache/security/backup…). 99 pass; <code>encrypted-blog</code> fail do plugin lỗi.</td></tr>
           <tr><td>Multisite</td><td>2 site: meta encryption + search index theo site; user columns dùng <code>wp_users</code>/<code>wp_usermeta</code> shared; user creation/role assignment đã fix ở 0.2.2.</td></tr>
           <tr><td>Đa ngôn ngữ</td><td>Polylang en/vi: translated posts, encrypted meta, search, language filter — pass.</td></tr>
-          <tr><td>Vận hành</td><td>Backup/restore, rotate key 2 pha, verify <code>--full</code>, lock, backup-ack TTL — đã diễn tập trên server test.</td></tr>
+          <tr><td>Vận hành</td><td>Backup/restore, safety dump tự động, rotate key 2 pha, verify <code>--full</code>, lock, backup-ack TTL — đã diễn tập trên server test.</td></tr>
           <tr><td>Bảo mật dữ liệu</td><td>DB dump chứa ciphertext; key không nằm trong DB; email lookup/auth vẫn hoạt động qua token.</td></tr>
         </tbody>
       </table>
@@ -223,6 +223,8 @@ wp kec verify --full</code></pre>
         <span class="chip">Wordfence</span><span class="chip">Solid Security</span><span class="chip">WP Mail SMTP</span>
         <span class="chip">W3TC</span><span class="chip">WP Super Cache</span><span class="chip">UpdraftPlus</span>
         <span class="chip">Duplicator</span><span class="chip">WP All Import</span><span class="chip">Redis Object Cache</span>
+        <span class="chip">BuddyPress</span><span class="chip">bbPress</span><span class="chip">FluentCRM</span>
+        <span class="chip">WP ERP</span><span class="chip">Forminator</span><span class="chip">LearnPress</span>
       </div>
       <div class="note" style="margin-top:22px">
         Giới hạn đã biết: <code>post_content</code>/<code>post_title</code> không được mã hoá;
@@ -268,7 +270,7 @@ wp kec verify --full</code></pre>
       <h2>Sẵn sàng bảo vệ PII khách hàng?</h2>
       <p class="sub" style="margin-left:auto;margin-right:auto">Cài plugin, khai báo field cần bảo vệ và chạy <code>verify --full</code> trước khi go-live.</p>
       <div class="cta" style="justify-content:center">
-        <a class="btn primary" href="https://github.com/thiennhant95/wp-encrypted-fields/releases/tag/v0.2.3" target="_blank" rel="noopener">Tải v0.2.3</a>
+        <a class="btn primary" href="https://github.com/thiennhant95/wp-encrypted-fields/releases/tag/v0.3.0" target="_blank" rel="noopener">Tải v0.3.0</a>
         <a class="btn" href="https://github.com/thiennhant95/wp-encrypted-fields/blob/main/README.md" target="_blank" rel="noopener">Đọc tài liệu</a>
       </div>
       <div class="chips" style="justify-content:center;margin-top:18px">

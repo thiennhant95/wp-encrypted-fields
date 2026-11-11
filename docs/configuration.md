@@ -75,6 +75,7 @@ custom tables without an adapter are not covered by the meta layer.
 | `KEC_READONLY_FIELDS` | Fields to decrypt but never encrypt |
 | `KEC_LEGACY` | Legacy cipher keys for migration reads |
 | `KEC_ALLOW_DB_KEY` | Allow `kec_key` option (not recommended) |
+| `KEC_SAFETY_DUMP_DIR` | Directory for automatic pre-migration safety dumps |
 | `KEC_DEBUG` | Write plugin errors to `error_log` |
 
 Legacy configuration:

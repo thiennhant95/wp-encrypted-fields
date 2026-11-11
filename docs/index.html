@@ -52,7 +52,7 @@
   <div class="wrap hero">
     <div class="hero-grid">
       <div>
-        <span class="badge">v0.2.3 · WordPress 7.1.4 · GPL-2.0-or-later</span>
+        <span class="badge">v0.3.0 · WordPress 7.1.4 · GPL-2.0-or-later</span>
         <h1>Field-level encryption.<br><span class="grad">The database only sees ciphertext.</span></h1>
         <p class="lead">
           Protect customer PII at rest without rewriting your site. Declare the fields to encrypt,
@@ -62,7 +62,7 @@
         <div class="cta">
           <a class="btn primary" href="#install">Install</a>
           <a class="btn" href="https://github.com/thiennhant95/wp-encrypted-fields" target="_blank" rel="noopener">Source on GitHub</a>
-          <a class="btn" href="https://github.com/thiennhant95/wp-encrypted-fields/releases/tag/v0.2.3" target="_blank" rel="noopener">Release v0.2.3</a>
+          <a class="btn" href="https://github.com/thiennhant95/wp-encrypted-fields/releases/tag/v0.3.0" target="_blank" rel="noopener">Release v0.3.0</a>
         </div>
       </div>
       <div class="mini-term" aria-label="Database ciphertext and API plaintext example">
@@ -75,7 +75,7 @@
       </div>
     </div>
     <div class="stats">
-      <div class="stat"><b>75</b><span>plugins tested for compatibility</span></div>
+      <div class="stat"><b>100</b><span>plugins tested for compatibility</span></div>
       <div class="stat"><b>27</b><span>encrypted rows in the test lab</span></div>
       <div class="stat"><b>0</b><span>plaintext samples in verify --full</span></div>
       <div class="stat"><b>2</b><span>multisite sites verified</span></div>
@@ -137,7 +137,7 @@
         <div class="card"><div class="icon">🔎</div><h3>Blind index</h3><p>HMAC-SHA256 full token + trigrams for exact and partial search while the database stores no plaintext.</p></div>
         <div class="card"><div class="icon">👤</div><h3>User token mode</h3><p><code>user_login</code>/<code>user_email</code> store a 55-character token; reversible plaintext lives in encrypted meta.</p></div>
         <div class="card"><div class="icon">🛒</div><h3>WooCommerce</h3><p>Order meta, address index, customer lookup and order search; HPOS must be off in v1.</p></div>
-        <div class="card"><div class="icon">🧰</div><h3>Operations</h3><p>Scan, migrate, <code>verify --full</code>, reindex, rollback, two-phase key rotation, WP-CLI.</p></div>
+        <div class="card"><div class="icon">🧰</div><h3>Operations</h3><p>Scan, migrate, <code>verify --full</code>, reindex, rollback, automatic safety dumps, two-phase key rotation, WP-CLI.</p></div>
       </div>
       <div class="flow">
         <div class="node"><b>Registry</b>field → entity/type/search</div>
@@ -205,14 +205,14 @@ wp kec verify --full</code></pre>
   <section id="tests">
     <div class="wrap">
       <h2>Verification results</h2>
-      <p class="sub">Same test lab: WordPress 7.1.4, PHP 8.1, MySQL 5.7, plugin 0.2.3.</p>
+      <p class="sub">Same test lab: WordPress 7.1.4, PHP 8.1, MySQL 5.7, plugin 0.3.0.</p>
       <table>
         <thead><tr><th>Area</th><th>Result</th></tr></thead>
         <tbody>
-          <tr><td>Plugin compatibility</td><td>75 plugins (WooCommerce, CF7/Flamingo, ACF, Yoast, Rank Math, Elementor, WPForms, Polylang, cache/security/backup/CRM…). 74 pass; <code>encrypted-blog</code> fails because of its own plugin error.</td></tr>
+          <tr><td>Plugin compatibility</td><td>100 plugins (WooCommerce, CF7/Flamingo, ACF, Yoast, Rank Math, Elementor, WPForms, Polylang, BuddyPress, bbPress, FluentCRM, membership/LMS/form/CRM/cache/security/backup…). 99 pass; <code>encrypted-blog</code> fails because of its own plugin error.</td></tr>
           <tr><td>Multisite</td><td>2 sites: per-site meta encryption and search indexes; user columns use shared <code>wp_users</code>/<code>wp_usermeta</code>; user creation and role assignment fixed in 0.2.2.</td></tr>
           <tr><td>Multilingual</td><td>Polylang en/vi: translated posts, encrypted meta, search and language filters pass.</td></tr>
-          <tr><td>Operations</td><td>Backup/restore, two-phase key rotation, <code>verify --full</code>, lock and backup-ack TTL rehearsed on the test server.</td></tr>
+          <tr><td>Operations</td><td>Backup/restore, automatic safety dumps, two-phase key rotation, <code>verify --full</code>, lock and backup-ack TTL rehearsed on the test server.</td></tr>
           <tr><td>Data at rest</td><td>DB dumps contain ciphertext; the key is not in the database; email lookup and auth still work through tokens.</td></tr>
         </tbody>
       </table>
@@ -223,6 +223,8 @@ wp kec verify --full</code></pre>
         <span class="chip">Wordfence</span><span class="chip">Solid Security</span><span class="chip">WP Mail SMTP</span>
         <span class="chip">W3TC</span><span class="chip">WP Super Cache</span><span class="chip">UpdraftPlus</span>
         <span class="chip">Duplicator</span><span class="chip">WP All Import</span><span class="chip">Redis Object Cache</span>
+        <span class="chip">BuddyPress</span><span class="chip">bbPress</span><span class="chip">FluentCRM</span>
+        <span class="chip">WP ERP</span><span class="chip">Forminator</span><span class="chip">LearnPress</span>
       </div>
       <div class="note" style="margin-top:22px">
         Known limits: <code>post_content</code>/<code>post_title</code> are not encrypted;
@@ -268,7 +270,7 @@ wp kec verify --full</code></pre>
       <h2>Ready to protect customer PII?</h2>
       <p class="sub" style="margin-left:auto;margin-right:auto">Install the plugin, declare the fields you need, and run <code>verify --full</code> before going live.</p>
       <div class="cta" style="justify-content:center">
-        <a class="btn primary" href="https://github.com/thiennhant95/wp-encrypted-fields/releases/tag/v0.2.3" target="_blank" rel="noopener">Download v0.2.3</a>
+        <a class="btn primary" href="https://github.com/thiennhant95/wp-encrypted-fields/releases/tag/v0.3.0" target="_blank" rel="noopener">Download v0.3.0</a>
         <a class="btn" href="https://github.com/thiennhant95/wp-encrypted-fields/blob/main/README.md" target="_blank" rel="noopener">Read the docs</a>
       </div>
       <div class="chips" style="justify-content:center;margin-top:18px">

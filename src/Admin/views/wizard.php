@@ -164,7 +164,7 @@ $busy = (bool) ($setup['step'] ?? false);
         <ul>
             <li>Suggested: <code>wp db export backup-<?php echo esc_html(gmdate('Ymd-His')); ?>.sql</code></li>
             <li>Or use your hosting/backup plugin snapshot.</li>
-            <li>A safety dump of affected tables is optional and is not a full backup.</li>
+            <li>A safety dump of affected tables is created automatically before migration when the content directory is writable. It can contain plaintext and is not a full backup.</li>
         </ul>
         <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
             <input type="hidden" name="action" value="kec_wizard">

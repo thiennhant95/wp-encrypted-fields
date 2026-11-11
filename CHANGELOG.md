@@ -2,10 +2,13 @@
 
 All notable changes to this project are documented here.
 
-## [Unreleased]
+## [0.3.0] - 2026-11-11
 
 ### Added
 
+- Automatic safety dump of affected tables before migration, rollback and key
+  rotation. Files are 0600 in a 0700 directory, keep the last five, and can be
+  disabled with `--no-safety-dump` or moved with `KEC_SAFETY_DUMP_DIR`.
 - GitHub Pages landing page under `docs/` with real database/API screenshots
   from the test lab. English is the default at `/`, Vietnamese at `/vi/`.
 
@@ -14,6 +17,13 @@ All notable changes to this project are documented here.
 - Landing now explains the problem, concrete outcomes, use cases and FAQ;
   added hero terminal proof, canonical/OG/Twitter metadata, favicon, sitemap
   and robots.txt.
+
+### Tests
+
+- Compatibility matrix expanded from 75 to **100 plugins**: 99 pass. The only
+  failure remains `encrypted-blog` (activation fatal in that plugin).
+- Added bbPress, BuddyPress, FluentCRM, Fluent Support, Groundhogg, WP ERP,
+  membership/LMS, form, CRM and email-delivery plugins to the matrix.
 
 ## [0.2.3] - 2026-11-11
 

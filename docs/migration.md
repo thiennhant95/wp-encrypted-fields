@@ -10,6 +10,21 @@
 
 The plugin is idempotent: already-migrated rows are skipped.
 
+## Safety dump
+
+Before a real migration, rollback or key rotation the plugin writes a SQL
+snapshot of the affected tables. CLI and admin results show the file path.
+
+- Default directory: `wp-content/kec-backups` (override with
+  `KEC_SAFETY_DUMP_DIR` or the `kec_safety_dump_dir` filter).
+- Directory `0700`, file `0600`, plus `.htaccess`/`index.php` deny rules.
+- The dump can contain **plaintext PII**; it is not a full backup. Delete it
+  after the operation and prefer a directory outside the web root.
+- Limits: 64 MB and 500,000 rows by default (`kec_safety_dump_max_bytes` and
+  `kec_safety_dump_max_rows` filters). Use `--no-safety-dump` when a manual
+  full backup is preferable.
+- The last five dumps are kept.
+
 ## Data states
 
 | State | Meaning |

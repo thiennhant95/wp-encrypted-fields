@@ -26,7 +26,7 @@ final class RotationService
     /**
      * @return array<string, mixed>
      */
-    public function rotate(bool $dryRun = false, int $batch = 500, ?callable $progress = null, bool $backupConfirmed = false): array
+    public function rotate(bool $dryRun = false, int $batch = 500, ?callable $progress = null, bool $backupConfirmed = false, bool $safetyDump = true): array
     {
         $keys = $this->plugin->keys();
 
@@ -90,6 +90,7 @@ final class RotationService
             'errors' => array(),
             'tokens_reissued' => !$keys->tokenSecretIsStable(),
             'phases' => array(),
+            'safety_dumps' => array(),
         );
 
         try {
@@ -103,6 +104,7 @@ final class RotationService
                         'resume' => true,
                         'state_option' => self::TARGET_STATE_OPTION,
                         'backup_confirmed' => true,
+                        'safety_dump' => $safetyDump,
                     ));
                 } elseif ('customer_lookup' === $phase) {
                     $result = $lookup->rotate('customer_lookup', array(
@@ -110,6 +112,7 @@ final class RotationService
                         'lock' => false,
                         'resume' => true,
                         'backup_confirmed' => true,
+                        'safety_dump' => $safetyDump,
                     ));
                 } elseif ('siteguard_history' === $phase) {
                     $result = $lookup->rotate('siteguard_history', array(
@@ -117,12 +120,17 @@ final class RotationService
                         'lock' => false,
                         'resume' => true,
                         'backup_confirmed' => true,
+                        'safety_dump' => $safetyDump,
                     ));
                 } else {
                     $result = $this->verify($migrator, $lookup, $batch);
                 }
 
                 $summary['phases'][$phase] = $result;
+
+                if (!empty($result['safety_dump'])) {
+                    $summary['safety_dumps'][] = (string) $result['safety_dump'];
+                }
 
                 if (empty($result['ok'])) {
                     $summary['ok'] = false;

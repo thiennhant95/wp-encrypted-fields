@@ -44,6 +44,10 @@ The plugin protects data at rest when the database or a backup leaks.
   subjects and bodies in plaintext after `wp_mail` recipients are decrypted.
 - Decryption failures return the stored value and log an error code, never a
   fatal error or plaintext.
+- Automatic safety dumps contain pre-migration data (plaintext and ciphertext).
+  They are written with `0600` into a `0700` directory with web deny rules and
+  the last five are kept. Prefer `KEC_SAFETY_DUMP_DIR` outside the web root and
+  delete dumps after use.
 
 ## Rotation
 

@@ -4,7 +4,7 @@ Tags: encryption, security, privacy, gdpr, woocommerce
 Requires at least: 6.4
 Tested up to: 7.1
 Requires PHP: 8.0
-Stable tag: 0.2.3
+Stable tag: 0.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -61,6 +61,14 @@ storage is disabled by default.
 
 == Changelog ==
 
+= 0.3.0 =
+* Automatic safety dump of affected tables before migration, rollback and key
+  rotation; 0600 files in a 0700 directory, last five kept,
+  `--no-safety-dump` and `KEC_SAFETY_DUMP_DIR` overrides.
+* Compatibility matrix expanded to 100 plugins; 99 pass, with only
+  `encrypted-blog` failing due to its own activation error.
+* Bilingual GitHub Pages landing page.
+
 = 0.2.3 =
 * Warn about known plaintext email/CRM plugins in status and Health.
 * Admin Settings and Setup Wizard verify all rows.
@@ -87,6 +95,10 @@ storage is disabled by default.
 Initial implementation.
 
 == Upgrade Notice ==
+
+= 0.3.0 =
+Adds automatic safety dumps before migration/rotation and expands
+compatibility testing to 100 plugins.
 
 = 0.2.3 =
 Recommended when using email logging/CRM plugins or Polylang.

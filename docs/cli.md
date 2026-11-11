@@ -52,8 +52,11 @@ Options:
 | `--entity=...` | Limit to an entity |
 | `--field=entity:key` | Limit to one field |
 | `--from=plaintext|legacy` | Source format |
+| `--no-safety-dump` | Skip the automatic safety dump of affected tables |
 
-Existing data migration is blocked without backup acknowledgement.
+Existing data migration is blocked without backup acknowledgement. A safety
+dump is created by default before real migration/rollback/rotation; the path is
+printed and it may contain plaintext, so protect or delete it after use.
 
 ## Auxiliary tables
 

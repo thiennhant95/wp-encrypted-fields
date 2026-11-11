@@ -201,6 +201,24 @@ final class Migrator
 
         $targets = Env::targets($this->plugin, $this->db, $filters['entity'], $filters['field'], $filters['table']);
 
+        $safety = $pending > 0
+            ? $this->maybeSafetyDump($targets, $options)
+            : array('ok' => true, 'path' => null, 'skipped' => true);
+
+        if (empty($safety['ok'])) {
+            $this->releaseLock($token);
+
+            return array(
+                'ok' => false,
+                'error' => 'safety_dump_failed',
+                'message' => isset($safety['message']) ? (string) $safety['message'] : 'Safety dump failed.',
+                'migrated' => 0,
+                'errors' => array(),
+            );
+        }
+
+        $summary['safety_dump'] = isset($safety['path']) ? $safety['path'] : null;
+
         try {
             foreach ($targets as $target) {
                 $targetKey = Env::targetKey($target);
@@ -354,6 +372,22 @@ final class Migrator
         }
 
         $summary = array('ok' => true, 'decrypted' => 0, 'skipped' => 0, 'errors' => array());
+
+        $safety = $this->maybeSafetyDump($targets, $options);
+
+        if (empty($safety['ok'])) {
+            $this->releaseLock($token);
+
+            return array(
+                'ok' => false,
+                'error' => 'safety_dump_failed',
+                'message' => isset($safety['message']) ? (string) $safety['message'] : 'Safety dump failed.',
+                'decrypted' => 0,
+                'errors' => array(),
+            );
+        }
+
+        $summary['safety_dump'] = isset($safety['path']) ? $safety['path'] : null;
 
         try {
             foreach ($targets as $target) {
@@ -576,6 +610,24 @@ final class Migrator
 
         $summary = array('ok' => true, 'rotated' => 0, 'skipped' => 0, 'errors' => array(), 'resumed' => $resume);
 
+        $safety = $this->maybeSafetyDump($targets, $options);
+
+        if (empty($safety['ok'])) {
+            if ($useLock) {
+                $this->releaseLock($token);
+            }
+
+            return array(
+                'ok' => false,
+                'error' => 'safety_dump_failed',
+                'message' => isset($safety['message']) ? (string) $safety['message'] : 'Safety dump failed.',
+                'rotated' => 0,
+                'errors' => array(),
+            );
+        }
+
+        $summary['safety_dump'] = isset($safety['path']) ? $safety['path'] : null;
+
         try {
             foreach ($targets as $target) {
                 $targetKey = Env::targetKey($target);
@@ -628,6 +680,42 @@ final class Migrator
         ));
 
         return $summary;
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $targets
+     * @param array<string, mixed> $options
+     * @param array<int, string> $extraTables
+     * @return array<string, mixed>
+     */
+    private function maybeSafetyDump(array $targets, array $options, array $extraTables = array()): array
+    {
+        $enabled = array_key_exists('safety_dump', $options)
+            ? (bool) $options['safety_dump']
+            : (null === $this->db);
+
+        if (!$enabled) {
+            return array('ok' => true, 'path' => null, 'skipped' => true);
+        }
+
+        $tables = array();
+
+        foreach ($targets as $target) {
+            if (isset($target['table'])) {
+                $tables[] = (string) $target['table'];
+            }
+        }
+
+        foreach ($extraTables as $table) {
+            $tables[] = (string) $table;
+        }
+
+        $db = Env::db($this->db);
+        if (null !== $db) {
+            $tables[] = Env::table($db, 'kec_search_index');
+        }
+
+        return SafetyDump::create($this->plugin, $this->db, $tables, $options);
     }
 
     public function backupSatisfied(array $options = array()): bool

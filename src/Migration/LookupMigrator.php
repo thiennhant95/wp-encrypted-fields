@@ -220,6 +220,43 @@ final class LookupMigrator
             'resumed' => $resume,
         );
 
+        $safety = array('ok' => true, 'path' => null, 'skipped' => true);
+
+        if ($pending > 0) {
+            $enabled = array_key_exists('safety_dump', $options)
+                ? (bool) $options['safety_dump']
+                : (null === $this->db);
+
+            if ($enabled) {
+                $db = Env::db($this->db);
+                $tables = array($definition['table']);
+
+                if (null !== $db) {
+                    $tables[] = Env::table($db, 'kec_search_index');
+                }
+
+                $safety = SafetyDump::create($this->plugin, $this->db, $tables, $options);
+            }
+        }
+
+        if (empty($safety['ok'])) {
+            if ($useLock) {
+                $this->locker()->releaseLock($lock);
+            }
+
+            return array(
+                'ok' => false,
+                'error' => 'safety_dump_failed',
+                'message' => isset($safety['message']) ? (string) $safety['message'] : 'Safety dump failed.',
+                'table' => $definition['table'],
+                'migrated' => 0,
+                'skipped' => 0,
+                'errors' => array(),
+            );
+        }
+
+        $summary['safety_dump'] = isset($safety['path']) ? $safety['path'] : null;
+
         try {
             foreach ($definition['columns'] as $column => $spec) {
                 $field = $this->fieldFor($spec);

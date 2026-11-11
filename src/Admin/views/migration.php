@@ -40,7 +40,7 @@ $data = is_array($result) && isset($result['data']) && is_array($result['data'])
         <label><input type="checkbox" name="kec_backup_confirm" value="1"> I have a full database and files backup.</label><br>
         <input type="text" class="regular-text" name="kec_backup_reference" placeholder="Backup path, snapshot ID or note" value="<?php echo esc_attr($ack['reference'] ?? ''); ?>">
     </p>
-    <p class="description">A safety dump is optional and is not a full backup. Restore requires the same encryption key.</p>
+    <p class="description">A safety dump of affected tables is created automatically before migration when possible. It can contain plaintext and is not a full backup; restore requires the same encryption key.</p>
     <p><button type="submit" class="button">Save backup acknowledgement</button></p>
 </form>
 

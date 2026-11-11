@@ -35,6 +35,8 @@ database; no core or third-party plugin patches are required.
 - Setup wizard for new and existing sites, with a mandatory backup gate.
 - WP-CLI commands for status, scan, migrate, decrypt, reindex, verify and
   rotation.
+- Automatic safety dump of affected tables before migration/rotation
+  (protected directory, size/row limits, `--no-safety-dump` override).
 - Legacy cipher adapter for migration from the original Koyo implementation.
 
 ## Requirements
