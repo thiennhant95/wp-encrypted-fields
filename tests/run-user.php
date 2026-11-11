@@ -571,6 +571,17 @@ namespace {
     $lookup->rewriteLikes($underscoreWhere, $underscoreSearch);
     same('nhan_tt', $underscoreSearch->terms[0][1] ?? null, 'UserLookup unescapes LIKE underscores');
 
+    $cipherRegistry = new Registry(array(
+        'user' => array(
+            'meta' => array(
+                'bad_cipher' => array('type' => 'text', 'cipher' => 'bogus'),
+                'det_cipher' => array('type' => 'text', 'cipher' => 'det'),
+            ),
+        ),
+    ));
+    same('sb', $cipherRegistry->get('user', 'bad_cipher')->cipherName(), 'invalid cipher falls back to default');
+    same('det', $cipherRegistry->get('user', 'det_cipher')->cipherName(), 'valid cipher override is kept');
+
     $nullSearchPlugin = make_plugin($registry, $crypto, null);
     $nullSearchLookup = new UserLookup($nullSearchPlugin);
     $nullQuery = new class {

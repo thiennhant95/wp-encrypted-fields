@@ -102,8 +102,10 @@ wp kec rotate-key --backup-confirmed
 1. Generate a new key.
 2. Set `KEC_KEY_NEXT` to the new key; keep `KEC_KEY` as the old key.
 3. Run `wp kec rotate-key --backup-confirmed`.
-4. Set `KEC_KEY` to the new key and remove `KEC_KEY_NEXT`.
-5. Keep the old key in `KEC_OLD_KEYS` until you have verified all data.
+4. Run `wp kec verify --full`.
+5. Set `KEC_KEY` to the new key and remove `KEC_KEY_NEXT`.
+6. Run `wp kec verify --full` again.
+7. Keep the old key in `KEC_OLD_KEYS` until you have verified all data.
 
 If `KEC_TOKEN_SECRET` is not defined, login/email tokens are derived from the
 master key. Rotation then re-tokenizes every user and updates `_kec_user_login`
