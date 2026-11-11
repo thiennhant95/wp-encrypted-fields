@@ -1,0 +1,25 @@
+# Composer
+/vendor/
+composer.lock
+
+# PHPUnit
+.phpunit.result.cache
+/tests/tmp/
+
+# Logs and local config
+*.log
+wp-config.php
+kec-fields.php
+.env
+.env.*
+
+# Editors / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+/build/
+/dist/
+*.zip

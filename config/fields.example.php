@@ -1,0 +1,53 @@
+<?php
+
+return array(
+    'user' => array(
+        'columns' => array(
+            'user_login' => array('type' => 'login', 'max_length' => 60),
+            'user_email' => array('type' => 'email', 'max_length' => 100),
+        ),
+        'meta' => array(
+            'first_name' => array('type' => 'text'),
+            'last_name' => array('type' => 'text'),
+            'billing_first_name' => array('type' => 'text', 'search' => true),
+            'billing_last_name' => array('type' => 'text', 'search' => true),
+            'billing_company' => array('type' => 'text'),
+            'billing_postcode' => array('type' => 'text', 'search' => true),
+            'billing_city' => array('type' => 'text', 'search' => true),
+            'billing_address_1' => array('type' => 'text'),
+            'billing_address_2' => array('type' => 'text'),
+            'billing_phone' => array('type' => 'text', 'search' => true),
+            'billing_email' => array('type' => 'email', 'search' => true),
+            'shipping_first_name' => array('type' => 'text'),
+            'shipping_last_name' => array('type' => 'text'),
+            'shipping_company' => array('type' => 'text'),
+            'shipping_postcode' => array('type' => 'text'),
+            'shipping_city' => array('type' => 'text'),
+            'shipping_address_1' => array('type' => 'text'),
+            'shipping_address_2' => array('type' => 'text'),
+            'shipping_phone' => array('type' => 'text'),
+        ),
+    ),
+    'post' => array(
+        'post_types' => array('shop_order'),
+        'meta' => array(
+            '_billing_first_name' => array('type' => 'text', 'search' => true),
+            '_billing_last_name' => array('type' => 'text', 'search' => true),
+            '_billing_company' => array('type' => 'text'),
+            '_billing_postcode' => array('type' => 'text', 'search' => true),
+            '_billing_city' => array('type' => 'text', 'search' => true),
+            '_billing_address_1' => array('type' => 'text'),
+            '_billing_address_2' => array('type' => 'text'),
+            '_billing_phone' => array('type' => 'text', 'search' => true),
+            '_billing_email' => array('type' => 'email', 'search' => true),
+            '_shipping_first_name' => array('type' => 'text'),
+            '_shipping_last_name' => array('type' => 'text'),
+            '_shipping_company' => array('type' => 'text'),
+            '_shipping_postcode' => array('type' => 'text'),
+            '_shipping_city' => array('type' => 'text'),
+            '_shipping_address_1' => array('type' => 'text'),
+            '_shipping_address_2' => array('type' => 'text'),
+            '_shipping_phone' => array('type' => 'text'),
+        ),
+    ),
+);

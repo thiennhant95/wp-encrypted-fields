@@ -1,0 +1,39 @@
+{
+    "name": "thiennhant95/wp-encrypted-fields",
+    "description": "Registry-driven field-level encryption for WordPress and WooCommerce",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "homepage": "https://github.com/thiennhant95/wp-encrypted-fields",
+    "keywords": [
+        "wordpress",
+        "encryption",
+        "security",
+        "gdpr",
+        "woocommerce",
+        "blind-index"
+    ],
+    "support": {
+        "issues": "https://github.com/thiennhant95/wp-encrypted-fields/issues",
+        "source": "https://github.com/thiennhant95/wp-encrypted-fields"
+    },
+    "require": {
+        "php": ">=8.0",
+        "ext-openssl": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.6 || ^10.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Koyo\\EncryptedFields\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Koyo\\EncryptedFields\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    }
+}

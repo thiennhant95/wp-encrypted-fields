@@ -1,0 +1,54 @@
+# Contributing
+
+## Requirements
+
+- PHP 8.0+
+- OpenSSL extension
+- Git
+
+## Setup
+
+```bash
+git clone https://github.com/thiennhant95/wp-encrypted-fields.git
+cd wp-encrypted-fields
+```
+
+Composer is optional. The plugin ships a PSR-4 autoloader, so no vendor
+directory is required to run the test scripts.
+
+## Checks
+
+```bash
+find src tests -name '*.php' -print0 | xargs -0 -n1 php -l
+for t in tests/run-*.php; do php "$t" || exit 1; done
+```
+
+All test scripts are standalone and use inline WordPress stubs; they do not
+need a database.
+
+If you have Composer and PHPUnit installed:
+
+```bash
+composer install
+vendor/bin/phpunit
+```
+
+## Coding guidelines
+
+- PHP 8.0-compatible syntax (no readonly properties, enums, or readonly classes).
+- PSR-4 namespace `Koyo\EncryptedFields\`.
+- Follow WordPress coding standards where practical.
+- Keep public APIs documented with short PHPDoc.
+- Never log plaintext, ciphertext, keys or email addresses.
+- Never add real keys or secrets to tests or fixtures.
+
+## Pull requests
+
+1. Fork the repository.
+2. Create a feature branch.
+3. Add or update tests for the changed behavior.
+4. Run the checks above.
+5. Describe the security impact of the change.
+
+Security fixes should follow [SECURITY.md](SECURITY.md) and must not be
+discussed in public issues before a fix is released.
