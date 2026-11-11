@@ -1,5 +1,9 @@
 # Encrypted Fields
 
+[![CI](https://github.com/thiennhant95/wp-encrypted-fields/actions/workflows/ci.yml/badge.svg)](https://github.com/thiennhant95/wp-encrypted-fields/actions/workflows/ci.yml)
+[![License: GPLv2+](https://img.shields.io/badge/license-GPLv2%2B-blue.svg)](LICENSE)
+[![PHP 8.0+](https://img.shields.io/badge/php-8.0%2B-777bb4.svg)](https://www.php.net/)
+
 Registry-driven, field-level encryption for WordPress and WooCommerce.
 
 Encrypt only the fields you declare, keep normal WordPress APIs working, and
@@ -152,6 +156,10 @@ The test scripts are standalone and need no database. Composer is optional.
 - [Security](docs/security.md)
 - [Design](docs/design.md)
 - [FAQ](docs/faq.md)
+- [Changelog](CHANGELOG.md)
+- [Contributing](CONTRIBUTING.md)
+- [Security policy](SECURITY.md)
+- [Code of conduct](CODE_OF_CONDUCT.md)
 
 ## License
 

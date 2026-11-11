@@ -475,36 +475,7 @@ final class Migrator
                 continue;
             }
 
-            $rows = $this->fetchEncryptedSample($target, $full ? 0 : 50);
-            foreach ($rows as $row) {
-                $value = isset($row->value) ? (string) $row->value : '';
-                if (!Env::isEncrypted($this->plugin, $value, $target['field_obj'])) {
-                    continue;
-                }
-
-                try {
-                    $plain = $this->plugin->crypto()->decrypt($value, $target['field_obj']);
-                    if (!Env::isEncrypted($this->plugin, $plain, $target['field_obj'])) {
-                        $decryptOk++;
-                    } else {
-                        $decryptFailed++;
-                        $errors[] = array(
-                            'entity' => $target['entity'],
-                            'field' => $target['field'],
-                            'id' => isset($row->row_id) ? (int) $row->row_id : 0,
-                            'error' => 'decrypt_failed',
-                        );
-                    }
-                } catch (\Throwable $exception) {
-                    $decryptFailed++;
-                    $errors[] = array(
-                        'entity' => $target['entity'],
-                        'field' => $target['field'],
-                        'id' => isset($row->row_id) ? (int) $row->row_id : 0,
-                        'error' => 'decrypt_failed',
-                    );
-                }
-            }
+            $this->verifyEncryptedTarget($target, $decryptOk, $decryptFailed, $errors, $full);
         }
 
         $indexRows = null;
@@ -975,6 +946,62 @@ final class Migrator
         }
     }
 
+    private function verifyEncryptedTarget(array $target, int &$ok, int &$failed, array &$errors, bool $full): void
+    {
+        $cursor = 0;
+        $batch = $full ? 500 : 50;
+        $checked = 0;
+
+        while (true) {
+            $rows = $this->fetchEncryptedSample($target, $batch, $cursor);
+            if (array() === $rows) {
+                break;
+            }
+
+            foreach ($rows as $row) {
+                $cursor = isset($row->row_id) ? (int) $row->row_id : $cursor;
+                $value = isset($row->value) ? (string) $row->value : '';
+
+                if (!Env::isEncrypted($this->plugin, $value, $target['field_obj'])) {
+                    continue;
+                }
+
+                try {
+                    $plain = $this->plugin->crypto()->decrypt($value, $target['field_obj']);
+                    if (!Env::isEncrypted($this->plugin, $plain, $target['field_obj'])) {
+                        $ok++;
+                    } else {
+                        $failed++;
+                        $errors[] = array(
+                            'entity' => $target['entity'],
+                            'field' => $target['field'],
+                            'id' => isset($row->row_id) ? (int) $row->row_id : 0,
+                            'error' => 'decrypt_failed',
+                        );
+                    }
+                } catch (\Throwable $exception) {
+                    $failed++;
+                    $errors[] = array(
+                        'entity' => $target['entity'],
+                        'field' => $target['field'],
+                        'id' => isset($row->row_id) ? (int) $row->row_id : 0,
+                        'error' => 'decrypt_failed',
+                    );
+                }
+
+                $checked++;
+
+                if (!$full && $checked >= 50) {
+                    return;
+                }
+            }
+
+            if (!$full || count($rows) < $batch) {
+                break;
+            }
+        }
+    }
+
     private function columnStore(): ColumnStore
     {
         if (null === $this->columns) {
@@ -1403,7 +1430,7 @@ final class Migrator
      * @param array<string, mixed> $target
      * @return object[]
      */
-    private function fetchEncryptedSample(array $target, int $limit): array
+    private function fetchEncryptedSample(array $target, int $limit, int $cursor = 0): array
     {
         $db = Env::db($this->db);
         if (null === $db) {
@@ -1414,6 +1441,7 @@ final class Migrator
             $db,
             $target,
             $target['value_col'] . " LIKE 'enc:v2%'"
+            . ($cursor > 0 ? ' AND ' . $target['id_col'] . ' > ' . (int) $cursor : '')
         );
 
         $sql = 'SELECT ' . $target['id_col'] . ' AS row_id, '

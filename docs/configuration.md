@@ -44,7 +44,7 @@ return [
 | `cipher` | Override the cipher name |
 | `max_length` | Refuse values whose ciphertext exceeds this length (meta only) |
 | `compact` | Use the `v2c` envelope (legacy compatibility) |
-| `post_types` | Restrict a post meta field to these post types |
+| `post_types` | Restrict a post meta field to these post types (per-field override) |
 
 ### Cipher types
 
@@ -54,6 +54,13 @@ return [
 - `wp_users.user_login` / `user_email`: **token mode**. The column stores a
   55-character blind-index token; the reversible plaintext is encrypted in
   `_kec_user_login` / `_kec_user_email`.
+
+Accepted `cipher` values are `sb`, `det`, `deterministic`, `siv`, `secretbox`,
+`random` and `randomized`; unknown values fall back to the type default.
+
+Serialized arrays/objects in a declared meta field are serialized, encrypted
+and unserialized again on read. `post_content`, `post_title`, `wp_options` and
+custom tables without an adapter are not covered by the meta layer.
 
 ## Constants
 

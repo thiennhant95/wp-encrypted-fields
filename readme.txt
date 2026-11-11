@@ -4,7 +4,7 @@ Tags: encryption, security, privacy, gdpr, woocommerce
 Requires at least: 6.4
 Tested up to: 7.1
 Requires PHP: 8.0
-Stable tag: 0.1.0
+Stable tag: 0.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -26,7 +26,9 @@ Features:
 * WooCommerce integration (HPOS must be disabled in v1).
 * SiteGuard integration and a legacy migration preset.
 * Setup wizard with a mandatory backup gate.
-* WP-CLI migration, verification, reindex and two-phase key rotation.
+* WP-CLI migration, full verification, reindex and two-phase key rotation.
+* Serialized array/object meta encryption for declared fields.
+* WooCommerce customer-lookup column widening and order address-index guidance.
 * No core or third-party plugin patches.
 
 == Installation ==
@@ -59,10 +61,21 @@ storage is disabled by default.
 
 == Changelog ==
 
+= 0.2.0 =
+* Added serialized meta encryption, full row verification, search-index checks,
+  WooCommerce lookup safeguards, CLI aliases and adapter contract validation.
+* Fixed decrypt/index handling, LIKE search escaping, lookup column overflow,
+  uninstall lockout and CLI option parsing.
+* Security: cipher validation, database-key warning, address-index guidance.
+
 = 0.1.0 =
 Initial implementation.
 
 == Upgrade Notice ==
+
+= 0.2.0 =
+Update custom table adapters to implement table(), primaryKey() and
+write(): bool. Run `wp kec verify --full` after upgrading.
 
 = 0.1.0 =
 First release.

@@ -32,6 +32,13 @@ The plugin protects data at rest when the database or a backup leaks.
 - User columns use blind-index tokens; reversible plaintext is encrypted in
   user meta.
 - Format: `enc:v2:<cipher>:<key_id>:<base64url(payload)>`.
+- Serialized arrays/objects in declared meta fields are serialized, encrypted
+  and unserialized after decryption.
+- `post_content`, `post_title`, `wp_options` and custom tables without an
+  adapter are not encrypted by the meta layer.
+- The WooCommerce customer lookup migration widens short columns so ciphertext
+  is not truncated; `_billing_address_index` / `_shipping_address_index` must be
+  declared to avoid plaintext name/email/phone copies.
 - Decryption failures return the stored value and log an error code, never a
   fatal error or plaintext.
 
@@ -42,7 +49,11 @@ re-encryption, promote the new key and keep the old one in `KEC_OLD_KEYS` until
 verification completes.
 
 If the token secret is derived from the master key (no `KEC_TOKEN_SECRET`),
-rotation re-tokenizes every user.
+rotation re-tokenizes every user. Run `wp kec verify --full` after rotation and
+again after promoting the new key.
+
+Storing the key in the database (`kec_key` / `KEC_ALLOW_DB_KEY`) is reported as
+a warning by `wp kec status`; a database dump would also expose the key.
 
 ## Fail-closed behavior
 
