@@ -2,7 +2,15 @@
 
 All notable changes to this project are documented here.
 
-## [Unreleased]
+## [0.2.2] - 2026-11-11
+
+### Fixed
+
+- User creation on multisite (and WP-CLI user creation) no longer reports a
+  duplicate email after the account was already inserted. The email is
+  tokenized before WordPress runs its duplicate-email check, so role/site
+  assignment completes.
+- Password-only updates on multisite keep the tokenized email/login columns.
 
 ### Changed
 
@@ -10,6 +18,12 @@ All notable changes to this project are documented here.
   FluentCRM) store data in their own tables/options and are not encrypted.
   WP Mail Logging stores decrypted recipients, subjects and bodies in
   plaintext; use it only when that is acceptable or add a table adapter.
+
+### Tests
+
+- Added `pre_user_email` and pending-email regression tests.
+- Verified per-site meta encryption, search indexes and shared user columns on
+  a two-site multisite install.
 
 ## [0.2.1] - 2026-11-11
 

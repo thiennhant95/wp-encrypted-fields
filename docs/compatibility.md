@@ -7,7 +7,7 @@
 | PHP | 8.0 – 8.3 |
 | WordPress | 6.4+ (tested through 7.x) |
 | WooCommerce | optional, HPOS disabled |
-| Multisite | supported (per-site key and tables) |
+| Multisite | supported (per-site meta/search tables; user columns use shared `wp_users`/`wp_usermeta`) |
 | Object cache | supported; plaintext is never written to persistent cache |
 
 ## Plugin families

@@ -4,7 +4,7 @@ Tags: encryption, security, privacy, gdpr, woocommerce
 Requires at least: 6.4
 Tested up to: 7.1
 Requires PHP: 8.0
-Stable tag: 0.2.1
+Stable tag: 0.2.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -61,6 +61,12 @@ storage is disabled by default.
 
 == Changelog ==
 
+= 0.2.2 =
+* Fixed multisite/WP-CLI user creation reporting duplicate email after the
+  account was inserted; email is tokenized before the duplicate check.
+* Password-only updates keep tokenized email/login on multisite.
+* Documented email logging/CRM plaintext caveats.
+
 = 0.2.1 =
 * Fixed password-only/partial user updates blanking tokenized login/email
   columns; the token is rebuilt from encrypted user meta.
@@ -76,6 +82,9 @@ storage is disabled by default.
 Initial implementation.
 
 == Upgrade Notice ==
+
+= 0.2.2 =
+Recommended for multisite and WP-CLI user management.
 
 = 0.2.1 =
 Recommended for sites that update users/passwords from CLI or third-party

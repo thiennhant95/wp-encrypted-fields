@@ -402,6 +402,13 @@ namespace {
     $blankMeta = $hooks->filterInsertUserMeta(array(), new WP_User(7, array()), true);
     same('Alice@Example.COM', $blankMeta['_kec_user_email'] ?? null, 'rebuilt email meta is preserved');
 
+    $preToken = $hooks->filterPreUserEmail('Pre@Example.com');
+    check($store->isToken($preToken, ColumnStore::EMAIL), 'pre_user_email returns a token');
+    $preInsert = $hooks->filterPreInsert(array('user_login' => 'preuser', 'user_email' => $preToken), false, 0);
+    check($store->isToken($preInsert['user_email'], ColumnStore::EMAIL), 'pre_user_email token is preserved');
+    $preMeta = $hooks->filterInsertUserMeta(array(), new WP_User(0, array()), false);
+    same('Pre@Example.com', $preMeta['_kec_user_email'] ?? null, 'pre_user_email plaintext stored in meta');
+
     $emailOnlyPlugin = make_plugin(array(
         'user' => array(
             'columns' => array(

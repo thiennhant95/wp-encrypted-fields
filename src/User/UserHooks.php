@@ -25,6 +25,8 @@ final class UserHooks
     /** @var array<string, string> */
     private static array $pending = array();
 
+    private static ?string $pendingEmail = null;
+
     public function __construct(Plugin $plugin)
     {
         $this->plugin = $plugin;
@@ -43,6 +45,7 @@ final class UserHooks
             return;
         }
 
+        add_filter('pre_user_email', array($this, 'filterPreUserEmail'), 10, 1);
         add_filter('wp_pre_insert_user_data', array($this, 'filterPreInsert'), 10, 3);
         add_filter('insert_user_meta', array($this, 'filterInsertUserMeta'), 10, 3);
         add_filter('pre_user_display_name', array($this, 'filterDisplayName'), 10, 4);
@@ -51,6 +54,49 @@ final class UserHooks
         add_action('set_current_user', array($this, 'filterCurrentUser'), 10, 1);
         add_action('wp_login', array($this, 'filterLogin'), 1, 2);
         add_filter('rest_prepare_user', array($this, 'filterRestPrepare'), 10, 3);
+    }
+
+    /**
+     * Tokenize the email before WordPress runs its duplicate-email check.
+     * Without this, a plaintext email compared with tokenized rows can match
+     * the user being updated (wp_update_user) and abort multisite user
+     * creation after the account was already inserted.
+     *
+     * @param mixed $email
+     *
+     * @return mixed
+     */
+    public function filterPreUserEmail($email)
+    {
+        if (!is_string($email) || '' === trim($email)) {
+            self::$pendingEmail = null;
+
+            return $email;
+        }
+
+        $store = $this->store();
+        if (null === $store || !$this->hasUserColumns()) {
+            self::$pendingEmail = null;
+
+            return $email;
+        }
+
+        if ($store->isToken($email, ColumnStore::EMAIL)) {
+            self::$pendingEmail = null;
+
+            return $email;
+        }
+
+        $token = $store->lookupToken($email, ColumnStore::EMAIL);
+        if (is_string($token) && '' !== $token) {
+            self::$pendingEmail = trim($email);
+
+            return $token;
+        }
+
+        self::$pendingEmail = null;
+
+        return $email;
     }
 
     /**
@@ -82,6 +128,9 @@ final class UserHooks
             $userId = (int) $data['ID'];
         }
 
+        $pendingEmail = self::$pendingEmail;
+        self::$pendingEmail = null;
+
         $targets = array(
             'user_login' => ColumnStore::LOGIN,
             'user_email' => ColumnStore::EMAIL,
@@ -90,6 +139,19 @@ final class UserHooks
         foreach ($targets as $key => $name) {
             if (!isset($columns[$key]) || !array_key_exists($key, $data)) {
                 continue;
+            }
+
+            if ('user_email' === $key
+                && null !== $pendingEmail
+                && !$store->isToken($pendingEmail, ColumnStore::EMAIL)
+            ) {
+                $token = $store->lookupToken($pendingEmail, ColumnStore::EMAIL);
+
+                if (is_string($token) && '' !== $token) {
+                    $data[$key] = $token;
+                    self::$pending[$name] = $pendingEmail;
+                    continue;
+                }
             }
 
             $value = $data[$key];

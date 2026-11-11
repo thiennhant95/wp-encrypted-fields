@@ -107,6 +107,13 @@ wp kec reindex --entity=all
 
 Never treat the import as complete until `verify --full` passes.
 
+## Multisite
+
+Run migration and verification per site with `--url=...`. User columns are
+network-wide (`wp_users`), user meta is shared (`wp_usermeta`), and the search
+index is per site. After migrating users, run `wp kec reindex --entity=user`
+for every site so each site's user search index is populated.
+
 ## Go-live checklist
 
 1. HPOS is disabled.
