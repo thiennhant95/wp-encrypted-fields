@@ -39,6 +39,9 @@ The plugin protects data at rest when the database or a backup leaks.
 - The WooCommerce customer lookup migration widens short columns so ciphertext
   is not truncated; `_billing_address_index` / `_shipping_address_index` must be
   declared to avoid plaintext name/email/phone copies.
+- Third-party email logs and CRM tables/options (for example WP Mail Logging,
+  MailPoet, FluentCRM) are not encrypted. WP Mail Logging stores recipients,
+  subjects and bodies in plaintext after `wp_mail` recipients are decrypted.
 - Decryption failures return the stored value and log an error code, never a
   fatal error or plaintext.
 

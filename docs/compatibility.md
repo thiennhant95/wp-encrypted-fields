@@ -24,6 +24,7 @@ Most plugins that use standard WordPress/WooCommerce APIs work unchanged.
 | Backup/migration | UpdraftPlus, Duplicator, All-in-One WP Migration | Dumps contain ciphertext; restore needs the same key; user imports may need the index |
 | Membership/LMS | MemberPress, LearnDash | User meta works; test admin lists that read raw columns |
 | Email marketing | Mailchimp for WooCommerce, Klaviyo | Customer emails resolve via WC integration; test sync |
+| Logging / CRM | WP Mail Logging, MailPoet, FluentCRM | Their own tables/options are not encrypted; WP Mail Logging stores recipients, subjects and bodies in plaintext. Avoid for sensitive mail or register a table adapter |
 | Multilingual | WPML, Polylang | None for encryption; search normalization still applies |
 | Woo extensions | Subscriptions, Bookings, YITH | Order meta works when HPOS is off |
 | Search engines | Relevanssi, ElasticPress, Algolia | Encrypted fields cannot be indexed automatically |

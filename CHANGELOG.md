@@ -2,6 +2,15 @@
 
 All notable changes to this project are documented here.
 
+## [Unreleased]
+
+### Changed
+
+- Documented that email logging/CRM plugins (WP Mail Logging, MailPoet,
+  FluentCRM) store data in their own tables/options and are not encrypted.
+  WP Mail Logging stores decrypted recipients, subjects and bodies in
+  plaintext; use it only when that is acceptable or add a table adapter.
+
 ## [0.2.1] - 2026-11-11
 
 ### Fixed
