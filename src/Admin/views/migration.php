@@ -2,7 +2,7 @@
 /**
  * Migration tab.
  *
- * @var \Koyo\EncryptedFields\Plugin $plugin
+ * @var \EncryptedFields\Plugin $plugin
  * @var array<string, mixed> $state
  * @var array<string, mixed>|null $result
  */

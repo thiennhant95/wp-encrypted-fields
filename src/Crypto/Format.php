@@ -1,6 +1,6 @@
 <?php
 
-namespace Koyo\EncryptedFields\Crypto;
+namespace EncryptedFields\Crypto;
 
 /**
  * Storage format helpers for the v2 cipher envelope.

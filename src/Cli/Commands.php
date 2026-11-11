@@ -1,13 +1,13 @@
 <?php
 
-namespace Koyo\EncryptedFields\Cli;
+namespace EncryptedFields\Cli;
 
-use Koyo\EncryptedFields\Crypto\RotationService;
-use Koyo\EncryptedFields\Migration\Env;
-use Koyo\EncryptedFields\Migration\LookupMigrator;
-use Koyo\EncryptedFields\Migration\Migrator;
-use Koyo\EncryptedFields\Migration\StateDetector;
-use Koyo\EncryptedFields\Plugin;
+use EncryptedFields\Crypto\RotationService;
+use EncryptedFields\Migration\Env;
+use EncryptedFields\Migration\LookupMigrator;
+use EncryptedFields\Migration\Migrator;
+use EncryptedFields\Migration\StateDetector;
+use EncryptedFields\Plugin;
 
 /**
  * WP-CLI commands for Encrypted Fields.
@@ -94,7 +94,7 @@ final class Commands
      * : fresh or existing.
      *
      * [--preset=<preset>]
-     * : minimal, full-ec-koyo or custom.
+     * : minimal, full or custom.
      *
      * [--fields=<file>]
      * : JSON registry file.
@@ -866,7 +866,7 @@ final class Commands
             return $minimal;
         }
 
-        if ('full-ec-koyo' === $preset) {
+        if ('full' === $preset) {
             $file = dirname(__DIR__, 2) . '/config/fields.example.php';
             if (is_file($file)) {
                 $loaded = include $file;

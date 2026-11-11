@@ -147,20 +147,20 @@ require_once __DIR__ . '/../src/Contracts/EncryptorInterface.php';
 require_once __DIR__ . '/../src/Support/Logger.php';
 require_once __DIR__ . '/../src/Crypto/Format.php';
 require_once __DIR__ . '/../src/Crypto/KeyManager.php';
-require_once __DIR__ . '/../src/Crypto/LegacyEcKoyoCipher.php';
+require_once __DIR__ . '/../src/Crypto/LegacyCipher.php';
 require_once __DIR__ . '/../src/Crypto/Encryptor.php';
 require_once __DIR__ . '/../src/Plugin.php';
 require_once __DIR__ . '/../src/User/ColumnStore.php';
 require_once __DIR__ . '/../src/Mail/MailHooks.php';
 
-use Koyo\EncryptedFields\Config\Field;
-use Koyo\EncryptedFields\Config\Registry;
-use Koyo\EncryptedFields\Contracts\EncryptorInterface;
-use Koyo\EncryptedFields\Crypto\Encryptor;
-use Koyo\EncryptedFields\Crypto\KeyManager;
-use Koyo\EncryptedFields\Mail\MailHooks;
-use Koyo\EncryptedFields\Plugin;
-use Koyo\EncryptedFields\Support\Logger;
+use EncryptedFields\Config\Field;
+use EncryptedFields\Config\Registry;
+use EncryptedFields\Contracts\EncryptorInterface;
+use EncryptedFields\Crypto\Encryptor;
+use EncryptedFields\Crypto\KeyManager;
+use EncryptedFields\Mail\MailHooks;
+use EncryptedFields\Plugin;
+use EncryptedFields\Support\Logger;
 
 final class TestEncryptor implements EncryptorInterface
 {

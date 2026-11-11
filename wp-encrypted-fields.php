@@ -3,7 +3,7 @@
  * Plugin Name: Encrypted Fields
  * Plugin URI: https://github.com/thiennhant95/wp-encrypted-fields
  * Description: Registry-driven field-level encryption for WordPress and WooCommerce.
- * Version: 0.3.0
+ * Version: 0.4.0
  * Requires PHP: 8.0
  * Requires at least: 6.4
  * Author: thiennhant95
@@ -17,14 +17,14 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('KEC_VERSION', '0.3.0');
+define('KEC_VERSION', '0.4.0');
 define('KEC_DB_VERSION', '1');
 define('KEC_FILE', __FILE__);
 define('KEC_DIR', plugin_dir_path(__FILE__));
 define('KEC_URL', plugin_dir_url(__FILE__));
 
 spl_autoload_register(function ($class) {
-    $prefix = 'Koyo\\EncryptedFields\\';
+    $prefix = 'EncryptedFields\\';
 
     if (strncmp($class, $prefix, strlen($prefix)) !== 0) {
         return;
@@ -39,5 +39,5 @@ spl_autoload_register(function ($class) {
 });
 
 add_action('plugins_loaded', function () {
-    \Koyo\EncryptedFields\Plugin::boot();
+    \EncryptedFields\Plugin::boot();
 }, 5);

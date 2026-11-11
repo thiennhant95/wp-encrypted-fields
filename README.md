@@ -37,7 +37,7 @@ database; no core or third-party plugin patches are required.
   rotation.
 - Automatic safety dump of affected tables before migration/rotation
   (protected directory, size/row limits, `--no-safety-dump` override).
-- Legacy cipher adapter for migration from the original Koyo implementation.
+- Legacy cipher adapter for migration from the original implementation.
 
 ## Requirements
 

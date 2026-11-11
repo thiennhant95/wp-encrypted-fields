@@ -1,11 +1,11 @@
 <?php
 
-namespace Koyo\EncryptedFields\Migration;
+namespace EncryptedFields\Migration;
 
-use Koyo\EncryptedFields\Config\Field;
-use Koyo\EncryptedFields\Integrations\WooCommerce\CustomerLookupSchema;
-use Koyo\EncryptedFields\Plugin;
-use Koyo\EncryptedFields\User\ColumnStore;
+use EncryptedFields\Config\Field;
+use EncryptedFields\Integrations\WooCommerce\CustomerLookupSchema;
+use EncryptedFields\Plugin;
+use EncryptedFields\User\ColumnStore;
 
 /**
  * Migration for auxiliary lookup tables that are not part of the registry.

@@ -1,8 +1,8 @@
 <?php
 
-namespace Koyo\EncryptedFields\Contracts;
+namespace EncryptedFields\Contracts;
 
-use Koyo\EncryptedFields\Config\Field;
+use EncryptedFields\Config\Field;
 
 interface EncryptorInterface
 {

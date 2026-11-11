@@ -48,11 +48,11 @@ When SiteGuard is active:
 
 ## Legacy preset
 
-`Integrations\LegacyEcKoyo\Preset` provides a registry matching the original
-Koyo implementation:
+`Integrations\Legacy\Preset` provides a registry matching the original
+implementation:
 
 ```bash
-wp kec setup --mode=existing --preset=full-ec-koyo
+wp kec setup --mode=existing --preset=full
 ```
 
 It also maps the legacy cipher configuration:
@@ -79,7 +79,7 @@ add_filter('kec_table_adapters', function ($adapters) {
 });
 ```
 
-Implement `Koyo\EncryptedFields\Contracts\TableAdapterInterface`:
+Implement `EncryptedFields\Contracts\TableAdapterInterface`:
 
 ```php
 interface TableAdapterInterface

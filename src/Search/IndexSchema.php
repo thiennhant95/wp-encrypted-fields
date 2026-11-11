@@ -1,6 +1,6 @@
 <?php
 
-namespace Koyo\EncryptedFields\Search;
+namespace EncryptedFields\Search;
 
 /**
  * Owns the {prefix}kec_search_index table definition and upgrades.

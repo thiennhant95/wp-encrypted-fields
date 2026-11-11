@@ -1,6 +1,6 @@
 <?php
 
-namespace Koyo\EncryptedFields\Search;
+namespace EncryptedFields\Search;
 
 /**
  * Builds deterministic blind-index tokens.

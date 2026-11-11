@@ -1,9 +1,9 @@
 <?php
 
-namespace Koyo\EncryptedFields\Crypto;
+namespace EncryptedFields\Crypto;
 
 /**
- * Read-only adapter for the legacy EC-KOYO cipher formats.
+ * Read-only adapter for the legacy cipher formats.
  *
  * Supported:
  *  - CTR:   base64(16-byte nonce . AES-256-CTR ciphertext)
@@ -12,7 +12,7 @@ namespace Koyo\EncryptedFields\Crypto;
  *
  * Nothing in this class writes legacy ciphertext; new data always uses v2.
  */
-final class LegacyEcKoyoCipher
+final class LegacyCipher
 {
     private ?string $ctrKey;
     private ?string $loginKey;

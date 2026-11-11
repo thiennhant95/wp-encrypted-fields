@@ -1,6 +1,6 @@
 <?php
 
-namespace Koyo\EncryptedFields\Crypto;
+namespace EncryptedFields\Crypto;
 
 /**
  * Resolves master keys, old (rotation) keys and derives purpose-bound
@@ -282,7 +282,7 @@ final class KeyManager
     }
 
     /**
-     * Legacy EC-KOYO configuration, passed through to LegacyEcKoyoCipher.
+     * Legacy cipher configuration, passed through to LegacyCipher.
      *
      * @return array<string,mixed>
      */

@@ -1,6 +1,6 @@
 <?php
 
-namespace Koyo\EncryptedFields\Meta;
+namespace EncryptedFields\Meta;
 
 final class MetaCache
 {

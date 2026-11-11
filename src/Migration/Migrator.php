@@ -1,10 +1,10 @@
 <?php
 
-namespace Koyo\EncryptedFields\Migration;
+namespace EncryptedFields\Migration;
 
-use Koyo\EncryptedFields\Config\Field;
-use Koyo\EncryptedFields\Plugin;
-use Koyo\EncryptedFields\User\ColumnStore;
+use EncryptedFields\Config\Field;
+use EncryptedFields\Plugin;
+use EncryptedFields\User\ColumnStore;
 
 /**
  * Scans, migrates, verifies and rolls back encrypted fields.
@@ -1390,14 +1390,14 @@ final class Migrator
      */
     private function writePlainValue(array $target, object $row, string $value): bool
     {
-        \Koyo\EncryptedFields\Meta\MetaWriteGuard::suspend();
-        \Koyo\EncryptedFields\Query\QueryRewriter::suspend();
+        \EncryptedFields\Meta\MetaWriteGuard::suspend();
+        \EncryptedFields\Query\QueryRewriter::suspend();
 
         try {
             return $this->writeValue($target, $row, $value);
         } finally {
-            \Koyo\EncryptedFields\Query\QueryRewriter::resume();
-            \Koyo\EncryptedFields\Meta\MetaWriteGuard::resume();
+            \EncryptedFields\Query\QueryRewriter::resume();
+            \EncryptedFields\Meta\MetaWriteGuard::resume();
         }
     }
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Koyo\EncryptedFields\Support;
+namespace EncryptedFields\Support;
 
 final class Logger
 {

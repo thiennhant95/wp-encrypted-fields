@@ -4,7 +4,7 @@ Tags: encryption, security, privacy, gdpr, woocommerce
 Requires at least: 6.4
 Tested up to: 7.1
 Requires PHP: 8.0
-Stable tag: 0.3.0
+Stable tag: 0.4.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -61,6 +61,13 @@ storage is disabled by default.
 
 == Changelog ==
 
+= 0.4.0 =
+* Renamed the vendor-prefixed PHP namespace to `EncryptedFields`.
+* Renamed the legacy adapter to `LegacyCipher` / `Integrations\Legacy` and
+  config presets to `full.php` / `legacy.php`; setup preset is now `full`.
+* Removed the old prefixed legacy constant fallback; use `KEC_LEGACY_*`.
+* Removed legacy vendor branding from the codebase, docs and landing page.
+
 = 0.3.0 =
 * Automatic safety dump of affected tables before migration, rollback and key
   rotation; 0600 files in a 0700 directory, last five kept,
@@ -95,6 +102,11 @@ storage is disabled by default.
 Initial implementation.
 
 == Upgrade Notice ==
+
+= 0.4.0 =
+Breaking namespace rename. Update custom code that references the old
+namespace, class names, preset slug or legacy constant prefix. Stored
+ciphertext is unchanged.
 
 = 0.3.0 =
 Adds automatic safety dumps before migration/rotation and expands

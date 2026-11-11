@@ -1,10 +1,10 @@
 <?php
 
-namespace Koyo\EncryptedFields\User;
+namespace EncryptedFields\User;
 
-use Koyo\EncryptedFields\Config\Registry;
-use Koyo\EncryptedFields\Contracts\SearchInterface;
-use Koyo\EncryptedFields\Plugin;
+use EncryptedFields\Config\Registry;
+use EncryptedFields\Contracts\SearchInterface;
+use EncryptedFields\Plugin;
 
 /**
  * Replaces encrypted wp_users LIKE searches with blind-index lookups.

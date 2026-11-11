@@ -2,7 +2,7 @@
 /**
  * Status tab.
  *
- * @var \Koyo\EncryptedFields\Plugin $plugin
+ * @var \EncryptedFields\Plugin $plugin
  * @var array<string, mixed> $state
  */
 

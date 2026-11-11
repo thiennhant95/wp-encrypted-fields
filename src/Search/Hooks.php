@@ -1,8 +1,8 @@
 <?php
 
-namespace Koyo\EncryptedFields\Search;
+namespace EncryptedFields\Search;
 
-use Koyo\EncryptedFields\Plugin;
+use EncryptedFields\Plugin;
 
 /**
  * Keeps the blind index in sync with WordPress write/delete hooks.

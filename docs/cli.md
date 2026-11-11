@@ -22,14 +22,14 @@ searchable fields exist.
 ## Setup
 
 ```bash
-wp kec setup --mode=fresh --preset=full-ec-koyo
+wp kec setup --mode=fresh --preset=full
 wp kec setup --mode=existing --preset=custom --fields=fields.json
 ```
 
 Presets:
 
 - `minimal`
-- `full-ec-koyo`
+- `full`
 - `custom` (requires a fields file)
 
 ## Migration

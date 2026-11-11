@@ -1,11 +1,11 @@
 <?php
 
-namespace Koyo\EncryptedFields\Admin;
+namespace EncryptedFields\Admin;
 
-use Koyo\EncryptedFields\Migration\Env;
-use Koyo\EncryptedFields\Migration\Migrator;
-use Koyo\EncryptedFields\Migration\StateDetector;
-use Koyo\EncryptedFields\Plugin;
+use EncryptedFields\Migration\Env;
+use EncryptedFields\Migration\Migrator;
+use EncryptedFields\Migration\StateDetector;
+use EncryptedFields\Plugin;
 
 /**
  * Multi-step setup and migration wizard.
@@ -378,7 +378,7 @@ final class SetupWizard
 
         return array(
             'minimal' => array('label' => 'Minimal', 'registry' => $minimal),
-            'full-ec-koyo' => array('label' => 'Full EC-KOYO', 'registry' => $full),
+            'full' => array('label' => 'Full fields', 'registry' => $full),
             'custom' => array('label' => 'Custom JSON', 'registry' => array()),
         );
     }

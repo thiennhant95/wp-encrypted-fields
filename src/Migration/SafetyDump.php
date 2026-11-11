@@ -1,8 +1,8 @@
 <?php
 
-namespace Koyo\EncryptedFields\Migration;
+namespace EncryptedFields\Migration;
 
-use Koyo\EncryptedFields\Plugin;
+use EncryptedFields\Plugin;
 
 /**
  * Creates a best-effort SQL snapshot of the tables a migration will touch.

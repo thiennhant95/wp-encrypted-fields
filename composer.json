@@ -25,12 +25,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Koyo\\EncryptedFields\\": "src/"
+            "EncryptedFields\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Koyo\\EncryptedFields\\Tests\\": "tests/"
+            "EncryptedFields\\Tests\\": "tests/"
         }
     },
     "config": {

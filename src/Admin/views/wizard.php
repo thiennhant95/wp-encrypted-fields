@@ -2,7 +2,7 @@
 /**
  * Setup wizard view.
  *
- * @var \Koyo\EncryptedFields\Plugin $plugin
+ * @var \EncryptedFields\Plugin $plugin
  * @var array<string, mixed> $state
  * @var array<string, mixed> $setup
  * @var string $step
@@ -139,8 +139,8 @@ $busy = (bool) ($setup['step'] ?? false);
                 <p><label>
                     <input type="radio" name="kec_preset" value="<?php echo esc_attr($slug); ?>" <?php echo $slug === $preset ? 'checked' : ''; ?>>
                     <strong><?php echo esc_html((string) $meta['label']); ?></strong>
-                    <?php if ('full-ec-koyo' === $slug) : ?>
-                        &mdash; EC-KOYO billing/shipping/user fields
+                    <?php if ('full' === $slug) : ?>
+                        &mdash; billing, shipping and user fields
                     <?php elseif ('minimal' === $slug) : ?>
                         &mdash; a small set of user and order fields
                     <?php endif; ?>

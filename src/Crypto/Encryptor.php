@@ -1,9 +1,9 @@
 <?php
 
-namespace Koyo\EncryptedFields\Crypto;
+namespace EncryptedFields\Crypto;
 
-use Koyo\EncryptedFields\Config\Field;
-use Koyo\EncryptedFields\Contracts\EncryptorInterface;
+use EncryptedFields\Config\Field;
+use EncryptedFields\Contracts\EncryptorInterface;
 
 /**
  * AES-256-GCM based encryptor.
@@ -17,12 +17,12 @@ use Koyo\EncryptedFields\Contracts\EncryptorInterface;
 final class Encryptor implements EncryptorInterface
 {
     private KeyManager $keys;
-    private LegacyEcKoyoCipher $legacy;
+    private LegacyCipher $legacy;
 
     public function __construct(KeyManager $keys)
     {
         $this->keys = $keys;
-        $this->legacy = new LegacyEcKoyoCipher($keys->legacyConfig());
+        $this->legacy = new LegacyCipher($keys->legacyConfig());
     }
 
     public function encrypt(string $plaintext, Field $field): string

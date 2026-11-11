@@ -106,7 +106,7 @@ namespace {
     }
 
     spl_autoload_register(function ($class) {
-        $prefix = 'Koyo\\EncryptedFields\\';
+        $prefix = 'EncryptedFields\\';
         if (0 !== strncmp($class, $prefix, strlen($prefix))) {
             return;
         }
@@ -122,9 +122,9 @@ namespace {
     require_once __DIR__ . '/../src/Contracts/TableAdapterInterface.php';
 }
 
-namespace Koyo\EncryptedFields\Crypto {
-    use Koyo\EncryptedFields\Config\Field;
-    use Koyo\EncryptedFields\Contracts\EncryptorInterface;
+namespace EncryptedFields\Crypto {
+    use EncryptedFields\Config\Field;
+    use EncryptedFields\Contracts\EncryptorInterface;
 
     final class KeyManager
     {
@@ -369,9 +369,9 @@ namespace {
         }
     }
 
-    function kec_make_plugin(): \Koyo\EncryptedFields\Plugin
+    function kec_make_plugin(): \EncryptedFields\Plugin
     {
-        $plugin = new \Koyo\EncryptedFields\Plugin();
+        $plugin = new \EncryptedFields\Plugin();
         $plugin->init();
         return $plugin;
     }
@@ -445,7 +445,7 @@ namespace {
             'wp_postmeta' => array(),
         ));
         $plugin = kec_make_plugin();
-        $state = (new \Koyo\EncryptedFields\Migration\StateDetector($plugin, $db))->detect();
+        $state = (new \EncryptedFields\Migration\StateDetector($plugin, $db))->detect();
         assert_same('existing_plaintext', $state['state'], 'state should be existing_plaintext');
         assert_true($state['counts']['plaintext'] >= 2, 'plaintext samples should be counted');
         assert_true($state['key_configured'], 'key should be configured');
@@ -461,7 +461,7 @@ namespace {
             'wp_postmeta' => array(),
         ));
         $plugin = kec_make_plugin();
-        $state = (new \Koyo\EncryptedFields\Migration\StateDetector($plugin, $db))->detect();
+        $state = (new \EncryptedFields\Migration\StateDetector($plugin, $db))->detect();
         assert_same('existing_legacy', $state['state'], 'state should be existing_legacy');
         assert_true($state['counts']['legacy'] >= 2, 'legacy samples should be counted');
 
@@ -474,7 +474,7 @@ namespace {
             'wp_postmeta' => array(),
         ));
         $plugin = kec_make_plugin();
-        $state = (new \Koyo\EncryptedFields\Migration\StateDetector($plugin, $db))->detect();
+        $state = (new \EncryptedFields\Migration\StateDetector($plugin, $db))->detect();
         assert_same('mixed', $state['state'], 'state should be mixed');
     });
 
@@ -488,13 +488,13 @@ namespace {
             'wp_postmeta' => array(),
         ));
         $plugin = kec_make_plugin();
-        $state = (new \Koyo\EncryptedFields\Migration\StateDetector($plugin, $db))->detect();
+        $state = (new \EncryptedFields\Migration\StateDetector($plugin, $db))->detect();
         assert_same('configured', $state['state'], 'state should be configured');
 
         $db = kec_reset('');
         $db->setFixtures(array('wp_users' => array()));
         $plugin = kec_make_plugin();
-        $state = (new \Koyo\EncryptedFields\Migration\StateDetector($plugin, $db))->detect();
+        $state = (new \EncryptedFields\Migration\StateDetector($plugin, $db))->detect();
         assert_same('fresh', $state['state'], 'state should be fresh');
     });
 
@@ -507,7 +507,7 @@ namespace {
             ),
         ));
         $plugin = kec_make_plugin();
-        $state = (new \Koyo\EncryptedFields\Migration\StateDetector($plugin, $db))->detect();
+        $state = (new \EncryptedFields\Migration\StateDetector($plugin, $db))->detect();
         assert_true($state['hpos'], 'HPOS should be detected');
         assert_same('existing_legacy', $state['state'], 'fallback scan should detect legacy data without treating plaintext as configured PII');
     });
@@ -524,7 +524,7 @@ namespace {
             'wp_postmeta' => array(),
         ));
         $plugin = kec_make_plugin();
-        $state = (new \Koyo\EncryptedFields\Migration\StateDetector($plugin, $db))->detect();
+        $state = (new \EncryptedFields\Migration\StateDetector($plugin, $db))->detect();
         $codes = array_column($state['warnings'], 'code');
         assert_true(in_array('plaintext_plugin', $codes, true), 'plaintext plugin warning should be present');
         $plugins = array_column($state['warnings'], 'plugin');
@@ -547,7 +547,7 @@ namespace {
             ),
         ));
         $plugin = kec_make_plugin();
-        $result = (new \Koyo\EncryptedFields\Migration\Migrator($plugin, $db))->dryRun();
+        $result = (new \EncryptedFields\Migration\Migrator($plugin, $db))->dryRun();
         assert_same('dry_run', $result['mode'], 'mode should be dry_run');
         assert_true($result['totals']['plaintext'] >= 2, 'plaintext should be detected');
         assert_true($result['totals']['legacy'] >= 1, 'legacy should be detected');
@@ -574,7 +574,7 @@ namespace {
             'wp_postmeta' => array(),
         ));
         $plugin = kec_make_plugin();
-        $result = (new \Koyo\EncryptedFields\Migration\Migrator($plugin, $db))->migrate();
+        $result = (new \EncryptedFields\Migration\Migrator($plugin, $db))->migrate();
         assert_same(false, $result['ok'], 'migration should fail');
         assert_same('backup_required', $result['error'], 'error should be backup_required');
         assert_same(0, $db->writes, 'no writes should happen before backup ack');
@@ -598,7 +598,7 @@ namespace {
             'wp_postmeta' => array(),
         ));
         $plugin = kec_make_plugin();
-        $migrator = new \Koyo\EncryptedFields\Migration\Migrator($plugin, $db);
+        $migrator = new \EncryptedFields\Migration\Migrator($plugin, $db);
         assert_true($migrator->backupSatisfied(), 'backup ack should satisfy gate');
         $result = $migrator->migrate(array('batch' => 2));
         assert_same(true, $result['ok'], 'migration should succeed');
@@ -624,8 +624,8 @@ namespace {
             'wp_postmeta' => array(),
         ));
         $plugin = kec_make_plugin();
-        $columns = new \Koyo\EncryptedFields\User\ColumnStore($plugin);
-        $result = (new \Koyo\EncryptedFields\Migration\Migrator($plugin, $db))->migrate(array('batch' => 10));
+        $columns = new \EncryptedFields\User\ColumnStore($plugin);
+        $result = (new \EncryptedFields\Migration\Migrator($plugin, $db))->migrate(array('batch' => 10));
         assert_same(true, $result['ok'], 'migration should succeed');
         assert_same(array(), $result['errors'], 'no errors expected');
 
@@ -639,8 +639,8 @@ namespace {
             }
         }
 
-        assert_true(isset($written['login']) && $columns->isToken($written['login'], \Koyo\EncryptedFields\User\ColumnStore::LOGIN), 'login column should hold a token');
-        assert_true(isset($written['email']) && $columns->isToken($written['email'], \Koyo\EncryptedFields\User\ColumnStore::EMAIL), 'email column should hold a token');
+        assert_true(isset($written['login']) && $columns->isToken($written['login'], \EncryptedFields\User\ColumnStore::LOGIN), 'login column should hold a token');
+        assert_true(isset($written['email']) && $columns->isToken($written['email'], \EncryptedFields\User\ColumnStore::EMAIL), 'email column should hold a token');
         assert_true(strlen($written['login']) <= 60, 'login token must fit varchar(60)');
         assert_true(strlen($written['email']) <= 100, 'email token must fit varchar(100)');
         assert_same(strtolower($longLogin), $GLOBALS['kec_usermeta'][1]['_kec_user_login'] ?? null, 'login plaintext meta should be normalized');
@@ -657,7 +657,7 @@ namespace {
             'wp_postmeta' => array(),
         ));
         $plugin = kec_make_plugin();
-        $migrator = new \Koyo\EncryptedFields\Migration\Migrator($plugin, $db);
+        $migrator = new \EncryptedFields\Migration\Migrator($plugin, $db);
         $blocked = $migrator->rotate();
         assert_same('backup_required', $blocked['error'], 'rotation should require backup ack');
 
@@ -671,9 +671,9 @@ namespace {
     test('Migrator verifies tokenized user columns and meta', function () use ($registryJson) {
         $db = kec_reset($registryJson);
         $plugin = kec_make_plugin();
-        $columns = new \Koyo\EncryptedFields\User\ColumnStore($plugin);
-        $loginToken = $columns->tokenFor('alice', \Koyo\EncryptedFields\User\ColumnStore::LOGIN);
-        $emailToken = $columns->tokenFor('alice@example.com', \Koyo\EncryptedFields\User\ColumnStore::EMAIL);
+        $columns = new \EncryptedFields\User\ColumnStore($plugin);
+        $loginToken = $columns->tokenFor('alice', \EncryptedFields\User\ColumnStore::LOGIN);
+        $emailToken = $columns->tokenFor('alice@example.com', \EncryptedFields\User\ColumnStore::EMAIL);
 
         $db->setFixtures(array(
             'wp_users' => array(
@@ -689,7 +689,7 @@ namespace {
             '_kec_user_email' => 'alice@example.com',
         );
 
-        $result = (new \Koyo\EncryptedFields\Migration\Migrator($plugin, $db))->verify();
+        $result = (new \EncryptedFields\Migration\Migrator($plugin, $db))->verify();
         assert_same(true, $result['ok'], 'verification should pass');
         assert_same(2, $result['token'], 'both user columns should be counted as tokens');
         assert_true($result['decrypt_ok'] >= 2, 'token meta should resolve to plaintext');
@@ -707,7 +707,7 @@ namespace {
             'wp_postmeta' => array(),
         ));
         $plugin = kec_make_plugin();
-        $result = (new \Koyo\EncryptedFields\Migration\Migrator($plugin, $db))->verify();
+        $result = (new \EncryptedFields\Migration\Migrator($plugin, $db))->verify();
         assert_same(false, $result['ok'], 'plaintext user columns must fail verification');
         assert_true($result['plaintext'] >= 2, 'plaintext columns should be reported');
     });
@@ -728,7 +728,7 @@ namespace {
             ),
         ));
         $plugin = kec_make_plugin();
-        $migrator = new \Koyo\EncryptedFields\Migration\LookupMigrator($plugin, $db);
+        $migrator = new \EncryptedFields\Migration\LookupMigrator($plugin, $db);
 
         $dry = $migrator->dryRun('customer_lookup');
         assert_same(true, $dry['ok'], 'dry run should succeed');
@@ -763,7 +763,7 @@ namespace {
             ),
         ));
         $plugin = kec_make_plugin();
-        $migrator = new \Koyo\EncryptedFields\Migration\LookupMigrator($plugin, $db);
+        $migrator = new \EncryptedFields\Migration\LookupMigrator($plugin, $db);
 
         $dry = $migrator->dryRun('siteguard_history');
         assert_same(2, $dry['totals']['pending'], 'dry run should count encrypted logins only');
@@ -803,7 +803,7 @@ namespace {
         ));
         $GLOBALS['kec_rotation_pending'] = true;
         $plugin = kec_make_plugin();
-        $service = new \Koyo\EncryptedFields\Crypto\RotationService($plugin, $db);
+        $service = new \EncryptedFields\Crypto\RotationService($plugin, $db);
 
         $plan = $service->rotate(true, 500);
         assert_same(true, $plan['ok'], 'rotation dry run should succeed');
@@ -827,8 +827,8 @@ namespace {
             ),
         ));
         $plugin = kec_make_plugin();
-        $columns = new \Koyo\EncryptedFields\User\ColumnStore($plugin);
-        $migrator = new \Koyo\EncryptedFields\Migration\Migrator($plugin, $db);
+        $columns = new \EncryptedFields\User\ColumnStore($plugin);
+        $migrator = new \EncryptedFields\Migration\Migrator($plugin, $db);
 
         $migrated = $migrator->migrate(array('batch' => 10));
         assert_same(true, $migrated['ok'], 'initial tokenization should succeed');
@@ -839,7 +839,7 @@ namespace {
                 $oldLogin = (string) $update[1]['user_login'];
             }
         }
-        assert_true($columns->isToken($oldLogin, \Koyo\EncryptedFields\User\ColumnStore::LOGIN), 'initial login should be a token');
+        assert_true($columns->isToken($oldLogin, \EncryptedFields\User\ColumnStore::LOGIN), 'initial login should be a token');
 
         $GLOBALS['kec_token_secret'] = 'rotated-token-secret';
         $rotated = $migrator->rotate(array('batch' => 10));
@@ -855,7 +855,7 @@ namespace {
 
         assert_true($newLogin !== $oldLogin, 'token should change without KEC_TOKEN_SECRET');
         assert_same(
-            $columns->tokenFor('alice', \Koyo\EncryptedFields\User\ColumnStore::LOGIN),
+            $columns->tokenFor('alice', \EncryptedFields\User\ColumnStore::LOGIN),
             $newLogin,
             'new token should use the rotated token secret'
         );
@@ -864,9 +864,9 @@ namespace {
     test('Password reset and user helpers resolve tokens to plaintext', function () use ($registryJson) {
         $db = kec_reset($registryJson);
         $plugin = kec_make_plugin();
-        $columns = new \Koyo\EncryptedFields\User\ColumnStore($plugin);
-        $loginToken = $columns->tokenFor('alice', \Koyo\EncryptedFields\User\ColumnStore::LOGIN);
-        $emailToken = $columns->tokenFor('alice@example.com', \Koyo\EncryptedFields\User\ColumnStore::EMAIL);
+        $columns = new \EncryptedFields\User\ColumnStore($plugin);
+        $loginToken = $columns->tokenFor('alice', \EncryptedFields\User\ColumnStore::LOGIN);
+        $emailToken = $columns->tokenFor('alice@example.com', \EncryptedFields\User\ColumnStore::EMAIL);
 
         $GLOBALS['kec_usermeta'][7] = array(
             '_kec_user_login' => 'alice',
@@ -880,7 +880,7 @@ namespace {
 
         $user = (object) array('ID' => 7, 'user_email' => $emailToken);
         $message = "Username: {$loginToken}\nEmail: {$emailToken}\nReset: https://example.test/?login=" . rawurlencode($loginToken);
-        $reset = new \Koyo\EncryptedFields\User\PasswordReset($plugin);
+        $reset = new \EncryptedFields\User\PasswordReset($plugin);
         $out = $reset->filterMessage($message, 'key', $loginToken, $user);
 
         assert_true(false === strpos($out, $loginToken), 'password reset message must not contain login token');

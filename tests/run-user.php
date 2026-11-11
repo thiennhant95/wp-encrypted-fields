@@ -3,17 +3,17 @@
 declare(strict_types=1);
 
 namespace {
-    use Koyo\EncryptedFields\Config\Field;
-    use Koyo\EncryptedFields\Config\Registry;
-    use Koyo\EncryptedFields\Contracts\EncryptorInterface;
-    use Koyo\EncryptedFields\Contracts\SearchInterface;
-    use Koyo\EncryptedFields\Crypto\KeyManager;
-    use Koyo\EncryptedFields\Plugin;
-    use Koyo\EncryptedFields\Query\QueryRewriter;
-    use Koyo\EncryptedFields\Support\Logger;
-    use Koyo\EncryptedFields\User\ColumnStore;
-    use Koyo\EncryptedFields\User\UserHooks;
-    use Koyo\EncryptedFields\User\UserLookup;
+    use EncryptedFields\Config\Field;
+    use EncryptedFields\Config\Registry;
+    use EncryptedFields\Contracts\EncryptorInterface;
+    use EncryptedFields\Contracts\SearchInterface;
+    use EncryptedFields\Crypto\KeyManager;
+    use EncryptedFields\Plugin;
+    use EncryptedFields\Query\QueryRewriter;
+    use EncryptedFields\Support\Logger;
+    use EncryptedFields\User\ColumnStore;
+    use EncryptedFields\User\UserHooks;
+    use EncryptedFields\User\UserLookup;
 
     $root = dirname(__DIR__);
     require $root . '/src/Config/Field.php';

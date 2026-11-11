@@ -1,6 +1,6 @@
 <?php
 
-namespace Koyo\EncryptedFields\Contracts;
+namespace EncryptedFields\Contracts;
 
 interface SearchInterface
 {

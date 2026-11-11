@@ -189,18 +189,18 @@ require_once dirname(__DIR__) . '/src/User/ColumnStore.php';
 require_once dirname(__DIR__) . '/src/Integrations/WooCommerce/CustomerLookupSchema.php';
 require_once dirname(__DIR__) . '/src/Integrations/WooCommerce/Integration.php';
 require_once dirname(__DIR__) . '/src/Integrations/SiteGuard/Integration.php';
-require_once dirname(__DIR__) . '/src/Integrations/LegacyEcKoyo/Preset.php';
+require_once dirname(__DIR__) . '/src/Integrations/Legacy/Preset.php';
 
-use Koyo\EncryptedFields\Config\Field;
-use Koyo\EncryptedFields\Config\Registry;
-use Koyo\EncryptedFields\Contracts\EncryptorInterface;
-use Koyo\EncryptedFields\Contracts\SearchInterface;
-use Koyo\EncryptedFields\Integrations\LegacyEcKoyo\Preset;
-use Koyo\EncryptedFields\Integrations\SiteGuard\Integration as SiteGuardIntegration;
-use Koyo\EncryptedFields\Integrations\WooCommerce\Integration as WooIntegration;
-use Koyo\EncryptedFields\Plugin;
-use Koyo\EncryptedFields\Support\Logger;
-use Koyo\EncryptedFields\User\ColumnStore;
+use EncryptedFields\Config\Field;
+use EncryptedFields\Config\Registry;
+use EncryptedFields\Contracts\EncryptorInterface;
+use EncryptedFields\Contracts\SearchInterface;
+use EncryptedFields\Integrations\Legacy\Preset;
+use EncryptedFields\Integrations\SiteGuard\Integration as SiteGuardIntegration;
+use EncryptedFields\Integrations\WooCommerce\Integration as WooIntegration;
+use EncryptedFields\Plugin;
+use EncryptedFields\Support\Logger;
+use EncryptedFields\User\ColumnStore;
 
 final class FakeCrypto implements EncryptorInterface
 {
@@ -564,7 +564,7 @@ kec_test_run('SiteGuard resolves user tokens and token mail recipients', functio
     kec_test_assert_same('admin', $mail['cc'], 'Mail login token recipient should resolve.');
 });
 
-kec_test_run('EC-KOYO preset contains expected columns, meta and legacy keys', function () {
+kec_test_run('legacy preset contains expected columns, meta and legacy keys', function () {
     $registry = Preset::registry();
 
     kec_test_assert_same('login', $registry['user']['columns']['user_login']['type']);
@@ -612,10 +612,10 @@ kec_test_run('EC-KOYO preset contains expected columns, meta and legacy keys', f
         kec_test_assert_true(array_key_exists($key, $legacy), 'Missing legacy key: ' . $key);
     }
 
-    $configPreset = require dirname(__DIR__) . '/config/presets/full-ec-koyo.php';
+    $configPreset = require dirname(__DIR__) . '/config/presets/full.php';
     kec_test_assert_same($registry, $configPreset, 'Config preset differs from Preset::registry().');
 
-    $configLegacy = require dirname(__DIR__) . '/config/presets/legacy-ec-koyo.php';
+    $configLegacy = require dirname(__DIR__) . '/config/presets/legacy.php';
     kec_test_assert_same($legacy, $configLegacy, 'Config legacy preset differs from Preset::legacyConfig().');
 });
 

@@ -1,10 +1,10 @@
 <?php
 
-namespace Koyo\EncryptedFields\Crypto;
+namespace EncryptedFields\Crypto;
 
-use Koyo\EncryptedFields\Migration\LookupMigrator;
-use Koyo\EncryptedFields\Migration\Migrator;
-use Koyo\EncryptedFields\Plugin;
+use EncryptedFields\Migration\LookupMigrator;
+use EncryptedFields\Migration\Migrator;
+use EncryptedFields\Plugin;
 
 /**
  * Two-phase key rotation using KEC_KEY_NEXT as the new current key.

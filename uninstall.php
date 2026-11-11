@@ -22,9 +22,9 @@ if (function_exists('get_users') && is_file($kecPluginFile)) {
     try {
         require_once $kecPluginFile;
 
-        $kecPlugin = \Koyo\EncryptedFields\Plugin::instance();
+        $kecPlugin = \EncryptedFields\Plugin::instance();
         $kecPlugin->init();
-        $kecStore = new \Koyo\EncryptedFields\User\ColumnStore($kecPlugin);
+        $kecStore = new \EncryptedFields\User\ColumnStore($kecPlugin);
 
         $kecUsers = $wpdb->get_results("SELECT ID, user_login, user_email FROM {$wpdb->users}");
 
@@ -36,8 +36,8 @@ if (function_exists('get_users') && is_file($kecPluginFile)) {
                 }
 
                 $kecColumns = array(
-                    'user_login' => array(\Koyo\EncryptedFields\User\ColumnStore::LOGIN, '_kec_user_login'),
-                    'user_email' => array(\Koyo\EncryptedFields\User\ColumnStore::EMAIL, '_kec_user_email'),
+                    'user_login' => array(\EncryptedFields\User\ColumnStore::LOGIN, '_kec_user_login'),
+                    'user_email' => array(\EncryptedFields\User\ColumnStore::EMAIL, '_kec_user_email'),
                 );
 
                 foreach ($kecColumns as $kecColumn => $kecTarget) {
@@ -59,7 +59,7 @@ if (function_exists('get_users') && is_file($kecPluginFile)) {
                         continue;
                     }
 
-                    \Koyo\EncryptedFields\Query\QueryRewriter::suspend();
+                    \EncryptedFields\Query\QueryRewriter::suspend();
 
                     try {
                         $kecUpdated = $wpdb->update(
@@ -68,7 +68,7 @@ if (function_exists('get_users') && is_file($kecPluginFile)) {
                             array('ID' => $kecId)
                         );
                     } finally {
-                        \Koyo\EncryptedFields\Query\QueryRewriter::resume();
+                        \EncryptedFields\Query\QueryRewriter::resume();
                     }
 
                     if (false === $kecUpdated) {

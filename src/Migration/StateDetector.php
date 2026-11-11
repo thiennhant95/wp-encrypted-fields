@@ -1,9 +1,9 @@
 <?php
 
-namespace Koyo\EncryptedFields\Migration;
+namespace EncryptedFields\Migration;
 
-use Koyo\EncryptedFields\Config\Field;
-use Koyo\EncryptedFields\Plugin;
+use EncryptedFields\Config\Field;
+use EncryptedFields\Plugin;
 
 /**
  * Classifies the installation as fresh/plaintext/legacy/mixed/configured.

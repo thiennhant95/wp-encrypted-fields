@@ -1,11 +1,11 @@
 <?php
 
-namespace Koyo\EncryptedFields\Integrations\SiteGuard;
+namespace EncryptedFields\Integrations\SiteGuard;
 
-use Koyo\EncryptedFields\Config\Field;
-use Koyo\EncryptedFields\Config\Registry;
-use Koyo\EncryptedFields\Plugin;
-use Koyo\EncryptedFields\User\ColumnStore;
+use EncryptedFields\Config\Field;
+use EncryptedFields\Config\Registry;
+use EncryptedFields\Plugin;
+use EncryptedFields\User\ColumnStore;
 
 /**
  * SiteGuard integration.
@@ -292,7 +292,7 @@ final class Integration
         }
     }
 
-    private function crypto(): ?\Koyo\EncryptedFields\Contracts\EncryptorInterface
+    private function crypto(): ?\EncryptedFields\Contracts\EncryptorInterface
     {
         try {
             return $this->plugin->crypto();

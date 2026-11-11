@@ -1,9 +1,9 @@
 <?php
 
-namespace Koyo\EncryptedFields\Meta;
+namespace EncryptedFields\Meta;
 
-use Koyo\EncryptedFields\Config\Field;
-use Koyo\EncryptedFields\Plugin;
+use EncryptedFields\Config\Field;
+use EncryptedFields\Plugin;
 
 final class MetaHooks
 {

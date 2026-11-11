@@ -1,9 +1,9 @@
 <?php
 
-namespace Koyo\EncryptedFields\Integrations\LegacyEcKoyo;
+namespace EncryptedFields\Integrations\Legacy;
 
 /**
- * Registry preset matching the EC-KOYO koyo_meta_cipher_map() fields.
+ * Registry preset matching the legacy meta cipher map fields.
  */
 final class Preset
 {
@@ -98,10 +98,10 @@ final class Preset
     /**
      * Map for KEC_LEGACY.
      *
-     * - ctr_key:   EC-KOYO encrypt()/decrypt() AES-256-CTR key (hex)
-     * - login_key: EC-KOYO encrypt_login()/decrypt_login() AES-256-CBC key (hex)
-     * - email_key: EC-KOYO encrypt_decrypt() secret_key
-     * - email_iv:  EC-KOYO encrypt_decrypt() secret_iv
+     * - ctr_key:   legacy encrypt()/decrypt() AES-256-CTR key (hex)
+     * - login_key: legacy encrypt_login()/decrypt_login() AES-256-CBC key (hex)
+     * - email_key: legacy encrypt_decrypt() secret_key
+     * - email_iv:  legacy encrypt_decrypt() secret_iv
      *
      * Secrets are read from constants/environment and are never bundled here.
      *
@@ -110,33 +110,21 @@ final class Preset
     public static function legacyConfig(): array
     {
         return array(
-            'ctr_key' => self::secret('KEC_LEGACY_CTR_KEY', 'KOYO_LEGACY_CTR_KEY'),
-            'login_key' => self::secret('KEC_LEGACY_LOGIN_KEY', 'KOYO_LEGACY_LOGIN_KEY'),
-            'email_key' => self::secret('KEC_LEGACY_EMAIL_KEY', 'KOYO_LEGACY_EMAIL_KEY'),
-            'email_iv' => self::secret('KEC_LEGACY_EMAIL_IV', 'KOYO_LEGACY_EMAIL_IV'),
+            'ctr_key' => self::secret('KEC_LEGACY_CTR_KEY'),
+            'login_key' => self::secret('KEC_LEGACY_LOGIN_KEY'),
+            'email_key' => self::secret('KEC_LEGACY_EMAIL_KEY'),
+            'email_iv' => self::secret('KEC_LEGACY_EMAIL_IV'),
         );
     }
 
-    private static function secret(string $primary, string $fallback): string
+    private static function secret(string $name): string
     {
-        if (defined($primary)) {
-            return (string) constant($primary);
+        if (defined($name)) {
+            return (string) constant($name);
         }
 
-        if (defined($fallback)) {
-            return (string) constant($fallback);
-        }
+        $env = getenv($name);
 
-        $env = getenv($primary);
-        if (is_string($env) && '' !== $env) {
-            return $env;
-        }
-
-        $env = getenv($fallback);
-        if (is_string($env) && '' !== $env) {
-            return $env;
-        }
-
-        return '';
+        return is_string($env) ? $env : '';
     }
 }

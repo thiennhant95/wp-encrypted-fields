@@ -1,11 +1,11 @@
 <?php
 
-namespace Koyo\EncryptedFields\Integrations\WooCommerce;
+namespace EncryptedFields\Integrations\WooCommerce;
 
-use Koyo\EncryptedFields\Config\Field;
-use Koyo\EncryptedFields\Config\Registry;
-use Koyo\EncryptedFields\Plugin;
-use Koyo\EncryptedFields\User\ColumnStore;
+use EncryptedFields\Config\Field;
+use EncryptedFields\Config\Registry;
+use EncryptedFields\Plugin;
+use EncryptedFields\User\ColumnStore;
 
 /**
  * WooCommerce integration.
@@ -668,7 +668,7 @@ final class Integration
         }
     }
 
-    private function search(): ?\Koyo\EncryptedFields\Contracts\SearchInterface
+    private function search(): ?\EncryptedFields\Contracts\SearchInterface
     {
         try {
             return $this->plugin->search();
@@ -677,7 +677,7 @@ final class Integration
         }
     }
 
-    private function crypto(): ?\Koyo\EncryptedFields\Contracts\EncryptorInterface
+    private function crypto(): ?\EncryptedFields\Contracts\EncryptorInterface
     {
         try {
             return $this->plugin->crypto();

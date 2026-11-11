@@ -1,8 +1,8 @@
 <?php
 
-namespace Koyo\EncryptedFields\User;
+namespace EncryptedFields\User;
 
-use Koyo\EncryptedFields\Plugin;
+use EncryptedFields\Plugin;
 
 /**
  * Replaces blind-index tokens in password reset mail with plaintext.

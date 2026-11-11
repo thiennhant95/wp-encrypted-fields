@@ -12,14 +12,14 @@ require_once __DIR__ . '/../src/Config/Field.php';
 require_once __DIR__ . '/../src/Contracts/EncryptorInterface.php';
 require_once __DIR__ . '/../src/Crypto/Format.php';
 require_once __DIR__ . '/../src/Crypto/KeyManager.php';
-require_once __DIR__ . '/../src/Crypto/LegacyEcKoyoCipher.php';
+require_once __DIR__ . '/../src/Crypto/LegacyCipher.php';
 require_once __DIR__ . '/../src/Crypto/Encryptor.php';
 
-use Koyo\EncryptedFields\Config\Field;
-use Koyo\EncryptedFields\Crypto\Encryptor;
-use Koyo\EncryptedFields\Crypto\Format;
-use Koyo\EncryptedFields\Crypto\KeyManager;
-use Koyo\EncryptedFields\Crypto\LegacyEcKoyoCipher;
+use EncryptedFields\Config\Field;
+use EncryptedFields\Crypto\Encryptor;
+use EncryptedFields\Crypto\Format;
+use EncryptedFields\Crypto\KeyManager;
+use EncryptedFields\Crypto\LegacyCipher;
 
 $GLOBALS['kec_crypto_pass'] = 0;
 $GLOBALS['kec_crypto_fail'] = 0;
@@ -164,18 +164,18 @@ check($threw, 'maxLength overflow throws RuntimeException');
 
 // Legacy CTR.
 $legacyCtr = legacy_ctr_encrypt('Legacy CTR text 日本語', $legacyConfig['ctr_key']);
-check((new LegacyEcKoyoCipher($legacyConfig))->detect($legacyCtr) === 'ctr', 'legacy CTR detected');
+check((new LegacyCipher($legacyConfig))->detect($legacyCtr) === 'ctr', 'legacy CTR detected');
 check($encryptor->isEncrypted($legacyCtr), 'legacy CTR recognized as encrypted');
 check($encryptor->decrypt($legacyCtr, $textField) === 'Legacy CTR text 日本語', 'legacy CTR decrypts');
 
 // Legacy login.
 $legacyLogin = legacy_login_encrypt('legacyuser', $legacyConfig['login_key']);
-check((new LegacyEcKoyoCipher($legacyConfig))->detect($legacyLogin) === 'login', 'legacy login detected');
+check((new LegacyCipher($legacyConfig))->detect($legacyLogin) === 'login', 'legacy login detected');
 check($encryptor->decrypt($legacyLogin, $loginField) === 'legacyuser', 'legacy login decrypts');
 
 // Legacy email.
 $legacyEmail = legacy_email_encrypt('Legacy.User@Example.com', $legacyConfig['email_key'], $legacyConfig['email_iv']);
-check((new LegacyEcKoyoCipher($legacyConfig))->detect($legacyEmail) === 'email', 'legacy email detected');
+check((new LegacyCipher($legacyConfig))->detect($legacyEmail) === 'email', 'legacy email detected');
 check($encryptor->decrypt($legacyEmail, $emailField) === 'Legacy.User@Example.com', 'legacy email decrypts');
 
 // Tamper detection returns the original input.

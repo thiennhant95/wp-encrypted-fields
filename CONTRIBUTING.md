@@ -36,7 +36,7 @@ vendor/bin/phpunit
 ## Coding guidelines
 
 - PHP 8.0-compatible syntax (no readonly properties, enums, or readonly classes).
-- PSR-4 namespace `Koyo\EncryptedFields\`.
+- PSR-4 namespace `EncryptedFields\`.
 - Follow WordPress coding standards where practical.
 - Keep public APIs documented with short PHPDoc.
 - Never log plaintext, ciphertext, keys or email addresses.

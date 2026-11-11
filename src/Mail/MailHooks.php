@@ -1,11 +1,11 @@
 <?php
 
-namespace Koyo\EncryptedFields\Mail;
+namespace EncryptedFields\Mail;
 
-use Koyo\EncryptedFields\Config\Field;
-use Koyo\EncryptedFields\Contracts\EncryptorInterface;
-use Koyo\EncryptedFields\Plugin;
-use Koyo\EncryptedFields\User\ColumnStore;
+use EncryptedFields\Config\Field;
+use EncryptedFields\Contracts\EncryptorInterface;
+use EncryptedFields\Plugin;
+use EncryptedFields\User\ColumnStore;
 
 /**
  * Decrypts encrypted recipients before mail is handed to the mailer.

@@ -15,13 +15,13 @@ require_once __DIR__ . '/../src/Meta/MetaCache.php';
 require_once __DIR__ . '/../src/Meta/MetaWriteGuard.php';
 require_once __DIR__ . '/../src/Meta/MetaHooks.php';
 
-use Koyo\EncryptedFields\Config\Field;
-use Koyo\EncryptedFields\Config\Registry;
-use Koyo\EncryptedFields\Contracts\EncryptorInterface;
-use Koyo\EncryptedFields\Meta\MetaCache;
-use Koyo\EncryptedFields\Meta\MetaHooks;
-use Koyo\EncryptedFields\Plugin;
-use Koyo\EncryptedFields\Support\Logger;
+use EncryptedFields\Config\Field;
+use EncryptedFields\Config\Registry;
+use EncryptedFields\Contracts\EncryptorInterface;
+use EncryptedFields\Meta\MetaCache;
+use EncryptedFields\Meta\MetaHooks;
+use EncryptedFields\Plugin;
+use EncryptedFields\Support\Logger;
 
 final class TestEncryptor implements EncryptorInterface
 {

@@ -1,9 +1,9 @@
 <?php
 
-namespace Koyo\EncryptedFields\User;
+namespace EncryptedFields\User;
 
-use Koyo\EncryptedFields\Config\Field;
-use Koyo\EncryptedFields\Plugin;
+use EncryptedFields\Config\Field;
+use EncryptedFields\Plugin;
 
 /**
  * Blind-index storage for wp_users.user_login and user_email.

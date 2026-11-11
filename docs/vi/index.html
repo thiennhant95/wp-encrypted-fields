@@ -52,7 +52,7 @@
   <div class="wrap hero">
     <div class="hero-grid">
       <div>
-        <span class="badge">v0.3.0 · WordPress 7.1.4 · GPL-2.0-or-later</span>
+        <span class="badge">v0.4.0 · WordPress 7.1.4 · GPL-2.0-or-later</span>
         <h1>Field-level encryption.<br><span class="grad">DB chỉ thấy ciphertext.</span></h1>
         <p class="lead">
           Bảo vệ PII khách hàng ngay trong database mà không phải viết lại site. Khai báo field cần mã hoá,
@@ -62,7 +62,7 @@
         <div class="cta">
           <a class="btn primary" href="#install">Cài đặt</a>
           <a class="btn" href="https://github.com/thiennhant95/wp-encrypted-fields" target="_blank" rel="noopener">Mã nguồn GitHub</a>
-          <a class="btn" href="https://github.com/thiennhant95/wp-encrypted-fields/releases/tag/v0.3.0" target="_blank" rel="noopener">Release v0.3.0</a>
+          <a class="btn" href="https://github.com/thiennhant95/wp-encrypted-fields/releases/tag/v0.4.0" target="_blank" rel="noopener">Release v0.4.0</a>
         </div>
       </div>
       <div class="mini-term" aria-label="Ví dụ ciphertext trong DB và plaintext qua API">
@@ -158,7 +158,7 @@
         <div class="card"><h3>WooCommerce store</h3><p>Mã hoá billing/shipping và address index; order search và customer lookup vẫn chạy.</p></div>
         <div class="card"><h3>Membership &amp; user site</h3><p>Tokenize login/email; authentication, password reset và quản lý user bằng WP-CLI vẫn hoạt động.</p></div>
         <div class="card"><h3>Form, ACF và CRM meta</h3><p>Mã hoá field form/ACF đã khai báo, search email qua blind index; Flamingo vẫn dùng được.</p></div>
-        <div class="card"><h3>Migration legacy</h3><p>Đọc ciphertext EC-KOYO, migrate sang v2, verify từng row và rotate key 2 pha.</p></div>
+        <div class="card"><h3>Migration legacy</h3><p>Đọc ciphertext legacy, migrate sang v2, verify từng row và rotate key 2 pha.</p></div>
       </div>
     </div>
   </section>
@@ -205,7 +205,7 @@ wp kec verify --full</code></pre>
   <section id="tests">
     <div class="wrap">
       <h2>Kết quả kiểm chứng</h2>
-      <p class="sub">Cùng một test lab: WordPress 7.1.4, PHP 8.1, MySQL 5.7, plugin 0.3.0.</p>
+      <p class="sub">Cùng một test lab: WordPress 7.1.4, PHP 8.1, MySQL 5.7, plugin 0.4.0.</p>
       <table>
         <thead><tr><th>Hạng mục</th><th>Kết quả</th></tr></thead>
         <tbody>
@@ -270,7 +270,7 @@ wp kec verify --full</code></pre>
       <h2>Sẵn sàng bảo vệ PII khách hàng?</h2>
       <p class="sub" style="margin-left:auto;margin-right:auto">Cài plugin, khai báo field cần bảo vệ và chạy <code>verify --full</code> trước khi go-live.</p>
       <div class="cta" style="justify-content:center">
-        <a class="btn primary" href="https://github.com/thiennhant95/wp-encrypted-fields/releases/tag/v0.3.0" target="_blank" rel="noopener">Tải v0.3.0</a>
+        <a class="btn primary" href="https://github.com/thiennhant95/wp-encrypted-fields/releases/tag/v0.4.0" target="_blank" rel="noopener">Tải v0.4.0</a>
         <a class="btn" href="https://github.com/thiennhant95/wp-encrypted-fields/blob/main/README.md" target="_blank" rel="noopener">Đọc tài liệu</a>
       </div>
       <div class="chips" style="justify-content:center;margin-top:18px">

@@ -1,8 +1,8 @@
 <?php
 
-namespace Koyo\EncryptedFields\Meta;
+namespace EncryptedFields\Meta;
 
-use Koyo\EncryptedFields\Plugin;
+use EncryptedFields\Plugin;
 
 final class MetaWriteGuard
 {

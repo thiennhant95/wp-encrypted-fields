@@ -2,7 +2,7 @@
 /**
  * Search index tab.
  *
- * @var \Koyo\EncryptedFields\Plugin $plugin
+ * @var \EncryptedFields\Plugin $plugin
  */
 
 $db = isset($GLOBALS['wpdb']) ? $GLOBALS['wpdb'] : null;

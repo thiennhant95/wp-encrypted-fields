@@ -2,7 +2,7 @@
 /**
  * Registry tab.
  *
- * @var \Koyo\EncryptedFields\Plugin $plugin
+ * @var \EncryptedFields\Plugin $plugin
  */
 
 $option = $plugin->option('kec_field_registry', null);

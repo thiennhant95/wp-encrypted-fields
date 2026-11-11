@@ -1,6 +1,6 @@
 <?php
 
-namespace Koyo\EncryptedFields\Integrations\WooCommerce;
+namespace EncryptedFields\Integrations\WooCommerce;
 
 /**
  * WooCommerce Analytics customer lookup table helper.

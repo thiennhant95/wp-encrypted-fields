@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Koyo\EncryptedFields\Crypto {
+namespace EncryptedFields\Crypto {
     if (!class_exists(KeyManager::class, false)) {
         final class KeyManager
         {
@@ -25,14 +25,14 @@ namespace Koyo\EncryptedFields\Crypto {
 }
 
 namespace {
-    use Koyo\EncryptedFields\Config\Registry;
-    use Koyo\EncryptedFields\Plugin;
-    use Koyo\EncryptedFields\Search\Hooks;
-    use Koyo\EncryptedFields\Search\IndexSchema;
-    use Koyo\EncryptedFields\Search\SearchService;
-    use Koyo\EncryptedFields\Search\Tokenizer;
-    use Koyo\EncryptedFields\Support\Logger;
-    use Koyo\EncryptedFields\User\ColumnStore;
+    use EncryptedFields\Config\Registry;
+    use EncryptedFields\Plugin;
+    use EncryptedFields\Search\Hooks;
+    use EncryptedFields\Search\IndexSchema;
+    use EncryptedFields\Search\SearchService;
+    use EncryptedFields\Search\Tokenizer;
+    use EncryptedFields\Support\Logger;
+    use EncryptedFields\User\ColumnStore;
 
     $root = dirname(__DIR__);
     require $root . '/src/Config/Field.php';
@@ -302,7 +302,7 @@ namespace {
         $plugin = $reflection->newInstanceWithoutConstructor();
 
         set_property($plugin, 'registry', new Registry($registry));
-        set_property($plugin, 'keys', new \Koyo\EncryptedFields\Crypto\KeyManager());
+        set_property($plugin, 'keys', new \EncryptedFields\Crypto\KeyManager());
         set_property($plugin, 'logger', new Logger());
         set_property($plugin, 'crypto', null);
         set_property($plugin, 'search', null);

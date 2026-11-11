@@ -52,7 +52,7 @@
   <div class="wrap hero">
     <div class="hero-grid">
       <div>
-        <span class="badge">v0.3.0 · WordPress 7.1.4 · GPL-2.0-or-later</span>
+        <span class="badge">v0.4.0 · WordPress 7.1.4 · GPL-2.0-or-later</span>
         <h1>Field-level encryption.<br><span class="grad">The database only sees ciphertext.</span></h1>
         <p class="lead">
           Protect customer PII at rest without rewriting your site. Declare the fields to encrypt,
@@ -62,7 +62,7 @@
         <div class="cta">
           <a class="btn primary" href="#install">Install</a>
           <a class="btn" href="https://github.com/thiennhant95/wp-encrypted-fields" target="_blank" rel="noopener">Source on GitHub</a>
-          <a class="btn" href="https://github.com/thiennhant95/wp-encrypted-fields/releases/tag/v0.3.0" target="_blank" rel="noopener">Release v0.3.0</a>
+          <a class="btn" href="https://github.com/thiennhant95/wp-encrypted-fields/releases/tag/v0.4.0" target="_blank" rel="noopener">Release v0.4.0</a>
         </div>
       </div>
       <div class="mini-term" aria-label="Database ciphertext and API plaintext example">
@@ -158,7 +158,7 @@
         <div class="card"><h3>WooCommerce stores</h3><p>Encrypt billing/shipping fields and the address index while order search and customer lookup keep working.</p></div>
         <div class="card"><h3>Membership &amp; user sites</h3><p>Tokenize login/email columns and keep authentication, password reset and WP-CLI user management working.</p></div>
         <div class="card"><h3>Forms, ACF and CRM meta</h3><p>Encrypt declared form/ACF fields and search emails through the blind index; keep Flamingo submissions usable.</p></div>
-        <div class="card"><h3>Legacy migrations</h3><p>Read EC-KOYO ciphertext, migrate to v2, verify every row and rotate keys in two phases.</p></div>
+        <div class="card"><h3>Legacy migrations</h3><p>Read legacy ciphertext, migrate to v2, verify every row and rotate keys in two phases.</p></div>
       </div>
     </div>
   </section>
@@ -205,7 +205,7 @@ wp kec verify --full</code></pre>
   <section id="tests">
     <div class="wrap">
       <h2>Verification results</h2>
-      <p class="sub">Same test lab: WordPress 7.1.4, PHP 8.1, MySQL 5.7, plugin 0.3.0.</p>
+      <p class="sub">Same test lab: WordPress 7.1.4, PHP 8.1, MySQL 5.7, plugin 0.4.0.</p>
       <table>
         <thead><tr><th>Area</th><th>Result</th></tr></thead>
         <tbody>
@@ -270,7 +270,7 @@ wp kec verify --full</code></pre>
       <h2>Ready to protect customer PII?</h2>
       <p class="sub" style="margin-left:auto;margin-right:auto">Install the plugin, declare the fields you need, and run <code>verify --full</code> before going live.</p>
       <div class="cta" style="justify-content:center">
-        <a class="btn primary" href="https://github.com/thiennhant95/wp-encrypted-fields/releases/tag/v0.3.0" target="_blank" rel="noopener">Download v0.3.0</a>
+        <a class="btn primary" href="https://github.com/thiennhant95/wp-encrypted-fields/releases/tag/v0.4.0" target="_blank" rel="noopener">Download v0.4.0</a>
         <a class="btn" href="https://github.com/thiennhant95/wp-encrypted-fields/blob/main/README.md" target="_blank" rel="noopener">Read the docs</a>
       </div>
       <div class="chips" style="justify-content:center;margin-top:18px">

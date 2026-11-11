@@ -2,6 +2,28 @@
 
 All notable changes to this project are documented here.
 
+## [0.4.0] - 2026-11-11
+
+### Changed
+
+- Renamed the vendor-prefixed PHP namespace to `EncryptedFields`.
+- Renamed the legacy cipher class to `LegacyCipher` and its integration
+  namespace to `Integrations\Legacy`.
+- Renamed config presets to `full.php` / `legacy.php`; the setup preset is now
+  `full`.
+
+### Removed
+
+- Removed the old prefixed legacy constants/environment fallback; use
+  `KEC_LEGACY_*`.
+- Removed legacy vendor branding from code, docs and the landing page.
+
+### Upgrade
+
+- Update custom code and configuration that references the old namespace,
+  class names, preset slug or legacy constant prefix. Stored ciphertext does
+  not need migration.
+
 ## [0.3.0] - 2026-11-11
 
 ### Added

@@ -1,6 +1,6 @@
 <?php
 
-namespace Koyo\EncryptedFields\Config;
+namespace EncryptedFields\Config;
 
 final class Registry
 {

@@ -1,10 +1,10 @@
 <?php
 
-namespace Koyo\EncryptedFields\User;
+namespace EncryptedFields\User;
 
-use Koyo\EncryptedFields\Config\Field;
-use Koyo\EncryptedFields\Config\Registry;
-use Koyo\EncryptedFields\Plugin;
+use EncryptedFields\Config\Field;
+use EncryptedFields\Config\Registry;
+use EncryptedFields\Plugin;
 
 /**
  * Transparent handling of encrypted wp_users columns.
@@ -363,7 +363,7 @@ final class UserHooks
      * This is intentionally public and static so callers can use it for users
      * loaded outside of the hooks above:
      *
-     *     \Koyo\EncryptedFields\User\UserHooks::decryptUser($user);
+     *     \EncryptedFields\User\UserHooks::decryptUser($user);
      *
      * @param mixed $user
      */

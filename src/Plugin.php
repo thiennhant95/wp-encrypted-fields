@@ -1,14 +1,14 @@
 <?php
 
-namespace Koyo\EncryptedFields;
+namespace EncryptedFields;
 
-use Koyo\EncryptedFields\Config\Registry;
-use Koyo\EncryptedFields\Contracts\EncryptorInterface;
-use Koyo\EncryptedFields\Contracts\SearchInterface;
-use Koyo\EncryptedFields\Contracts\TableAdapterInterface;
-use Koyo\EncryptedFields\Crypto\Encryptor;
-use Koyo\EncryptedFields\Crypto\KeyManager;
-use Koyo\EncryptedFields\Support\Logger;
+use EncryptedFields\Config\Registry;
+use EncryptedFields\Contracts\EncryptorInterface;
+use EncryptedFields\Contracts\SearchInterface;
+use EncryptedFields\Contracts\TableAdapterInterface;
+use EncryptedFields\Crypto\Encryptor;
+use EncryptedFields\Crypto\KeyManager;
+use EncryptedFields\Support\Logger;
 
 final class Plugin
 {
@@ -54,8 +54,8 @@ final class Plugin
         $this->keys = new KeyManager();
         $this->crypto = new Encryptor($this->keys);
 
-        if (class_exists(\Koyo\EncryptedFields\Search\SearchService::class)) {
-            $this->search = new \Koyo\EncryptedFields\Search\SearchService($this);
+        if (class_exists(\EncryptedFields\Search\SearchService::class)) {
+            $this->search = new \EncryptedFields\Search\SearchService($this);
         }
 
         $this->tableAdapters = (array) apply_filters('kec_table_adapters', array());
@@ -65,27 +65,27 @@ final class Plugin
     private function registerModules(): void
     {
         $modules = array(
-            \Koyo\EncryptedFields\Meta\MetaHooks::class,
-            \Koyo\EncryptedFields\User\UserHooks::class,
-            \Koyo\EncryptedFields\User\UserLookup::class,
-            \Koyo\EncryptedFields\User\PasswordReset::class,
-            \Koyo\EncryptedFields\Query\QueryRewriter::class,
-            \Koyo\EncryptedFields\Search\Hooks::class,
-            \Koyo\EncryptedFields\Mail\MailHooks::class,
-            \Koyo\EncryptedFields\Admin\SettingsPage::class,
-            \Koyo\EncryptedFields\Admin\SetupWizard::class,
+            \EncryptedFields\Meta\MetaHooks::class,
+            \EncryptedFields\User\UserHooks::class,
+            \EncryptedFields\User\UserLookup::class,
+            \EncryptedFields\User\PasswordReset::class,
+            \EncryptedFields\Query\QueryRewriter::class,
+            \EncryptedFields\Search\Hooks::class,
+            \EncryptedFields\Mail\MailHooks::class,
+            \EncryptedFields\Admin\SettingsPage::class,
+            \EncryptedFields\Admin\SetupWizard::class,
         );
 
         if (class_exists('WooCommerce')) {
-            $modules[] = \Koyo\EncryptedFields\Integrations\WooCommerce\Integration::class;
+            $modules[] = \EncryptedFields\Integrations\WooCommerce\Integration::class;
         }
 
         if (defined('SITEGUARD_VERSION')) {
-            $modules[] = \Koyo\EncryptedFields\Integrations\SiteGuard\Integration::class;
+            $modules[] = \EncryptedFields\Integrations\SiteGuard\Integration::class;
         }
 
         if (defined('WP_CLI') && WP_CLI) {
-            $modules[] = \Koyo\EncryptedFields\Cli\Commands::class;
+            $modules[] = \EncryptedFields\Cli\Commands::class;
         }
 
         foreach ($modules as $class) {

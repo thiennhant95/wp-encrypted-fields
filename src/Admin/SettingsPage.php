@@ -1,11 +1,11 @@
 <?php
 
-namespace Koyo\EncryptedFields\Admin;
+namespace EncryptedFields\Admin;
 
-use Koyo\EncryptedFields\Migration\Env;
-use Koyo\EncryptedFields\Migration\Migrator;
-use Koyo\EncryptedFields\Migration\StateDetector;
-use Koyo\EncryptedFields\Plugin;
+use EncryptedFields\Migration\Env;
+use EncryptedFields\Migration\Migrator;
+use EncryptedFields\Migration\StateDetector;
+use EncryptedFields\Plugin;
 
 /**
  * Settings -> Encrypted Fields admin screen.

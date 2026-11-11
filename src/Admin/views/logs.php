@@ -2,7 +2,7 @@
 /**
  * Logs tab.
  *
- * @var \Koyo\EncryptedFields\Plugin $plugin
+ * @var \EncryptedFields\Plugin $plugin
  */
 
 $logs = $plugin->logger()->recent(100);

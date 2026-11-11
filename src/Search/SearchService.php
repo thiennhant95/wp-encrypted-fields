@@ -1,12 +1,12 @@
 <?php
 
-namespace Koyo\EncryptedFields\Search;
+namespace EncryptedFields\Search;
 
-use Koyo\EncryptedFields\Config\Field;
-use Koyo\EncryptedFields\Config\Registry;
-use Koyo\EncryptedFields\Contracts\SearchInterface;
-use Koyo\EncryptedFields\Plugin;
-use Koyo\EncryptedFields\User\ColumnStore;
+use EncryptedFields\Config\Field;
+use EncryptedFields\Config\Registry;
+use EncryptedFields\Contracts\SearchInterface;
+use EncryptedFields\Plugin;
+use EncryptedFields\User\ColumnStore;
 
 final class SearchService implements SearchInterface
 {
