@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Encrypted Fields — WordPress &amp; WooCommerce のフィールド単位暗号化</title>
+<meta name="description" content="WordPress と WooCommerce 向けのレジストリ駆動フィールド単位暗号化。AES-256-GCM、ブラインドインデックス検索、ユーザートークンモード、WP-CLI マイグレーションとキーローテーション。">
+<meta property="og:title" content="Encrypted Fields — WordPress のフィールド単位暗号化">
+<meta property="og:description" content="宣言したフィールドを暗号化し、通常の WordPress API を維持。ブラインドインデックスで検索。AES-256-GCM、WooCommerce、マルチサイト、WP-CLI。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://thiennhant95.github.io/wp-encrypted-fields/ja/">
+<meta property="og:site_name" content="Encrypted Fields">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:locale:alternate" content="en_US">
+<meta property="og:locale:alternate" content="vi_VN">
+<meta property="og:image" content="https://thiennhant95.github.io/wp-encrypted-fields/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Encrypted Fields — WordPress のフィールド単位暗号化">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Encrypted Fields — WordPress のフィールド単位暗号化">
+<meta name="twitter:description" content="AES-256-GCM、ブラインドインデックス検索、ユーザートークンモード、WooCommerce、WP-CLI。">
+<meta name="twitter:image" content="https://thiennhant95.github.io/wp-encrypted-fields/assets/og-image.png">
+<meta name="robots" content="index,follow">
+<meta name="theme-color" content="#070b12">
+<link rel="canonical" href="https://thiennhant95.github.io/wp-encrypted-fields/ja/">
+<link rel="sitemap" type="application/xml" title="Sitemap" href="https://thiennhant95.github.io/wp-encrypted-fields/sitemap.xml">
+<link rel="alternate" hreflang="en" href="https://thiennhant95.github.io/wp-encrypted-fields/">
+<link rel="alternate" hreflang="vi" href="https://thiennhant95.github.io/wp-encrypted-fields/vi/">
+<link rel="alternate" hreflang="ja" href="https://thiennhant95.github.io/wp-encrypted-fields/ja/">
+<link rel="alternate" hreflang="x-default" href="https://thiennhant95.github.io/wp-encrypted-fields/">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../assets/landing.css">
+</head>
+<body>
+<header>
+  <div class="wrap nav">
+    <div class="brand"><span class="logo">EF</span> Encrypted Fields</div>
+    <nav class="navlinks">
+      <a href="#why">課題</a>
+      <a href="#evidence">DB エビデンス</a>
+      <a href="#features">機能</a>
+      <a href="#usecases">ユースケース</a>
+      <a href="#install">インストール</a>
+      <a href="#faq">FAQ</a>
+      <a href="https://github.com/thiennhant95/wp-encrypted-fields/blob/main/README.md" target="_blank" rel="noopener">Docs</a>
+      <a href="https://github.com/thiennhant95/wp-encrypted-fields/releases" target="_blank" rel="noopener">Releases</a>
+      <span class="lang"><a href="../">EN</a><a href="../vi/">VI</a><a class="on" href="./">日本語</a></span>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap hero">
+    <div class="hero-grid">
+      <div>
+        <span class="badge">v0.4.0 · WordPress 7.1.4 · GPL-2.0-or-later</span>
+        <h1>フィールド単位の暗号化。<br><span class="grad">データベースには暗号文だけ。</span></h1>
+        <p class="lead">
+          サイトを書き換えずに、保存時の顧客 PII を保護します。暗号化するフィールドを宣言し、
+          通常の WordPress API を維持したまま、ブラインドインデックスで検索し、キーを安全にローテーションできます。
+          下のスクリーンショットはテストデータベースの<b>実データ</b>です。
+        </p>
+        <div class="cta">
+          <a class="btn primary" href="#install">インストール</a>
+          <a class="btn" href="https://github.com/thiennhant95/wp-encrypted-fields" target="_blank" rel="noopener">GitHub のソース</a>
+          <a class="btn" href="https://github.com/thiennhant95/wp-encrypted-fields/releases/tag/v0.4.0" target="_blank" rel="noopener">v0.4.0 をリリース</a>
+        </div>
+      </div>
+      <div class="mini-term" aria-label="データベースの暗号文と API のプレーンテキストの例">
+        <div class="dots"><i></i><i></i><i></i><span>live proof</span></div>
+        <div class="cmd">$ wp db get _billing_email</div>
+        <div class="enc">enc:v2:det:505bf129:eGLUsgYsUp2mHnofiUMcc1bP00bid7...</div>
+        <div class="cmd">$ get_post_meta(2185, "_billing_email")</div>
+        <div class="plain">woo.kec@example.com</div>
+        <div class="caption">DB: 暗号文 · API: プレーンテキスト</div>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat"><b>100</b><span>互換性をテストしたプラグイン</span></div>
+      <div class="stat"><b>27</b><span>テスト環境の暗号化済み行</span></div>
+      <div class="stat"><b>0</b><span>verify --full のプレーンテキスト検体</span></div>
+      <div class="stat"><b>2</b><span>検証済みマルチサイト</span></div>
+    </div>
+  </div>
+
+  <section id="why">
+    <div class="wrap">
+      <span class="kicker">課題</span>
+      <h2>バックアップは思った以上に漏れます。</h2>
+      <p class="sub">HTTPS は通信中のデータを保護します。しかし DB ダンプ、盗まれたバックアップ、SQL インジェクションは保存時のデータを露出します。フィールド自体を暗号化しない限り。</p>
+      <div class="grid g3">
+        <div class="card bad"><div class="tag">Encrypted Fields なし</div><h3>メールと注文が平文で残る</h3><p>すべての DB ダンプ、バックアップ、分析エクスポートに、顧客の氏名・メール・電話番号が読める形で含まれます。</p></div>
+        <div class="card bad"><div class="tag">ハッシュだけでは不十分</div><h3>検索とログインが壊れる</h3><p>一方向ハッシュは値を守りますが、完全一致・部分一致検索や <code>get_user_by()</code> を動かす必要があります。</p></div>
+        <div class="card bad"><div class="tag">自作暗号</div><h3>ローテーションと移行は危険</h3><p>独自のキー管理は、ローテーション、移行、ロールバックを誤りやすくします。</p></div>
+      </div>
+      <h2 style="margin-top:40px">得られるもの</h2>
+      <p class="sub">暗号ライブラリだけでなく、具体的な成果。</p>
+      <div class="grid g3">
+        <div class="card good"><div class="tag">保存時</div><h3>DB ダンプで PII を読めない</h3><p>宣言したフィールドは <code>enc:v2:…</code> として保存され、キーは wp-config または DB 外のファイルに残ります。</p></div>
+        <div class="card good"><div class="tag">書き換え不要</div><h3>WordPress API はそのまま</h3><p><code>get_post_meta()</code>、<code>get_user_meta()</code>、WooCommerce、ACF はアプリにプレーンテキストを返します。</p></div>
+        <div class="card good"><div class="tag">検索可能</div><h3>ブラインドインデックス検索とログイン</h3><p>完全一致・部分一致検索、<code>get_user_by()</code>、<code>email_exists()</code>、トークン化ログインが動き続けます。</p></div>
+        <div class="card good"><div class="tag">運用</div><h3>安全な移行とローテーション</h3><p>スキャン、ドライラン、移行、<code>verify --full</code>、ロールバック、再インデックス、2 フェーズのキーローテーションを WP-CLI で。</p></div>
+        <div class="card good"><div class="tag">連携</div><h3>WooCommerce、フォーム、多言語</h3><p>注文メタ/住所インデックス、CF7+Flamingo、ACF、Polylang、マルチサイトをラボでテスト済み。</p></div>
+        <div class="card good"><div class="tag">オープンソース</div><h3>GPL-2.0、ロックインなし</h3><p>ソース、変更履歴、リリースは GitHub。コアパッチなし、キーはあなたのもの。</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="evidence">
+    <div class="wrap">
+      <h2>データベースからの実際の証拠</h2>
+      <p class="sub">合成テストデータのみ。実 PII はありません。キー ID は表示しますが、キーは表示しません。</p>
+      <figure class="shot">
+        <img src="../assets/db-ciphertext.png" alt="enc:v2 暗号文を示すデータベース行" width="1180" height="310" loading="lazy">
+        <figcaption>1. データベース: 同じ注文のメール、氏名、住所インデックスがすべて <code>enc:v2:…</code>。</figcaption>
+      </figure>
+      <div class="grid g2">
+        <figure class="shot">
+          <img src="../assets/api-plaintext.png" alt="プレーンテキストを返す WordPress API" width="1180" height="364" loading="lazy">
+          <figcaption>2. API: <code>get_post_meta()</code> と <code>get_user_meta()</code> は通常どおりプレーンテキストを返します。</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="../assets/search-verify.png" alt="WP-CLI のブラインドインデックス検索と verify 出力" width="1180" height="364" loading="lazy">
+          <figcaption>3. テストサーバーでのブラインドインデックス検索と <code>verify --full</code>。</figcaption>
+        </figure>
+      </div>
+      <div class="note">これはプラグインの公開ランディングページです。スクリーンショットは PII を除いた合成テストデータを使用しており、WordPress デモ自体は公開していません。</div>
+    </div>
+  </section>
+
+  <section id="features">
+    <div class="wrap">
+      <h2>設計</h2>
+      <p class="sub">デフォルト拒否: 宣言したフィールドだけを暗号化。コアパッチなし、サードパーティプラグインのパッチなし。</p>
+      <div class="grid g3">
+        <div class="card"><div class="icon">▦</div><h3>レジストリ駆動</h3><p><code>wp-config.php</code>、設定ファイル、フィルター、管理画面でエンティティ/メタ/カラムを宣言。</p></div>
+        <div class="card"><div class="icon">🔐</div><h3>AES-256-GCM</h3><p>テキストはランダム化、メール/ログインは SIV 決定論的。等価検索が平文を露出せずに機能します。</p></div>
+        <div class="card"><div class="icon">🔎</div><h3>ブラインドインデックス</h3><p>HMAC-SHA256 の完全トークン + トライグラムで、DB に平文を保存せず完全一致・部分一致検索。</p></div>
+        <div class="card"><div class="icon">👤</div><h3>ユーザートークンモード</h3><p><code>user_login</code>/<code>user_email</code> は 55 文字のトークンを保存し、復元可能な平文は暗号化メタに。</p></div>
+        <div class="card"><div class="icon">🛒</div><h3>WooCommerce</h3><p>注文メタ、住所インデックス、顧客ルックアップ、注文検索。v1 では HPOS をオフにする必要があります。</p></div>
+        <div class="card"><div class="icon">🧰</div><h3>運用</h3><p>スキャン、移行、<code>verify --full</code>、再インデックス、ロールバック、自動安全ダンプ、2 フェーズのキーローテーション、WP-CLI。</p></div>
+      </div>
+      <div class="flow">
+        <div class="node"><b>レジストリ</b>フィールド → エンティティ/型/検索</div>
+        <div class="arrow">→</div>
+        <div class="node"><b>フック</b>メタ / ユーザー / Woo / 検索</div>
+        <div class="arrow">→</div>
+        <div class="node"><b>暗号</b>AES-256-GCM + HMAC ブラインドインデックス</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="usecases">
+    <div class="wrap">
+      <span class="kicker">対象</span>
+      <h2>実際の WordPress データのために。</h2>
+      <p class="sub">検索、ログイン、通常の管理画面を犠牲にせず PII を保護したい代理店、ストアオーナー、会員サイト向け。</p>
+      <div class="grid g2">
+        <div class="card"><h3>WooCommerce ストア</h3><p>請求/配送フィールドと住所インデックスを暗号化し、注文検索と顧客ルックアップを維持。</p></div>
+        <div class="card"><h3>会員・ユーザーサイト</h3><p>ログイン/メールカラムをトークン化し、認証、パスワードリセット、WP-CLI ユーザー管理を維持。</p></div>
+        <div class="card"><h3>フォーム、ACF、CRM メタ</h3><p>宣言したフォーム/ACF フィールドを暗号化し、メールをブラインドインデックスで検索。Flamingo の送信も利用可能。</p></div>
+        <div class="card"><h3>レガシー移行</h3><p>レガシー暗号文を読み取り、v2 へ移行し、全行を検証して 2 フェーズでキーをローテーション。</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="install">
+    <div class="wrap">
+      <h2>インストール</h2>
+      <p class="sub">PHP 8.0+、WordPress 6.4+、OpenSSL が必要です。既存データを移行する前に DB をバックアップしてください。</p>
+      <div class="steps">
+        <div class="step"><b>01</b><p>プラグインをインストールし、<code>KEC_KEY</code> + <code>KEC_TOKEN_SECRET</code> を設定。</p></div>
+        <div class="step"><b>02</b><p><code>KEC_FIELDS</code> に必要なフィールドだけを宣言（デフォルト拒否）。</p></div>
+        <div class="step"><b>03</b><p>scan → migrate → <code>verify --full</code> を実行し、検索を再インデックス。</p></div>
+      </div>
+      <pre><code>git clone https://github.com/thiennhant95/wp-encrypted-fields.git
+cp -r wp-encrypted-fields wp-content/plugins/
+wp plugin activate wp-encrypted-fields
+
+# wp-config.php（wp-settings.php の require より前）
+define('KEC_KEY', 'base64:REPLACE_WITH_32_BYTE_KEY');
+define('KEC_TOKEN_SECRET', 'base64:REPLACE_WITH_STABLE_SECRET');
+define('KEC_FIELDS', [
+    'user' => [
+        'columns' => [
+            'user_login' => ['type' => 'login', 'max_length' => 60, 'search' => true],
+            'user_email' => ['type' => 'email', 'max_length' => 100, 'search' => true],
+        ],
+        'meta' => ['first_name' => ['type' => 'text', 'search' => true]],
+    ],
+    'post' => [
+        'post_types' => ['shop_order'],
+        'meta' => [
+            '_billing_email' => ['type' => 'email', 'search' => true],
+            '_billing_address_index' => ['type' => 'text', 'search' => true],
+        ],
+    ],
+]);
+
+wp kec scan
+wp kec migrate --backup-confirmed
+wp kec verify --full</code></pre>
+    </div>
+  </section>
+
+  <section id="tests">
+    <div class="wrap">
+      <h2>検証結果</h2>
+      <p class="sub">同じテスト環境: WordPress 7.1.4、PHP 8.1、MySQL 5.7、プラグイン 0.4.0。</p>
+      <table>
+        <thead><tr><th>項目</th><th>結果</th></tr></thead>
+        <tbody>
+          <tr><td>プラグイン互換性</td><td>100 プラグイン（WooCommerce、CF7/Flamingo、ACF、Yoast、Rank Math、Elementor、WPForms、Polylang、BuddyPress、bbPress、FluentCRM、会員/LMS/フォーム/CRM/キャッシュ/セキュリティ/バックアップ…）。99 合格。<code>encrypted-blog</code> のみプラグイン自体のエラーで失敗。</td></tr>
+          <tr><td>マルチサイト</td><td>2 サイト: サイトごとのメタ暗号化と検索インデックス。ユーザーカラムは共有 <code>wp_users</code>/<code>wp_usermeta</code>。ユーザー作成とロール割り当ては 0.2.2 で修正。</td></tr>
+          <tr><td>多言語</td><td>Polylang en/vi: 翻訳投稿、暗号化メタ、検索、言語フィルターが合格。</td></tr>
+          <tr><td>運用</td><td>バックアップ/リストア、自動安全ダンプ、2 フェーズのキーローテーション、<code>verify --full</code>、ロック、バックアップ確認 TTL をテストサーバーで演習。</td></tr>
+          <tr><td>保存時データ</td><td>DB ダンプは暗号文。キーは DB にない。メール検索と認証はトークン経由で動作。</td></tr>
+        </tbody>
+      </table>
+      <div class="chips">
+        <span class="chip">WooCommerce</span><span class="chip">CF7 + Flamingo</span><span class="chip">ACF</span>
+        <span class="chip">Yoast</span><span class="chip">Rank Math</span><span class="chip">AIOSEO</span>
+        <span class="chip">Elementor</span><span class="chip">WPForms</span><span class="chip">Polylang</span>
+        <span class="chip">Wordfence</span><span class="chip">Solid Security</span><span class="chip">WP Mail SMTP</span>
+        <span class="chip">W3TC</span><span class="chip">WP Super Cache</span><span class="chip">UpdraftPlus</span>
+        <span class="chip">Duplicator</span><span class="chip">WP All Import</span><span class="chip">Redis Object Cache</span>
+        <span class="chip">BuddyPress</span><span class="chip">bbPress</span><span class="chip">FluentCRM</span>
+        <span class="chip">WP ERP</span><span class="chip">Forminator</span><span class="chip">LearnPress</span>
+      </div>
+      <div class="note" style="margin-top:22px">
+        既知の制限: <code>post_content</code>/<code>post_title</code> は暗号化されません。
+        アダプターのないカスタムテーブル（WP Mail Logging、MailPoet、FluentCRM…）は平文のままです。
+        v1 は HPOS 非対応。
+      </div>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="wrap faq">
+      <span class="kicker">FAQ</span>
+      <h2>購入前のよくある質問</h2>
+      <details open>
+        <summary>HTTPS/SSL の代わりになりますか？</summary>
+        <p>いいえ。HTTPS は通信中のデータを保護します。Encrypted Fields は宣言したフィールドを保存時に保護し、DB ダンプや盗まれたバックアップでも露出しません。</p>
+      </details>
+      <details>
+        <summary>WooCommerce の注文検索はまだ動きますか？</summary>
+        <p>はい、宣言した検索可能フィールドについて。プラグインは WooCommerce の SQL 検索から暗号化カラムを除外し、ブラインドインデックス結果をマージします。v1 では HPOS を無効にする必要があります。</p>
+      </details>
+      <details>
+        <summary>get_user_by()、email_exists()、ログインは動きますか？</summary>
+        <p>はい。ログイン/メールカラムはブラインドインデックストークンを保存し、生の等価/IN 検索は書き換えられ、認証フックがトークンを平文に戻します。</p>
+      </details>
+      <details>
+        <summary>キーを失ったら？</summary>
+        <p>キーなしでは暗号化値を復元できません。wp-config/キーファイルをバックアップし、キーを DB 外に保存し、変更前にローテーションを演習してください。</p>
+      </details>
+      <details>
+        <summary>暗号化されないものは？</summary>
+        <p><code>post_content</code>/<code>post_title</code>、<code>wp_options</code>、アダプターのないカスタムテーブル。宣言したメタで平文のまま残るものは <code>wp kec verify --full</code> が報告します。</p>
+      </details>
+      <details>
+        <summary>無料ですか？</summary>
+        <p>はい。GPL-2.0-or-later、ソースとリリースは GitHub。有料プランやキー預託はありません。</p>
+      </details>
+    </div>
+  </section>
+  <section id="start" style="border-top:0">
+    <div class="wrap" style="text-align:center">
+      <span class="kicker">はじめる</span>
+      <h2>顧客 PII を保護する準備はできましたか？</h2>
+      <p class="sub" style="margin-left:auto;margin-right:auto">プラグインをインストールし、必要なフィールドを宣言し、公開前に <code>verify --full</code> を実行してください。</p>
+      <div class="cta" style="justify-content:center">
+        <a class="btn primary" href="https://github.com/thiennhant95/wp-encrypted-fields/releases/tag/v0.4.0" target="_blank" rel="noopener">v0.4.0 をダウンロード</a>
+        <a class="btn" href="https://github.com/thiennhant95/wp-encrypted-fields/blob/main/README.md" target="_blank" rel="noopener">ドキュメントを読む</a>
+      </div>
+      <div class="chips" style="justify-content:center;margin-top:18px">
+        <span class="chip">GPL-2.0</span><span class="chip">テレメトリーなし</span><span class="chip">キーはあなたのもの</span>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap footer-row">
+    <div><b>Encrypted Fields</b> · GPL-2.0-or-later · thiennhant95<br><span>公開ランディングページ。スクリーンショットはサニタイズ済みテストデータです。</span></div>
+    <div>
+      <a href="https://github.com/thiennhant95/wp-encrypted-fields" target="_blank" rel="noopener">GitHub</a> ·
+      <a href="https://github.com/thiennhant95/wp-encrypted-fields/releases" target="_blank" rel="noopener">Releases</a> ·
+      <a href="https://github.com/thiennhant95/wp-encrypted-fields/blob/main/README.md" target="_blank" rel="noopener">Docs</a>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

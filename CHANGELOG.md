@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented here.
 
+## [Unreleased]
+
+### Added
+
+- Japanese landing page at `/ja/` with matching hreflang, Open Graph
+  metadata, language switcher and sitemap entry.
+
 ## [0.4.0] - 2026-11-11
 
 ### Changed

@@ -12,7 +12,8 @@ search encrypted identifiers through blind indexes. Keys live outside the
 database; no core or third-party plugin patches are required.
 
 **Website:** [English](https://thiennhant95.github.io/wp-encrypted-fields/) ·
-[Tiếng Việt](https://thiennhant95.github.io/wp-encrypted-fields/vi/)
+[Tiếng Việt](https://thiennhant95.github.io/wp-encrypted-fields/vi/) ·
+[日本語](https://thiennhant95.github.io/wp-encrypted-fields/ja/)
 
 [![Database only sees ciphertext](docs/assets/db-ciphertext.png)](https://thiennhant95.github.io/wp-encrypted-fields/#evidence)
 
