@@ -3,6 +3,7 @@
 [![CI](https://github.com/thiennhant95/wp-encrypted-fields/actions/workflows/ci.yml/badge.svg)](https://github.com/thiennhant95/wp-encrypted-fields/actions/workflows/ci.yml)
 [![License: GPLv2+](https://img.shields.io/badge/license-GPLv2%2B-blue.svg)](LICENSE)
 [![PHP 8.0+](https://img.shields.io/badge/php-8.0%2B-777bb4.svg)](https://www.php.net/)
+[![Website](https://img.shields.io/badge/website-live-5cc8ff.svg)](https://thiennhant95.github.io/wp-encrypted-fields/)
 
 Registry-driven, field-level encryption for WordPress and WooCommerce.
 
