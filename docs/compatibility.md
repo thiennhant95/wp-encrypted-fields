@@ -25,7 +25,7 @@ Most plugins that use standard WordPress/WooCommerce APIs work unchanged.
 | Membership/LMS | MemberPress, LearnDash | User meta works; test admin lists that read raw columns |
 | Email marketing | Mailchimp for WooCommerce, Klaviyo | Customer emails resolve via WC integration; test sync |
 | Logging / CRM | WP Mail Logging, MailPoet, FluentCRM | Their own tables/options are not encrypted; WP Mail Logging stores recipients, subjects and bodies in plaintext. Avoid for sensitive mail or register a table adapter |
-| Multilingual | WPML, Polylang | None for encryption; search normalization still applies |
+| Multilingual | WPML, Polylang | None for encryption; search normalization still applies. Polylang two-language test passed for translated posts/meta; KEC search is global while Polylang keeps language filtering |
 | Woo extensions | Subscriptions, Bookings, YITH | Order meta works when HPOS is off |
 | Search engines | Relevanssi, ElasticPress, Algolia | Encrypted fields cannot be indexed automatically |
 | Import/export | WP All Import/Export | Export emits ciphertext; importing plaintext requires migration |

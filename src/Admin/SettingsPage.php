@@ -149,7 +149,9 @@ final class SettingsPage
                 return;
 
             case 'verify':
-                $result = (new Migrator($this->plugin))->verify($this->filterOptions());
+                $verifyOptions = $this->filterOptions();
+                $verifyOptions['full'] = true;
+                $result = (new Migrator($this->plugin))->verify($verifyOptions);
                 $ok = !empty($result['ok']);
                 $message = sprintf(
                     'Verify: %d plaintext, %d legacy, %d decrypt failures.',

@@ -89,6 +89,10 @@ final class StateDetector
             );
         }
 
+        foreach ($this->plaintextPluginWarnings() as $warning) {
+            $warnings[] = $warning;
+        }
+
         return array(
             'state' => $state,
             'registry_enabled' => $registryEnabled,
@@ -102,6 +106,65 @@ final class StateDetector
             'errors' => $errors,
             'warnings' => $warnings,
         );
+    }
+
+    /**
+     * Active plugin files, including network-activated plugins on multisite.
+     *
+     * @return string[]
+     */
+    private function activePluginFiles(): array
+    {
+        $files = array();
+
+        if (function_exists('get_option')) {
+            $single = get_option('active_plugins', array());
+            if (is_array($single)) {
+                $files = array_merge($files, array_values($single));
+            }
+        }
+
+        if (function_exists('is_multisite') && is_multisite() && function_exists('get_site_option')) {
+            $network = get_site_option('active_sitewide_plugins', array());
+            if (is_array($network)) {
+                $files = array_merge($files, array_keys($network));
+            }
+        }
+
+        return array_values(array_unique(array_map('strval', $files)));
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function plaintextPluginWarnings(): array
+    {
+        $map = array(
+            'wp-mail-logging/' => 'WP Mail Logging stores recipients, subjects and bodies in its own table in plaintext.',
+            'post-smtp/' => 'Post SMTP email logs may store recipients and message bodies in plaintext.',
+            'mailpoet/' => 'MailPoet stores subscribers and settings in its own tables/options; they are not encrypted.',
+            'fluent-crm/' => 'FluentCRM stores contacts in its own tables; they are not encrypted.',
+        );
+
+        $warnings = array();
+        $seen = array();
+
+        foreach ($this->activePluginFiles() as $file) {
+            foreach ($map as $prefix => $message) {
+                if (0 !== strpos($file, $prefix) || isset($seen[$prefix])) {
+                    continue;
+                }
+
+                $seen[$prefix] = true;
+                $warnings[] = array(
+                    'code' => 'plaintext_plugin',
+                    'plugin' => rtrim($prefix, '/'),
+                    'message' => $message,
+                );
+            }
+        }
+
+        return $warnings;
     }
 
     public function hposEnabled(): bool

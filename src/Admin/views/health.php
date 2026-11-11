@@ -14,6 +14,12 @@ $writable = defined('WP_CONTENT_DIR') ? is_writable(WP_CONTENT_DIR) : false;
 $multisite = function_exists('is_multisite') && is_multisite();
 $externalCache = function_exists('wp_using_ext_object_cache') && wp_using_ext_object_cache();
 $hpos = !empty($state['hpos']);
+$plaintextWarnings = array();
+foreach (isset($state['warnings']) && is_array($state['warnings']) ? $state['warnings'] : array() as $warning) {
+    if (isset($warning['code']) && 'plaintext_plugin' === $warning['code']) {
+        $plaintextWarnings[] = isset($warning['message']) ? (string) $warning['message'] : 'Known plaintext plugin';
+    }
+}
 ?>
 <h2>Health Check</h2>
 <table class="widefat striped" style="max-width: 900px;">
@@ -60,6 +66,21 @@ $hpos = !empty($state['hpos']);
             <td>External object cache</td>
             <td><?php echo $externalCache ? 'INFO' : 'OK'; ?></td>
             <td>Plaintext is not written to persistent object cache.</td>
+        </tr>
+        <tr>
+            <td>Plaintext logging/CRM plugins</td>
+            <td><?php echo array() !== $plaintextWarnings ? 'WARN' : 'OK'; ?></td>
+            <td>
+                <?php if (array() === $plaintextWarnings) : ?>
+                    No known plaintext email/CRM plugin detected.
+                <?php else : ?>
+                    <ul style="margin: 0;">
+                        <?php foreach ($plaintextWarnings as $plaintextWarning) : ?>
+                            <li><?php echo esc_html($plaintextWarning); ?></li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php endif; ?>
+            </td>
         </tr>
     </tbody>
 </table>

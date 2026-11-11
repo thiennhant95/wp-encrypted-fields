@@ -224,7 +224,7 @@ final class SetupWizard
                 return;
 
             case 'verify':
-                $result = (new Migrator($this->plugin))->verify();
+                $result = (new Migrator($this->plugin))->verify(array('full' => true));
                 if (empty($result['ok'])) {
                     $this->result(false, sprintf('Verification found %d plaintext, %d legacy and %d decrypt failures.', (int) $result['plaintext'], (int) $result['legacy'], (int) $result['decrypt_failed']), 'verify', $result);
                     return;

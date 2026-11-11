@@ -512,6 +512,25 @@ namespace {
         assert_same('existing_legacy', $state['state'], 'fallback scan should detect legacy data without treating plaintext as configured PII');
     });
 
+    test('StateDetector warns about known plaintext logging/CRM plugins', function () use ($registryJson) {
+        $db = kec_reset($registryJson);
+        $GLOBALS['kec_options']['active_plugins'] = array(
+            'wp-mail-logging/wp-mail-logging.php',
+            'mailpoet/mailpoet.php',
+        );
+        $db->setFixtures(array(
+            'wp_users' => array(),
+            'wp_usermeta' => array(),
+            'wp_postmeta' => array(),
+        ));
+        $plugin = kec_make_plugin();
+        $state = (new \Koyo\EncryptedFields\Migration\StateDetector($plugin, $db))->detect();
+        $codes = array_column($state['warnings'], 'code');
+        assert_true(in_array('plaintext_plugin', $codes, true), 'plaintext plugin warning should be present');
+        $plugins = array_column($state['warnings'], 'plugin');
+        assert_true(in_array('wp-mail-logging', $plugins, true), 'WP Mail Logging warning should be present');
+    });
+
     test('Migrator dry run builds a plan without plaintext values', function () use ($registryJson) {
         $db = kec_reset($registryJson);
         $longEmail = str_repeat('long', 30) . '@example.com';

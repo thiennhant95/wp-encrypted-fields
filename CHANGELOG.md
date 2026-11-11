@@ -2,6 +2,22 @@
 
 All notable changes to this project are documented here.
 
+## [0.2.3] - 2026-11-11
+
+### Added
+
+- `wp kec status` and the admin Health tab warn when a known plaintext
+  email/CRM plugin is active (WP Mail Logging, Post SMTP, MailPoet,
+  FluentCRM).
+- Admin Settings and the Setup Wizard use full-row verification instead of a
+  sample.
+
+### Tests
+
+- Polylang two-language setup: translated posts, encrypted meta, blind-index
+  search and language-filtered queries verified.
+- Added a StateDetector regression test for plaintext plugin warnings.
+
 ## [0.2.2] - 2026-11-11
 
 ### Fixed
