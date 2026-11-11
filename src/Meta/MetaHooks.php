@@ -112,7 +112,11 @@ final class MetaHooks
             $values = $this->decryptValues($cache[$metaKey], $field, true, $metaType, $objectId, $metaKey);
 
             if ($single) {
-                return isset($values[0]) ? $values[0] : '';
+                $value = isset($values[0]) ? $values[0] : '';
+
+                // WordPress unwraps an array returned by get_*_metadata with
+                // $check[0]; wrap array meta so it survives that unwrapping.
+                return is_array($value) ? array($value) : $value;
             }
 
             return $values;
@@ -149,18 +153,13 @@ final class MetaHooks
             return $check;
         }
 
-        if (!is_string($metaValue) || '' === $metaValue) {
-            $this->logWarning(
-                'Meta value skipped',
-                $metaType,
-                $metaKey,
-                array('reason' => 'non-string or empty', 'value_type' => gettype($metaValue))
-            );
+        $prepared = $this->prepareMetaValue($metaValue, $metaType, $metaKey);
 
+        if (null === $prepared) {
             return $check;
         }
 
-        $encrypted = $this->encrypt($metaValue, $field, $metaType, $metaKey);
+        $encrypted = $this->encrypt($prepared, $field, $metaType, $metaKey);
         if (false === $encrypted) {
             return false;
         }
@@ -207,18 +206,13 @@ final class MetaHooks
             return $check;
         }
 
-        if (!is_string($metaValue) || '' === $metaValue) {
-            $this->logWarning(
-                'Meta value skipped',
-                $metaType,
-                $metaKey,
-                array('reason' => 'non-string or empty', 'value_type' => gettype($metaValue))
-            );
+        $prepared = $this->prepareMetaValue($metaValue, $metaType, $metaKey);
 
+        if (null === $prepared) {
             return $check;
         }
 
-        $encrypted = $this->encrypt($metaValue, $field, $metaType, $metaKey);
+        $encrypted = $this->encrypt($prepared, $field, $metaType, $metaKey);
         if (false === $encrypted) {
             return false;
         }
@@ -325,6 +319,11 @@ final class MetaHooks
                 }
 
                 $decrypted = $this->decrypt($value, $field, $metaType, $metaKey);
+
+                if (function_exists('maybe_unserialize')) {
+                    $decrypted = maybe_unserialize($decrypted);
+                }
+
                 $result[$index] = $decrypted;
 
                 if ($decrypted !== $value) {
@@ -426,6 +425,42 @@ final class MetaHooks
         } catch (\Throwable $e) {
             return false;
         }
+    }
+
+    /**
+     * Turn scalar strings and arrays/objects into a value we can encrypt.
+     * Arrays are serialized first; the read path unserializes after decrypt.
+     *
+     * @param mixed $metaValue
+     */
+    private function prepareMetaValue($metaValue, string $metaType, string $metaKey): ?string
+    {
+        if (is_string($metaValue)) {
+            if ('' === $metaValue) {
+                $this->logWarning('Meta value skipped', $metaType, $metaKey, array('reason' => 'empty'));
+
+                return null;
+            }
+
+            return $metaValue;
+        }
+
+        if (is_array($metaValue) || is_object($metaValue)) {
+            try {
+                return serialize($metaValue);
+            } catch (\Throwable $exception) {
+                $this->logWarning('Meta value skipped', $metaType, $metaKey, array('reason' => 'serialize_failed'));
+
+                return null;
+            }
+        }
+
+        $this->logWarning('Meta value skipped', $metaType, $metaKey, array(
+            'reason' => 'non-string',
+            'value_type' => gettype($metaValue),
+        ));
+
+        return null;
     }
 
     private function logWarning(string $message, string $metaType, string $metaKey, array $context = array()): void

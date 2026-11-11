@@ -65,6 +65,17 @@ final class Env
         return $db->get_var($sql);
     }
 
+    public static function lastError(?object $db): string
+    {
+        $db = self::db($db);
+
+        if (!is_object($db) || !isset($db->last_error)) {
+            return '';
+        }
+
+        return is_string($db->last_error) ? trim($db->last_error) : '';
+    }
+
     public static function isV2(string $value): bool
     {
         return (bool) preg_match('/^enc:v2c?:/', $value);
@@ -273,6 +284,10 @@ final class Env
                         continue;
                     }
 
+                    if (!in_array($key, array('user_login', 'user_email'), true)) {
+                        continue;
+                    }
+
                     $targets[] = array(
                         'entity' => $entity,
                         'field' => $key,
@@ -312,7 +327,13 @@ final class Env
         }
 
         foreach ($plugin->tableAdapters() as $name => $adapter) {
-            if (!is_object($adapter) || !method_exists($adapter, 'columns') || !method_exists($adapter, 'read') || !method_exists($adapter, 'write')) {
+            if (!is_object($adapter)
+                || !method_exists($adapter, 'columns')
+                || !method_exists($adapter, 'read')
+                || !method_exists($adapter, 'write')
+                || !method_exists($adapter, 'table')
+                || !method_exists($adapter, 'primaryKey')
+            ) {
                 continue;
             }
 
@@ -321,23 +342,14 @@ final class Env
                 continue;
             }
 
-            $hasTableMethod = method_exists($adapter, 'table');
-            $table = $hasTableMethod ? (string) $adapter->table() : $adapterName;
-            if ('' === $table) {
+            $table = (string) $adapter->table();
+            if ('' === $table || !preg_match('/^[A-Za-z0-9_]+$/', $table)) {
                 continue;
             }
 
-            if (!preg_match('/^[A-Za-z0-9_]+$/', $table)) {
-                continue;
-            }
-
-            if (!$hasTableMethod && '' !== $prefix && 0 !== strpos($table, $prefix)) {
-                $table = $prefix . $table;
-            }
-
-            $idCol = method_exists($adapter, 'primaryKey') ? (string) $adapter->primaryKey() : 'id';
+            $idCol = (string) $adapter->primaryKey();
             if (!preg_match('/^[A-Za-z0-9_]+$/', $idCol)) {
-                $idCol = 'id';
+                continue;
             }
 
             $columns = $adapter->columns();
@@ -346,11 +358,16 @@ final class Env
             }
 
             foreach ($columns as $column => $type) {
+                $column = (string) $column;
+
                 if ('' !== $fieldFilter && $column !== $fieldFilter) {
                     continue;
                 }
 
-                $column = (string) $column;
+                if (!preg_match('/^[A-Za-z0-9_]+$/', $column)) {
+                    continue;
+                }
+
                 $type = is_string($type) ? $type : 'text';
                 $field = new Field('custom', $column, $type, false, null, array('table' => $adapterName));
 

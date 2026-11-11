@@ -40,6 +40,8 @@ return array(
             '_billing_address_2' => array('type' => 'text'),
             '_billing_phone' => array('type' => 'text', 'search' => true),
             '_billing_email' => array('type' => 'email', 'search' => true),
+            '_billing_address_index' => array('type' => 'text', 'search' => true),
+            '_shipping_address_index' => array('type' => 'text', 'search' => true),
             '_shipping_first_name' => array('type' => 'text'),
             '_shipping_last_name' => array('type' => 'text'),
             '_shipping_company' => array('type' => 'text'),

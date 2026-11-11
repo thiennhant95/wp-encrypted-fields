@@ -3,6 +3,7 @@
 namespace Koyo\EncryptedFields\Migration;
 
 use Koyo\EncryptedFields\Config\Field;
+use Koyo\EncryptedFields\Integrations\WooCommerce\CustomerLookupSchema;
 use Koyo\EncryptedFields\Plugin;
 use Koyo\EncryptedFields\User\ColumnStore;
 
@@ -141,6 +142,20 @@ final class LookupMigrator
         $resume = !empty($options['resume']);
         $stopOnError = !isset($options['stop_on_error']) || (bool) $options['stop_on_error'];
 
+        if ('customer_lookup' === $definition['type']
+            && (null === $this->db || !empty($options['widen_columns']))
+        ) {
+            $widened = CustomerLookupSchema::ensure();
+
+            if ($widened) {
+                foreach (array('username', 'email', 'city') as $wideColumn) {
+                    if (isset($definition['columns'][$wideColumn])) {
+                        $definition['columns'][$wideColumn]['max_length'] = 255;
+                    }
+                }
+            }
+        }
+
         $preview = $this->scan($definition['type'], array('full' => true, 'rotate' => $rotate));
         $pending = (int) $preview['totals']['pending'];
 
@@ -194,6 +209,7 @@ final class LookupMigrator
                 $cursor = $resume && isset($state['cursors'][$stateKey]) ? (int) $state['cursors'][$stateKey] : 0;
 
                 while (true) {
+                    $previousCursor = $cursor;
                     $rows = $this->fetchBatch($definition, $column, $cursor, $batch);
                     if (array() === $rows) {
                         break;
@@ -223,6 +239,16 @@ final class LookupMigrator
                     $this->saveState($state);
 
                     if ($summary['stopped'] || count($rows) < $batch) {
+                        break;
+                    }
+
+                    if ($cursor <= $previousCursor) {
+                        $summary['errors'][] = array(
+                            'column' => $column,
+                            'id' => $cursor,
+                            'error' => 'cursor_stalled',
+                        );
+                        $summary['stopped'] = true;
                         break;
                     }
                 }
@@ -439,12 +465,21 @@ final class LookupMigrator
         try {
             $cipher = $this->plugin->crypto()->encrypt($plain, $field);
         } catch (\Throwable $exception) {
-            $error['error'] = 'encrypt_failed';
+            $error['error'] = false !== stripos($exception->getMessage(), 'max length')
+                ? 'length_exceeded'
+                : 'encrypt_failed';
+
             return $error;
         }
 
         if (!Env::isEncrypted($this->plugin, $cipher, $field)) {
             $error['error'] = 'encrypt_failed';
+            return $error;
+        }
+
+        $max = isset($spec['max_length']) ? (int) $spec['max_length'] : 0;
+        if ($max > 0 && strlen($cipher) > $max) {
+            $error['error'] = 'length_exceeded';
             return $error;
         }
 
@@ -559,11 +594,11 @@ final class LookupMigrator
                 'id_col' => 'customer_id',
                 'user_col' => 'user_id',
                 'columns' => array(
-                    'first_name' => array('key' => 'first_name', 'type' => 'text', 'entity' => 'user'),
-                    'last_name' => array('key' => 'last_name', 'type' => 'text', 'entity' => 'user'),
-                    'city' => array('key' => 'city', 'type' => 'text', 'entity' => 'user'),
-                    'email' => array('key' => 'email', 'type' => 'email', 'entity' => 'user', 'token' => ColumnStore::EMAIL),
-                    'username' => array('key' => 'username', 'type' => 'login', 'entity' => 'user', 'token' => ColumnStore::LOGIN),
+                    'first_name' => array('key' => 'first_name', 'type' => 'text', 'entity' => 'user', 'max_length' => 255),
+                    'last_name' => array('key' => 'last_name', 'type' => 'text', 'entity' => 'user', 'max_length' => 255),
+                    'city' => array('key' => 'city', 'type' => 'text', 'entity' => 'user', 'max_length' => 100),
+                    'email' => array('key' => 'email', 'type' => 'email', 'entity' => 'user', 'max_length' => 100, 'token' => ColumnStore::EMAIL),
+                    'username' => array('key' => 'username', 'type' => 'login', 'entity' => 'user', 'max_length' => 60, 'token' => ColumnStore::LOGIN),
                 ),
             );
         }

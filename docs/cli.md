@@ -9,13 +9,15 @@ WP-CLI is active.
 wp kec status
 wp kec fields
 wp kec scan [--entity=user|post|term|comment] [--format=table|json] [--check-length]
-wp kec verify [--fix]
+wp kec verify [--fix] [--full]
 wp kec search <term> [--entity=user|post]
 ```
 
 `scan` reports plaintext, legacy, v2, token and empty counts per field.
 `verify` checks that no selected field still contains plaintext/legacy data and
-that encrypted values decrypt.
+that encrypted values decrypt. Use `--full` before go-live to decrypt every
+row instead of a sample, and to require a non-empty search index when
+searchable fields exist.
 
 ## Setup
 

@@ -41,6 +41,11 @@ final class Tokenizer
             if (is_string($normalized)) {
                 $text = $normalized;
             }
+        } elseif (function_exists('mb_convert_kana')) {
+            $converted = mb_convert_kana($text, 'asK', 'UTF-8');
+            if (is_string($converted)) {
+                $text = $converted;
+            }
         }
 
         if (function_exists('mb_strtolower')) {

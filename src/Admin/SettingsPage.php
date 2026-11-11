@@ -234,6 +234,10 @@ final class SettingsPage
                 return null;
             }
 
+            if (Env::hposEnabled() && 'post' === $entity && !empty($definition['meta'])) {
+                return null;
+            }
+
             $out = array();
 
             if (isset($definition['post_types'])) {
@@ -254,6 +258,11 @@ final class SettingsPage
                 $out[$group] = array();
                 foreach ($definition[$group] as $key => $config) {
                     if (!is_string($key)) {
+                        return null;
+                    }
+                    if ('columns' === $group
+                        && ('user' !== $entity || !in_array($key, array('user_login', 'user_email'), true))
+                    ) {
                         return null;
                     }
                     if (!is_array($config)) {

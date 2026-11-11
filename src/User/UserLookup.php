@@ -81,6 +81,7 @@ final class UserLookup
 
             $term = trim($value);
             $term = trim($term, '%');
+            $term = $this->unescapeLike($term);
             $term = trim($term);
 
             if ('' === $term) {
@@ -206,6 +207,17 @@ final class UserLookup
         }
 
         return $result;
+    }
+
+    /**
+     * Undo the LIKE escaping added by esc_like()/wpdb::prepare().
+     * WP_User_Query escapes "_" and "%" so a literal search such as
+     * "nhan_tt" arrives here as "nhan\\_tt"; strip that layer before
+     * building the blind-index lookup.
+     */
+    private function unescapeLike(string $term): string
+    {
+        return str_replace(array('\\\\', '\\_', '\\%'), array('\\', '_', '%'), $term);
     }
 
     private function sqlStringPattern(): string

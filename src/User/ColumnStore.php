@@ -158,13 +158,13 @@ final class ColumnStore
         return $value;
     }
 
-    public function storePlain(int $userId, string $plaintext, string $name): void
+    public function storePlain(int $userId, string $plaintext, string $name): bool
     {
         if ($userId <= 0 || '' === $plaintext) {
-            return;
+            return false;
         }
 
-        update_user_meta($userId, $this->metaKey($name), $plaintext);
+        return (bool) update_user_meta($userId, $this->metaKey($name), $plaintext);
     }
 
     public function readPlain(int $userId, string $name): ?string

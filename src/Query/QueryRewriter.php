@@ -19,9 +19,23 @@ final class QueryRewriter
     private Plugin $plugin;
     private bool $registered = false;
 
+    private static int $suspendDepth = 0;
+
     public function __construct(Plugin $plugin)
     {
         $this->plugin = $plugin;
+    }
+
+    public static function suspend(): void
+    {
+        ++self::$suspendDepth;
+    }
+
+    public static function resume(): void
+    {
+        if (self::$suspendDepth > 0) {
+            --self::$suspendDepth;
+        }
     }
 
     public function register(): void
@@ -50,7 +64,7 @@ final class QueryRewriter
             return $query;
         }
 
-        if (!$this->enabled() || !$this->hasUserColumns()) {
+        if (self::$suspendDepth > 0 || !$this->enabled() || !$this->hasUserColumns()) {
             return $query;
         }
 

@@ -40,6 +40,19 @@ final class Hooks
         add_action('deleted_post', array($this, 'onDeletedPost'), 20, 1);
         add_action('deleted_user', array($this, 'onDeletedUser'), 20, 1);
         add_action('deleted_term', array($this, 'onDeletedTerm'), 20, 3);
+
+        foreach (array('post', 'user', 'term', 'comment') as $type) {
+            foreach (array('added', 'updated', 'deleted') as $event) {
+                add_action(
+                    $event . '_' . $type . '_meta',
+                    function ($metaId, $objectId, $metaKey = '') use ($type): void {
+                        $this->onMeta($type, (int) $objectId, $metaKey);
+                    },
+                    20,
+                    3
+                );
+            }
+        }
     }
 
     public function onSavePost($postId, $post = null, $update = false): void
@@ -83,6 +96,40 @@ final class Hooks
     public function onDeletedTerm($termId, $termTaxonomyId = null, $taxonomy = ''): void
     {
         $this->queue('term', (int) $termId, 'remove');
+    }
+
+    /**
+     * Keep the blind index in sync when searchable meta is written directly.
+     *
+     * @param mixed $metaKey
+     */
+    public function onMeta(string $entity, int $objectId, $metaKey = ''): void
+    {
+        if ($objectId <= 0) {
+            return;
+        }
+
+        $keys = is_array($metaKey) ? $metaKey : array($metaKey);
+
+        try {
+            $registry = $this->plugin->registry();
+        } catch (\Throwable $e) {
+            return;
+        }
+
+        foreach ($keys as $key) {
+            $key = (string) $key;
+            if ('' === $key) {
+                continue;
+            }
+
+            $field = $registry->get($entity, $key);
+            if (null !== $field && $field->isSearchable()) {
+                $this->queue($entity, $objectId, 'index');
+
+                return;
+            }
+        }
     }
 
     public function flush(): void

@@ -20,9 +20,33 @@ final class MetaWriteGuard
 
     private static bool $busy = false;
 
+    private static int $suspendDepth = 0;
+
     public function __construct(Plugin $plugin)
     {
         $this->plugin = $plugin;
+    }
+
+    /**
+     * Temporarily stop the guard from re-encrypting raw UPDATE queries.
+     *
+     * Used by migration/rollback, which intentionally write plaintext.
+     */
+    public static function suspend(): void
+    {
+        ++self::$suspendDepth;
+    }
+
+    public static function resume(): void
+    {
+        if (self::$suspendDepth > 0) {
+            --self::$suspendDepth;
+        }
+    }
+
+    public static function isSuspended(): bool
+    {
+        return self::$suspendDepth > 0;
     }
 
     public function register(): void
@@ -38,7 +62,7 @@ final class MetaWriteGuard
 
     public function filterQuery($query)
     {
-        if (!is_string($query) || '' === $query || self::$busy) {
+        if (!is_string($query) || '' === $query || self::$busy || self::$suspendDepth > 0) {
             return $query;
         }
 

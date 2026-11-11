@@ -203,10 +203,23 @@ final class Commands
      */
     public function migrate($args = array(), $assoc = array()): void
     {
+        $entity = isset($assoc['entity']) ? (string) $assoc['entity'] : '';
+        $field = isset($assoc['field']) ? (string) $assoc['field'] : '';
+
+        if ('' !== $field && false !== strpos($field, ':')) {
+            list($fieldEntity, $fieldKey) = explode(':', $field, 2);
+
+            if ('' === $entity) {
+                $entity = $fieldEntity;
+            }
+
+            $field = $fieldKey;
+        }
+
         $options = array(
             'from' => isset($assoc['from']) ? (string) $assoc['from'] : 'both',
-            'entity' => isset($assoc['entity']) ? (string) $assoc['entity'] : '',
-            'field' => isset($assoc['field']) ? (string) $assoc['field'] : '',
+            'entity' => $entity,
+            'field' => $field,
             'table' => isset($assoc['table']) ? (string) $assoc['table'] : '',
             'dry_run' => !empty($assoc['dry-run']),
             'batch' => isset($assoc['batch']) ? max(1, (int) $assoc['batch']) : 500,
@@ -217,13 +230,9 @@ final class Commands
         $migrator = new Migrator($this->plugin);
         $result = $migrator->migrate($options);
 
-        if (!empty($options['dry_run'])) {
-            $this->printDryRun($result, $assoc);
-            return;
-        }
+        $error = isset($result['error']) ? (string) $result['error'] : '';
 
-        if (empty($result['ok'])) {
-            $error = isset($result['error']) ? (string) $result['error'] : 'migration_failed';
+        if ('' !== $error) {
             if ('backup_required' === $error) {
                 \WP_CLI::warning('Backup confirmation required. Pass --backup-confirmed after creating a backup.');
                 \WP_CLI::halt(2);
@@ -233,6 +242,16 @@ final class Commands
                 \WP_CLI::halt(2);
             }
             \WP_CLI::error(isset($result['message']) ? (string) $result['message'] : $error);
+            return;
+        }
+
+        if (!empty($options['dry_run'])) {
+            $this->printDryRun($result, $assoc);
+            return;
+        }
+
+        if (empty($result['ok'])) {
+            \WP_CLI::error('Migration failed.');
             return;
         }
 
@@ -255,8 +274,13 @@ final class Commands
      * ## OPTIONS
      *
      * --field=<entity:key>
+     * : Field to decrypt.
+     *
      * [--batch=<batch>]
+     * : Rows per batch.
+     *
      * [--dry-run]
+     * : Print what would change.
      */
     public function decrypt($args = array(), $assoc = array()): void
     {
@@ -296,7 +320,11 @@ final class Commands
      * [--to=<target>]
      * : plaintext (default) or backup.
      *
+     * [--backup-confirmed]
+     * : Acknowledge that a database backup exists.
+     *
      * [--dry-run]
+     * : Print what would change.
      */
     public function rollback($args = array(), $assoc = array()): void
     {
@@ -310,7 +338,25 @@ final class Commands
         $result = (new Migrator($this->plugin))->rollback(array(
             'dry_run' => !empty($assoc['dry-run']),
             'batch' => isset($assoc['batch']) ? max(1, (int) $assoc['batch']) : 500,
+            'backup_confirmed' => !empty($assoc['backup-confirmed']),
         ));
+
+        $error = isset($result['error']) ? (string) $result['error'] : '';
+
+        if ('' !== $error) {
+            if ('backup_required' === $error) {
+                \WP_CLI::warning('Backup confirmation required. Pass --backup-confirmed after creating a backup.');
+                \WP_CLI::halt(2);
+            }
+
+            if ('locked' === $error) {
+                \WP_CLI::warning('Another migration is running.');
+                \WP_CLI::halt(2);
+            }
+
+            \WP_CLI::error(isset($result['message']) ? (string) $result['message'] : $error);
+            return;
+        }
 
         if (!empty($assoc['dry-run'])) {
             $this->printDryRun($result, $assoc);
@@ -359,14 +405,23 @@ final class Commands
      * ## OPTIONS
      *
      * [--fix]
+     * : Rebuild the search index when verification fails.
+     *
      * [--entity=<entity>]
+     * : Limit verification to one entity.
+     *
      * [--field=<field>]
+     * : Limit verification to one field.
+     *
+     * [--full]
+     * : Decrypt every row instead of a sample (slower, recommended before go-live).
      */
     public function verify($args = array(), $assoc = array()): void
     {
         $options = array(
             'entity' => isset($assoc['entity']) ? (string) $assoc['entity'] : '',
             'field' => isset($assoc['field']) ? (string) $assoc['field'] : '',
+            'full' => !empty($assoc['full']),
         );
 
         $migrator = new Migrator($this->plugin);
@@ -392,7 +447,12 @@ final class Commands
             \WP_CLI::halt(2);
         }
 
-        \WP_CLI::success(sprintf('Verification passed: %d v2 rows decrypted, %d samples checked.', (int) $result['v2'], (int) $result['decrypt_ok']));
+        \WP_CLI::success(sprintf(
+            'Verification passed: %d v2 rows decrypted, %d %s checked.',
+            (int) $result['v2'],
+            (int) $result['decrypt_ok'],
+            !empty($assoc['full']) ? 'rows' : 'samples'
+        ));
     }
 
     /**
@@ -404,7 +464,10 @@ final class Commands
      * : Search term.
      *
      * [--entity=<entity>]
+     * : Entity type: user, post, term or comment.
+     *
      * [--limit=<limit>]
+     * : Maximum number of matches.
      */
     public function search($args = array(), $assoc = array()): void
     {
@@ -473,9 +536,18 @@ final class Commands
      * : customer_lookup or siteguard_history.
      *
      * [--dry-run]
+     * : Print what would change without writing.
+     *
      * [--batch=<batch>]
+     * : Rows per batch.
+     *
      * [--backup-confirmed]
+     * : Acknowledge that a database backup exists.
+     *
      * [--resume]
+     * : Continue a previous run.
+     *
+     * @alias migrate-table
      */
     public function migrate_table($args = array(), $assoc = array()): void
     {
@@ -530,6 +602,13 @@ final class Commands
 
         if (empty($result['ok'])) {
             $error = isset($result['error']) ? (string) $result['error'] : 'migration_failed';
+
+            if (!empty($result['errors']) && is_array($result['errors'])) {
+                foreach (array_slice($result['errors'], 0, 10) as $rowError) {
+                    \WP_CLI::log('Row error: ' . json_encode($rowError));
+                }
+            }
+
             if ('backup_required' === $error) {
                 \WP_CLI::warning('Backup confirmation required. Pass --backup-confirmed after creating a backup.');
                 \WP_CLI::halt(2);

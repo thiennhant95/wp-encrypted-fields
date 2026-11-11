@@ -580,7 +580,11 @@ check(
 echo "\n== non-string / empty ==\n";
 reset_store();
 update_metadata('user', 8, 'first_name', array('x'));
-check(stored_value('user', 8, 'first_name') === array('x'), 'array value is not encrypted');
+check(
+    stored_value('user', 8, 'first_name') === 'enc:text:' . base64_encode(serialize(array('x'))),
+    'array value is serialized and encrypted'
+);
+check(get_metadata('user', 8, 'first_name', true) === array('x'), 'array value decrypts back to an array');
 update_metadata('user', 8, 'first_name', '');
 check(stored_value('user', 8, 'first_name') === '', 'empty string is not encrypted');
 add_metadata('user', 9, 'first_name', 123);

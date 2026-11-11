@@ -17,6 +17,7 @@ final class Migrator
     private Plugin $plugin;
     private ?object $db;
     private ?ColumnStore $columns = null;
+    private string $lockToken = '';
 
     public function __construct(Plugin $plugin, ?object $db = null)
     {
@@ -45,10 +46,15 @@ final class Migrator
         $fields = array();
         $totals = array('plaintext' => 0, 'legacy' => 0, 'v2' => 0, 'token' => 0, 'empty' => 0, 'rows' => 0);
         $warnings = array();
+        $scanFailed = false;
 
         foreach ($targets as $target) {
             $row = $this->scanTarget($target, $sample, $checkLength, $full);
             $fields[] = $row;
+
+            if (!empty($row['error'])) {
+                $scanFailed = true;
+            }
 
             foreach (array('plaintext', 'legacy', 'v2', 'token', 'empty', 'rows') as $key) {
                 $totals[$key] += $row[$key];
@@ -72,6 +78,8 @@ final class Migrator
         }
 
         return array(
+            'ok' => !$scanFailed,
+            'error' => $scanFailed ? 'scan_failed' : '',
             'fields' => $fields,
             'totals' => $totals,
             'targets' => count($targets),
@@ -105,6 +113,18 @@ final class Migrator
      */
     public function migrate(array $options = array()): array
     {
+        $from = isset($options['from']) ? (string) $options['from'] : 'both';
+
+        if (!in_array($from, array('both', 'plaintext', 'legacy'), true)) {
+            return array(
+                'ok' => false,
+                'error' => 'invalid_from',
+                'message' => 'The --from option must be one of: both, plaintext, legacy.',
+                'migrated' => 0,
+                'errors' => array(),
+            );
+        }
+
         if (!empty($options['dry_run'])) {
             return $this->dryRun($options);
         }
@@ -121,6 +141,17 @@ final class Migrator
         $stopOnError = !isset($options['stop_on_error']) || (bool) $options['stop_on_error'];
 
         $preview = $this->scan($filters + array('sample_limit' => 5, 'full' => true));
+
+        if (empty($preview['ok'])) {
+            return array(
+                'ok' => false,
+                'error' => 'scan_failed',
+                'message' => 'The pre-migration scan failed; refusing to migrate without a reliable backup decision.',
+                'migrated' => 0,
+                'errors' => array(),
+            );
+        }
+
         $pending = $preview['totals']['plaintext'] + $preview['totals']['legacy'];
 
         if ($pending > 0 && !$this->backupSatisfied($options)) {
@@ -161,6 +192,7 @@ final class Migrator
             'migrated' => 0,
             'skipped' => 0,
             'errors' => array(),
+            'error_count' => 0,
             'stopped' => false,
             'batch' => $batch,
             'from' => $from,
@@ -180,9 +212,10 @@ final class Migrator
                         break;
                     }
 
+                    $previousCursor = $cursor;
+
                     foreach ($rows as $row) {
-                        $cursor = isset($row->row_id) ? (int) $row->row_id : $cursor;
-                        $state['cursors'][$targetKey] = $cursor;
+                        $rowId = isset($row->row_id) ? (int) $row->row_id : $cursor;
                         $result = $this->processRow($target, $row, $from, true);
 
                         if ('migrated' === $result['status']) {
@@ -190,11 +223,25 @@ final class Migrator
                         } elseif ('skipped' === $result['status']) {
                             $summary['skipped']++;
                         } elseif ('error' === $result['status']) {
-                            $summary['errors'][] = $result['error'];
+                            $summary['error_count'] = (int) $summary['error_count'] + 1;
+
+                            if (count($summary['errors']) < 100) {
+                                $summary['errors'][] = $result['error'];
+                            }
+
                             if ($stopOnError) {
                                 $summary['stopped'] = true;
                             }
                         }
+
+                        if ('error' === $result['status'] && $stopOnError) {
+                            break;
+                        }
+
+                        if ($rowId > $cursor) {
+                            $cursor = $rowId;
+                        }
+                        $state['cursors'][$targetKey] = $cursor;
 
                         if ($summary['stopped']) {
                             break;
@@ -204,6 +251,17 @@ final class Migrator
                     $this->saveState($state);
 
                     if ($summary['stopped'] || count($rows) < $batch) {
+                        break;
+                    }
+
+                    if ($cursor <= $previousCursor) {
+                        $summary['errors'][] = array(
+                            'entity' => $target['entity'],
+                            'field' => $target['field'],
+                            'id' => $cursor,
+                            'error' => 'cursor_stalled',
+                        );
+                        $summary['stopped'] = true;
                         break;
                     }
                 }
@@ -252,13 +310,43 @@ final class Migrator
         }
 
         $batch = isset($options['batch']) ? max(1, min(5000, (int) $options['batch'])) : 500;
-        $targets = Env::targets(
-            $this->plugin,
-            $this->db,
-            isset($options['entity']) ? (string) $options['entity'] : '',
-            isset($options['field']) ? (string) $options['field'] : '',
-            isset($options['table']) ? (string) $options['table'] : ''
-        );
+        $entityFilter = isset($options['entity']) ? (string) $options['entity'] : '';
+        $fieldFilter = isset($options['field']) ? (string) $options['field'] : '';
+        $tableFilter = isset($options['table']) ? (string) $options['table'] : '';
+
+        if ('' === $fieldFilter) {
+            $preview = $this->scan(array(
+                'entity' => $entityFilter,
+                'field' => $fieldFilter,
+                'table' => $tableFilter,
+                'sample_limit' => 5,
+                'full' => true,
+            ));
+
+            if (empty($preview['ok'])) {
+                return array(
+                    'ok' => false,
+                    'error' => 'scan_failed',
+                    'message' => 'The rollback scan failed; no data was changed.',
+                    'decrypted' => 0,
+                    'errors' => array(),
+                );
+            }
+
+            $pending = (int) $preview['totals']['v2'] + (int) $preview['totals']['legacy'];
+
+            if ($pending > 0 && !$this->backupSatisfied($options)) {
+                return array(
+                    'ok' => false,
+                    'error' => 'backup_required',
+                    'message' => 'Rollback decrypts data and requires a confirmed backup.',
+                    'decrypted' => 0,
+                    'errors' => array(),
+                );
+            }
+        }
+
+        $targets = Env::targets($this->plugin, $this->db, $entityFilter, $fieldFilter, $tableFilter);
 
         $token = $this->acquireLock();
         if ('' === $token) {
@@ -331,6 +419,7 @@ final class Migrator
     public function verify(array $options = array()): array
     {
         $scan = $this->scan(array_merge($options, array('sample_limit' => 50, 'full' => true)));
+        $full = !empty($options['full']);
         $decryptOk = 0;
         $decryptFailed = 0;
         $tokenErrors = 0;
@@ -382,11 +471,11 @@ final class Migrator
 
         foreach ($targets as $target) {
             if ($this->isUserTokenTarget($target)) {
-                $this->verifyTokenTarget($target, $decryptOk, $decryptFailed, $errors);
+                $this->verifyTokenTarget($target, $decryptOk, $decryptFailed, $errors, $full);
                 continue;
             }
 
-            $rows = $this->fetchEncryptedSample($target, 10);
+            $rows = $this->fetchEncryptedSample($target, $full ? 0 : 50);
             foreach ($rows as $row) {
                 $value = isset($row->value) ? (string) $row->value : '';
                 if (!Env::isEncrypted($this->plugin, $value, $target['field_obj'])) {
@@ -419,16 +508,41 @@ final class Migrator
         }
 
         $indexRows = null;
+        $indexOk = true;
         $db = Env::db($this->db);
         if (null !== $db && method_exists($db, 'get_var')) {
             $indexRows = (int) Env::getVar($db, 'SELECT COUNT(*) FROM ' . Env::table($db, 'kec_search_index'));
+
+            $searchable = 0;
+            try {
+                foreach ($this->plugin->registry()->all() as $entityFields) {
+                    foreach ($entityFields as $field) {
+                        if ($field instanceof Field && $field->isSearchable()) {
+                            $searchable++;
+                        }
+                    }
+                }
+            } catch (\Throwable $exception) {
+                $searchable = 0;
+            }
+
+            if ($full && $searchable > 0 && 0 === $indexRows && (int) $scan['totals']['rows'] > 0) {
+                $indexOk = false;
+                $errors[] = array(
+                    'entity' => '',
+                    'field' => '',
+                    'error' => 'search_index_empty',
+                );
+            }
         }
 
         return array(
             'ok' => 0 === (int) $scan['totals']['plaintext']
                 && 0 === (int) $scan['totals']['legacy']
                 && 0 === $decryptFailed
-                && 0 === $tokenErrors,
+                && 0 === $tokenErrors
+                && $indexOk,
+            'index_ok' => $indexOk,
             'plaintext' => (int) $scan['totals']['plaintext'],
             'legacy' => (int) $scan['totals']['legacy'],
             'v2' => (int) $scan['totals']['v2'],
@@ -552,8 +666,11 @@ final class Migrator
         }
 
         $ack = $this->plugin->option('kec_backup_ack');
+        $timestamp = is_array($ack) && isset($ack['timestamp']) ? (int) $ack['timestamp'] : 0;
 
-        return is_array($ack) && !empty($ack['timestamp']);
+        return $timestamp > 0
+            && $timestamp <= time() + 300
+            && (time() - $timestamp) <= 86400;
     }
 
     public function acquireLock(): string
@@ -564,6 +681,8 @@ final class Migrator
             if ($expires > time()) {
                 return '';
             }
+
+            $this->plugin->deleteOption(self::LOCK_OPTION);
         }
 
         try {
@@ -572,12 +691,30 @@ final class Migrator
             $token = uniqid('kec', true);
         }
 
-        $this->plugin->updateOption(self::LOCK_OPTION, array(
+        $lock = array(
             'token' => $token,
             'time' => time(),
             'expires' => time() + 3600,
             'user_id' => function_exists('get_current_user_id') ? (int) get_current_user_id() : 0,
-        ));
+        );
+
+        if (function_exists('add_option')) {
+            if (!add_option(self::LOCK_OPTION, $lock, '', false)) {
+                $existing = $this->plugin->option(self::LOCK_OPTION);
+                if (is_array($existing) && !empty($existing['token'])) {
+                    $expires = isset($existing['expires']) ? (int) $existing['expires'] : 0;
+                    if ($expires > time()) {
+                        return '';
+                    }
+                }
+
+                $this->plugin->updateOption(self::LOCK_OPTION, $lock);
+            }
+        } else {
+            $this->plugin->updateOption(self::LOCK_OPTION, $lock);
+        }
+
+        $this->lockToken = $token;
 
         return $token;
     }
@@ -592,6 +729,7 @@ final class Migrator
         }
 
         $this->plugin->deleteOption(self::LOCK_OPTION);
+        $this->lockToken = '';
     }
 
     public function isLocked(): bool
@@ -625,15 +763,24 @@ final class Migrator
             'rows' => 0,
             'total' => 0,
             'length' => array('max' => Env::fieldMaxLength($target['field_obj']), 'risk' => false, 'observed' => 0),
+            'error' => '',
         );
 
         $db = Env::db($this->db);
         if (null === $db) {
+            $result['error'] = 'scan_failed';
+
             return $result;
         }
 
         $where = Env::targetWhereSql($db, $target, $target['value_col'] . " <> ''");
         $result['total'] = (int) Env::getVar($db, 'SELECT COUNT(*) FROM ' . $target['table'] . ($where !== '' ? ' WHERE ' . $where : ''));
+
+        if ('' !== Env::lastError($db)) {
+            $result['error'] = 'scan_failed';
+
+            return $result;
+        }
 
         if (!$full) {
             $sql = 'SELECT ' . $target['id_col'] . ' AS row_id, '
@@ -643,7 +790,15 @@ final class Migrator
                 . ($where !== '' ? ' WHERE ' . $where : '')
                 . ' ORDER BY ' . $target['id_col'] . ' ASC LIMIT ' . (int) $sample;
 
-            $this->accumulateRows($result, Env::getResults($db, $sql), $target, $checkLength);
+            $rows = Env::getResults($db, $sql);
+
+            if ('' !== Env::lastError($db)) {
+                $result['error'] = 'scan_failed';
+
+                return $result;
+            }
+
+            $this->accumulateRows($result, $rows, $target, $checkLength);
 
             return $result;
         }
@@ -666,6 +821,13 @@ final class Migrator
                 . ' ORDER BY ' . $target['id_col'] . ' ASC LIMIT ' . (int) $batch;
 
             $rows = Env::getResults($db, $sql);
+
+            if ('' !== Env::lastError($db)) {
+                $result['error'] = 'scan_failed';
+
+                return $result;
+            }
+
             if (array() === $rows) {
                 break;
             }
@@ -763,35 +925,51 @@ final class Migrator
      * @param array<string, mixed> $target
      * @param array<int, array<string, mixed>> $errors
      */
-    private function verifyTokenTarget(array $target, int &$ok, int &$failed, array &$errors): void
+    private function verifyTokenTarget(array $target, int &$ok, int &$failed, array &$errors, bool $full = false): void
     {
         $columns = $this->columnStore();
         $name = $this->tokenName($target);
         $checked = 0;
+        $cursor = 0;
+        $batch = $full ? 500 : 50;
 
-        foreach ($this->fetchBatch($target, 0, 50) as $row) {
-            $value = isset($row->value) ? (string) $row->value : '';
-            if (!$columns->isToken($value, $name)) {
-                continue;
+        while (true) {
+            $rows = $this->fetchBatch($target, $cursor, $batch);
+            if (array() === $rows) {
+                break;
             }
 
-            $userId = isset($row->entity_id) ? (int) $row->entity_id : 0;
-            $plain = $this->readMetaPlain($userId, $name);
+            foreach ($rows as $row) {
+                $cursor = isset($row->row_id) ? (int) $row->row_id : $cursor;
+                $value = isset($row->value) ? (string) $row->value : '';
 
-            if (null === $plain) {
-                $failed++;
-                $errors[] = array(
-                    'entity' => $target['entity'],
-                    'field' => $target['field'],
-                    'id' => isset($row->row_id) ? (int) $row->row_id : 0,
-                    'error' => 'meta_decrypt_failed',
-                );
-            } else {
-                $ok++;
+                if (!$columns->isToken($value, $name)) {
+                    continue;
+                }
+
+                $userId = isset($row->entity_id) ? (int) $row->entity_id : 0;
+                $plain = $this->readMetaPlain($userId, $name);
+
+                if (null === $plain) {
+                    $failed++;
+                    $errors[] = array(
+                        'entity' => $target['entity'],
+                        'field' => $target['field'],
+                        'id' => isset($row->row_id) ? (int) $row->row_id : 0,
+                        'error' => 'meta_decrypt_failed',
+                    );
+                } else {
+                    $ok++;
+                }
+
+                $checked++;
+
+                if (!$full && $checked >= 10) {
+                    return;
+                }
             }
 
-            $checked++;
-            if ($checked >= 10) {
+            if (!$full || count($rows) < $batch) {
                 break;
             }
         }
@@ -819,6 +997,17 @@ final class Migrator
 
         if ('empty' === $class) {
             return array('status' => 'skipped');
+        }
+
+        if (!$encrypt && $field->isInternal()) {
+            return array('status' => 'skipped');
+        }
+
+        if ('plaintext' === $class
+            && 'plaintext' !== $from
+            && $this->looksLikeLegacyIdentifier($value, $field)
+        ) {
+            return $this->error($target, $row, 'legacy_key_missing');
         }
 
         if ($this->isUserTokenTarget($target)) {
@@ -903,12 +1092,10 @@ final class Migrator
             return $this->error($target, $row, 'length_exceeded');
         }
 
-        $written = $this->writeValue($target, $row, $plain);
+        $written = $this->writePlainValue($target, $row, $plain);
         if (!$written) {
             return $this->error($target, $row, 'write_failed');
         }
-
-        $this->removeIndexRow($target, $row);
 
         return array('status' => 'migrated');
     }
@@ -936,12 +1123,10 @@ final class Migrator
                 return $this->error($target, $row, 'decrypt_failed');
             }
 
-            $written = $this->writeValue($target, $row, $plain);
+            $written = $this->writePlainValue($target, $row, $plain);
             if (!$written) {
                 return $this->error($target, $row, 'write_failed');
             }
-
-            $this->removeIndexRow($target, $row);
 
             return array('status' => 'migrated');
         }
@@ -998,7 +1183,13 @@ final class Migrator
             return $this->error($target, $row, 'length_exceeded');
         }
 
-        $columns->storePlain($userId, $plain, $name);
+        if (!$columns->storePlain($userId, $plain, $name)) {
+            return $this->error($target, $row, 'plaintext_not_stored');
+        }
+
+        if ($columns->readPlain($userId, $name) !== $plain) {
+            return $this->error($target, $row, 'plaintext_not_stored');
+        }
 
         $written = $this->writeValue($target, $row, $token);
         if (!$written) {
@@ -1078,6 +1269,24 @@ final class Migrator
     }
 
     /**
+     * Write plaintext without letting MetaWriteGuard re-encrypt it.
+     *
+     * @param array<string, mixed> $target
+     */
+    private function writePlainValue(array $target, object $row, string $value): bool
+    {
+        \Koyo\EncryptedFields\Meta\MetaWriteGuard::suspend();
+        \Koyo\EncryptedFields\Query\QueryRewriter::suspend();
+
+        try {
+            return $this->writeValue($target, $row, $value);
+        } finally {
+            \Koyo\EncryptedFields\Query\QueryRewriter::resume();
+            \Koyo\EncryptedFields\Meta\MetaWriteGuard::resume();
+        }
+    }
+
+    /**
      * @param array<string, mixed> $target
      */
     private function writeValue(array $target, object $row, string $value): bool
@@ -1090,8 +1299,7 @@ final class Migrator
 
             $id = isset($row->entity_id) ? (int) $row->entity_id : 0;
             try {
-                $adapter->write($id, array($target['field'] => $value));
-                return true;
+                return (bool) $adapter->write($id, array($target['field'] => $value));
             } catch (\Throwable $exception) {
                 return false;
             }
@@ -1213,9 +1421,47 @@ final class Migrator
             . $target['value_col'] . ' AS value'
             . ' FROM ' . $target['table']
             . ($where !== '' ? ' WHERE ' . $where : '')
-            . ' ORDER BY ' . $target['id_col'] . ' ASC LIMIT ' . (int) $limit;
+            . ' ORDER BY ' . $target['id_col'] . ' ASC'
+            . ($limit > 0 ? ' LIMIT ' . (int) $limit : '');
 
         return Env::getResults($db, $sql);
+    }
+
+    /**
+     * Strong-ish legacy detector. Avoids treating ordinary emails/logins as
+     * legacy ciphertext while still catching base64-shaped values.
+     */
+    private function looksLikeLegacyIdentifier(string $value, Field $field): bool
+    {
+        $type = $field->type();
+
+        if ('login' === $type) {
+            if (1 === preg_match('/^[A-Za-z0-9_.@ -]+$/', $value)) {
+                return false;
+            }
+
+            if (1 !== preg_match('/^[A-Za-z0-9+\/=]{16,}={0,2}$/', $value)) {
+                return false;
+            }
+
+            $decoded = base64_decode($value, true);
+
+            return false !== $decoded && strlen($decoded) >= 16;
+        }
+
+        if ('email' === $type) {
+            $parts = explode('@', $value);
+
+            if (2 !== count($parts) || 1 !== preg_match('/[+\/=]/', $parts[0])) {
+                return false;
+            }
+
+            $decoded = base64_decode($parts[0], true);
+
+            return false !== $decoded && strlen($decoded) > 16;
+        }
+
+        return false;
     }
 
     private function normalizeForField(string $value, Field $field): string
@@ -1260,5 +1506,15 @@ final class Migrator
     {
         $state['updated'] = time();
         $this->plugin->updateOption($option, $state);
+
+        if ('' === $this->lockToken) {
+            return;
+        }
+
+        $lock = $this->plugin->option(self::LOCK_OPTION);
+        if (is_array($lock) && isset($lock['token']) && $lock['token'] === $this->lockToken) {
+            $lock['expires'] = time() + 3600;
+            $this->plugin->updateOption(self::LOCK_OPTION, $lock);
+        }
     }
 }

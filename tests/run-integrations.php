@@ -186,6 +186,7 @@ require_once dirname(__DIR__) . '/src/Contracts/SearchInterface.php';
 require_once dirname(__DIR__) . '/src/Support/Logger.php';
 require_once dirname(__DIR__) . '/src/Plugin.php';
 require_once dirname(__DIR__) . '/src/User/ColumnStore.php';
+require_once dirname(__DIR__) . '/src/Integrations/WooCommerce/CustomerLookupSchema.php';
 require_once dirname(__DIR__) . '/src/Integrations/WooCommerce/Integration.php';
 require_once dirname(__DIR__) . '/src/Integrations/SiteGuard/Integration.php';
 require_once dirname(__DIR__) . '/src/Integrations/LegacyEcKoyo/Preset.php';
@@ -384,7 +385,19 @@ kec_test_run('HPOS off: order search filters use fake search service', function 
 
 kec_test_run('Analytics row decrypts customer fields + name idempotently', function () {
     kec_test_reset_options();
-    $plugin = kec_test_plugin(new Registry(array()), new FakeCrypto());
+    $plugin = kec_test_plugin(new Registry(array(
+        'user' => array(
+            'columns' => array(
+                'user_email' => array('type' => 'email'),
+                'user_login' => array('type' => 'login'),
+            ),
+            'meta' => array(
+                'first_name' => array('type' => 'text'),
+                'last_name' => array('type' => 'text'),
+                'city' => array('type' => 'text'),
+            ),
+        ),
+    )), new FakeCrypto());
     $integration = new WooIntegration($plugin);
 
     $row = array(
@@ -488,7 +501,19 @@ kec_test_run('Woo analytics lookup resolves tokens before encrypting lookup row'
     );
     $GLOBALS['kec_test_customer_updates'] = array();
 
-    $plugin = kec_test_plugin(new Registry(array()), new FakeCrypto());
+    $plugin = kec_test_plugin(new Registry(array(
+        'user' => array(
+            'columns' => array(
+                'user_email' => array('type' => 'email'),
+                'user_login' => array('type' => 'login'),
+            ),
+            'meta' => array(
+                'first_name' => array('type' => 'text'),
+                'last_name' => array('type' => 'text'),
+                'city' => array('type' => 'text'),
+            ),
+        ),
+    )), new FakeCrypto());
     $integration = new WooIntegration($plugin);
     $integration->onAnalyticsCustomer(21);
 

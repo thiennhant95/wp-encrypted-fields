@@ -15,6 +15,12 @@ Enabled automatically when `WooCommerce` is loaded.
   responses.
 - Customer objects are decrypted after `woocommerce_customer_loaded`.
 - Customer email/username tokens are resolved when reading customer data.
+- Declare `_billing_address_index` / `_shipping_address_index`; they contain a
+  plaintext copy of name/email/phone otherwise.
+- `wc_customer_lookup` needs longer columns for ciphertext. `wp kec
+  migrate-table customer_lookup` widens `username`, `email`, `city`,
+  `billing_phone` and `shipping_phone` to `varchar(255)` before migrating.
+  Re-run it after a WooCommerce schema update if the columns shrink again.
 
 ### HPOS
 
@@ -79,14 +85,18 @@ Implement `Koyo\EncryptedFields\Contracts\TableAdapterInterface`:
 interface TableAdapterInterface
 {
     public function name(): string;
+    public function table(): string;        // full physical table name
+    public function primaryKey(): string;   // unique integer primary key
     public function columns(): array;
     public function read(int $id): ?array;
-    public function write(int $id, array $data): void;
+    public function write(int $id, array $data): bool;
     public function searchableColumns(): array;
 }
 ```
 
 Adapters are optional and are used by `wp kec migrate --table=...`.
+`table()` and `primaryKey()` are required and validated as plain SQL
+identifiers; `write()` must return `true` only when all values were stored.
 
 ## Popular plugin compatibility
 

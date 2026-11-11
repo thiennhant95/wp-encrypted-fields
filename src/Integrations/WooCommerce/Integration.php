@@ -47,7 +47,9 @@ final class Integration
             return false;
         }
 
-        return 'yes' === get_option('woocommerce_custom_orders_table_enabled');
+        $option = get_option('woocommerce_custom_orders_table_enabled');
+
+        return in_array($option, array('yes', '1', 1, true), true);
     }
 
     private function registerHposGuards(): void
@@ -255,6 +257,9 @@ final class Integration
         }
 
         $table = $wpdb->prefix . 'wc_customer_lookup';
+
+        $widened = CustomerLookupSchema::ensure($wpdb);
+
         $format = defined('ARRAY_A') ? ARRAY_A : 'ARRAY_A';
         $row = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$table} WHERE customer_id = %d", $customerId), $format);
 
@@ -270,6 +275,21 @@ final class Integration
             'email' => 'email',
             'username' => 'login',
         );
+        $maxLengths = $widened
+            ? array(
+                'first_name' => 255,
+                'last_name' => 255,
+                'city' => 255,
+                'email' => 255,
+                'username' => 255,
+            )
+            : array(
+                'first_name' => 255,
+                'last_name' => 255,
+                'city' => 100,
+                'email' => 100,
+                'username' => 60,
+            );
 
         foreach ($map as $key => $type) {
             if (!isset($row[$key]) || !is_string($row[$key]) || '' === $row[$key]) {
@@ -290,6 +310,22 @@ final class Integration
 
             $encrypted = $this->encryptValue($value, 'user', $key, $type);
             if (is_string($encrypted) && $encrypted !== $value) {
+                $max = isset($maxLengths[$key]) ? (int) $maxLengths[$key] : 0;
+
+                if ($max > 0 && strlen($encrypted) > $max) {
+                    try {
+                        $this->plugin->logger()->warning('Woo customer lookup value is too long to encrypt.', array(
+                            'column' => $key,
+                            'max_length' => $max,
+                            'cipher_length' => strlen($encrypted),
+                        ));
+                    } catch (\Throwable $ignored) {
+                        // Logging must never break the lookup update.
+                    }
+
+                    continue;
+                }
+
                 $data[$key] = $encrypted;
             }
         }
@@ -371,7 +407,17 @@ final class Integration
             if (is_array($parts)) {
                 $decrypted = array();
                 foreach ($parts as $part) {
-                    $plain = $this->decryptValue($part, 'user', 'name', 'text');
+                    $plain = $part;
+
+                    foreach (array('first_name', 'last_name') as $candidate) {
+                        $value = $this->decryptValue($part, 'user', $candidate, 'text');
+
+                        if (is_string($value) && '' !== $value && $value !== $part) {
+                            $plain = $value;
+                            break;
+                        }
+                    }
+
                     if (is_string($plain) && '' !== $plain) {
                         $decrypted[] = $plain;
                     }
@@ -512,6 +558,33 @@ final class Integration
         return $this->columns;
     }
 
+    /**
+     * Default-deny: only encrypt/decrypt fields explicitly declared in the
+     * registry. Analytics columns map email/username back to the user columns.
+     */
+    private function isDeclared(string $entity, string $key): bool
+    {
+        $registry = $this->registry();
+
+        if (!$registry instanceof Registry) {
+            return false;
+        }
+
+        if ($registry->has($entity, $key)) {
+            return true;
+        }
+
+        if ('email' === $key) {
+            return $registry->has($entity, 'user_email');
+        }
+
+        if ('username' === $key) {
+            return $registry->has($entity, 'user_login');
+        }
+
+        return false;
+    }
+
     private function field(string $entity, string $key, string $type): Field
     {
         $registry = $this->registry();
@@ -536,6 +609,10 @@ final class Integration
             return $value;
         }
 
+        if (!$this->isDeclared($entity, $key)) {
+            return $value;
+        }
+
         $crypto = $this->crypto();
         if (!$crypto) {
             return $value;
@@ -557,6 +634,10 @@ final class Integration
     private function encryptValue($value, string $entity, string $key, string $type)
     {
         if (!is_string($value) || '' === $value) {
+            return $value;
+        }
+
+        if (!$this->isDeclared($entity, $key)) {
             return $value;
         }
 

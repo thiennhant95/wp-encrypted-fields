@@ -175,7 +175,7 @@ final class RotationService
      */
     private function verify(Migrator $migrator, LookupMigrator $lookup, int $batch): array
     {
-        $registry = $migrator->verify(array('sample_limit' => 50));
+        $registry = $migrator->verify(array('sample_limit' => 50, 'full' => true));
         $customer = $lookup->verify('customer_lookup');
         $siteguard = $lookup->verify('siteguard_history');
 

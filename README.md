@@ -68,6 +68,8 @@ define('KEC_FIELDS', [
         'meta' => [
             '_billing_first_name' => ['type' => 'text', 'search' => true],
             '_billing_email'      => ['type' => 'email', 'search' => true],
+            '_billing_address_index'  => ['type' => 'text', 'search' => true],
+            '_shipping_address_index' => ['type' => 'text', 'search' => true],
         ],
     ],
 ]);
@@ -120,8 +122,9 @@ See [docs/security.md](docs/security.md) and [SECURITY.md](SECURITY.md).
 - WooCommerce HPOS is not supported; order encryption is refused when HPOS is on.
 - `WP_User` objects read outside supported hooks expose tokens, not plaintext;
   use `kec_user_login()`, `kec_user_email()` or `ColumnStore`.
-- `wp_options`, comments/reviews, order notes and third-party custom tables are
-  not encrypted unless an adapter is registered.
+- `wp_options`, `post_content` / `post_title`, comments/reviews, order notes
+  and third-party custom tables are not encrypted unless an adapter is
+  registered.
 - WooCommerce reset-password templates may render the token login; core
   password-reset messages are handled.
 - External search engines (Elasticsearch, Algolia, Relevanssi) need their own

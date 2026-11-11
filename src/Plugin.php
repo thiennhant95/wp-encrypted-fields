@@ -67,6 +67,7 @@ final class Plugin
         $modules = array(
             \Koyo\EncryptedFields\Meta\MetaHooks::class,
             \Koyo\EncryptedFields\User\UserHooks::class,
+            \Koyo\EncryptedFields\User\UserLookup::class,
             \Koyo\EncryptedFields\User\PasswordReset::class,
             \Koyo\EncryptedFields\Query\QueryRewriter::class,
             \Koyo\EncryptedFields\Search\Hooks::class,

@@ -210,7 +210,6 @@ final class SetupWizard
                 $batch = isset($_POST['kec_batch']) ? max(1, min(5000, (int) $_POST['kec_batch'])) : 500;
                 $result = (new Migrator($this->plugin))->migrate(array(
                     'batch' => $batch,
-                    'backup_confirmed' => true,
                     'resume' => false,
                 ));
 

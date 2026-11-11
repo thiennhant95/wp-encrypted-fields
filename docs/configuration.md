@@ -25,6 +25,8 @@ return [
         'meta' => [
             '_billing_first_name' => ['type' => 'text', 'search' => true],
             '_billing_email'      => ['type' => 'email', 'search' => true],
+            '_billing_address_index'  => ['type' => 'text', 'search' => true],
+            '_shipping_address_index' => ['type' => 'text', 'search' => true],
             '_customer_ip_address'=> ['type' => 'text'],
         ],
     ],

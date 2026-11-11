@@ -82,4 +82,7 @@ search, and verifies. Promote the new key afterwards.
 - No plaintext in persistent object cache.
 - Do not silently store plaintext if encryption fails.
 - HPOS is out of scope for v1.
-- Only scalar string meta values are encrypted.
+- Scalar strings and serialized arrays/objects stored through meta APIs are
+  encrypted (serialized values are encrypted as their serialized string).
+- `post_content` / `post_title` and custom tables are not handled by the meta
+  layer.

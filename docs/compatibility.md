@@ -18,7 +18,7 @@ Most plugins that use standard WordPress/WooCommerce APIs work unchanged.
 |---|---|---|
 | Page builders | Elementor, WPBakery, Divi | None for unlisted content fields |
 | SEO | Yoast, Rank Math | None |
-| Forms | CF7, WPForms, Gravity Forms | Entries in their own tables are not encrypted; current-user email is decrypted |
+| Forms | CF7, WPForms, Gravity Forms | Entries in their own tables are not encrypted; current-user email is decrypted. Flamingo: declare `_fields`, `_meta`, `_from`, `_email` to encrypt serialized/meta values; `post_title`/`post_content` are not encrypted |
 | Cache | WP Rocket, LiteSpeed, W3TC | None |
 | Security | Wordfence | Exact `get_user_by`/SQL lookups work via query rewrite; activity reports/LIKE searches may need testing |
 | Backup/migration | UpdraftPlus, Duplicator, All-in-One WP Migration | Dumps contain ciphertext; restore needs the same key; user imports may need the index |
@@ -49,6 +49,9 @@ a `TableAdapterInterface`. If 7 is yes, do not use v1 for orders.
 
 - WooCommerce HPOS.
 - Encrypting `wp_options` / API keys.
+- Encrypting `post_content` / `post_title` (for example Flamingo stores a copy
+  of inbound form values there even when its meta is encrypted).
 - Full-text search outside trigram tokens.
 - Automatic protection against plugins reading raw `wp_users` columns outside
   the supported hooks.
+- Custom tables without a registered `TableAdapterInterface`.
