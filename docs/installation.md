@@ -18,6 +18,31 @@
 3. Define a key and a registry (see [configuration](configuration.md)).
 4. Run the setup wizard at **Settings → Encrypted Fields**.
 
+### Via Composer
+
+Once the package is published on [Packagist](https://packagist.org/packages/thiennhant95/wp-encrypted-fields), projects managed with Composer (Bedrock, Roots) can require it directly:
+
+```bash
+composer require thiennhant95/wp-encrypted-fields
+```
+
+If you need it before the Packagist listing is live, use the VCS repository:
+
+```json
+{
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/thiennhant95/wp-encrypted-fields"
+        }
+    ]
+}
+```
+
+```bash
+composer require thiennhant95/wp-encrypted-fields
+```
+
 ## Key setup
 
 Recommended: `wp-config.php` or environment.
