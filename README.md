@@ -17,6 +17,11 @@ database; no core or third-party plugin patches are required.
 
 [![Database only sees ciphertext](docs/assets/db-ciphertext.png)](https://thiennhant95.github.io/wp-encrypted-fields/#evidence)
 
+<p align="center">
+  <a href="https://thiennhant95.github.io/wp-encrypted-fields/#evidence"><img src="docs/assets/wp-admin.png" alt="Settings → Encrypted Fields status screen" width="49%"></a>
+  <a href="https://thiennhant95.github.io/wp-encrypted-fields/#evidence"><img src="docs/assets/wp-cli.png" alt="wp kec key generate, migrate and verify --full" width="49%"></a>
+</p>
+
 ## Features
 
 - Transparent encryption/decryption for post, user, term and comment meta.
