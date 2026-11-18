@@ -23,7 +23,7 @@ Features:
 * Exact and partial search through HMAC token indexes.
 * `get_user_by()`, `email_exists()`, `username_exists()` support.
 * Mail recipient decryption; password-reset message support.
-* WooCommerce integration (HPOS must be disabled in v1).
+* WooCommerce integration. HPOS order-meta encryption requires the Pro add-on.
 * SiteGuard integration and a legacy migration preset.
 * Setup wizard with a mandatory backup gate.
 * WP-CLI migration, full verification, reindex and two-phase key rotation.
@@ -52,7 +52,9 @@ Yes. Login and email lookups are rewritten to the stored token.
 
 = Does it work with WooCommerce HPOS? =
 
-Not in v1. Disable HPOS before enabling order encryption.
+The Free plugin does not encrypt order fields when HPOS is enabled. Install
+and license the Encrypted Fields Pro add-on to encrypt `wc_orders_meta`, keep
+order search working, and record an audit trail.
 
 = Where are keys stored? =
 

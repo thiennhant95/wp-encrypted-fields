@@ -214,6 +214,19 @@ final class Env
         return false;
     }
 
+    /**
+     * Whether an add-on (Encrypted Fields Pro) is licensed to handle HPOS
+     * order fields. When false, order encryption stays blocked.
+     */
+    public static function hposSupported(): bool
+    {
+        if (!function_exists('apply_filters')) {
+            return false;
+        }
+
+        return (bool) apply_filters('kec_hpos_supported', false);
+    }
+
     public static function fieldMaxLength(Field $field): ?int
     {
         $max = $field->maxLength();
@@ -274,6 +287,10 @@ final class Env
                 continue;
             }
 
+            if ('order' === $entity && !self::hposEnabled()) {
+                continue;
+            }
+
             foreach ($fields as $key => $field) {
                 if ('' !== $fieldFilter && $key !== $fieldFilter) {
                     continue;
@@ -319,7 +336,7 @@ final class Env
                     'entity_id_col' => $meta['entity_id_col'],
                     'value_col' => 'meta_value',
                     'where' => $where,
-                    'post_types' => $field->postTypes(),
+                    'post_types' => 'post' === $entity ? $field->postTypes() : array(),
                     'field_obj' => $field,
                     'adapter' => null,
                 );
@@ -405,6 +422,8 @@ final class Env
                 return array('table' => self::table($db, 'termmeta'), 'id_col' => 'meta_id', 'entity_id_col' => 'term_id');
             case 'comment':
                 return array('table' => self::table($db, 'commentmeta'), 'id_col' => 'meta_id', 'entity_id_col' => 'comment_id');
+            case 'order':
+                return array('table' => self::table($db, 'wc_orders_meta'), 'id_col' => 'id', 'entity_id_col' => 'order_id');
         }
 
         return null;

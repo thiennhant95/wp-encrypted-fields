@@ -71,3 +71,22 @@
   .faq details[open] summary:after{content:'–'}
   .faq p{margin:0 0 16px;color:var(--muted);font-size:14.5px}
   @media(max-width:900px){.steps{grid-template-columns:1fr}}
+  .table-wrap{overflow-x:auto;border-radius:var(--radius);border:1px solid var(--line)}
+  .table-wrap table{border:0;border-radius:0}
+  .compare td:not(:first-child),.compare th:not(:first-child){text-align:center;white-space:nowrap;width:120px}
+  .compare .st{font-weight:800}.compare .yes{color:var(--accent2)}.compare .no{color:var(--muted)}
+  .compare .pro{color:var(--accent)}
+  .compare th:last-child,.compare td:last-child{background:rgba(92,200,255,.06)}
+  .plans{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:26px;align-items:stretch}
+  .plan{position:relative;display:flex;flex-direction:column;gap:14px;background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:var(--radius);padding:26px}
+  .plan.featured{border-color:rgba(92,200,255,.55);box-shadow:0 0 0 1px rgba(92,200,255,.2),0 24px 60px rgba(0,0,0,.3)}
+  .plan .price{font-size:36px;font-weight:800;letter-spacing:-.8px;line-height:1}
+  .plan .price small{font-size:13px;color:var(--muted);font-weight:600;letter-spacing:0}
+  .plan .blurb{margin:0;color:var(--muted);font-size:14.5px}
+  .plan ul{margin:0;padding:0;list-style:none;display:grid;gap:9px;color:var(--muted);font-size:14.5px}
+  .plan li::before{content:'✓';color:var(--accent2);font-weight:800;margin-right:9px}
+  .plan li.off{opacity:.55}.plan li.off::before{content:'·';color:var(--muted)}
+  .plan .btn{margin-top:auto;justify-content:center}
+  .ribbon{position:absolute;top:-12px;right:20px;background:linear-gradient(135deg,var(--accent),#3b82f6);color:#05111d;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:5px 11px;border-radius:999px}
+  .navlinks a.pro{color:var(--accent2);font-weight:700}
+  @media(max-width:900px){.plans{grid-template-columns:1fr}.compare td:not(:first-child),.compare th:not(:first-child){width:auto;white-space:normal}}

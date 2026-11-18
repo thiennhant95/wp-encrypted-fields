@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Encrypted Fields — Field-level encryption for WordPress &amp; WooCommerce</title>
-<meta name="description" content="Registry-driven field-level encryption for WordPress and WooCommerce. AES-256-GCM, blind-index search, user token mode, WP-CLI migration and key rotation.">
+<meta name="description" content="Registry-driven field-level encryption for WordPress and WooCommerce. AES-256-GCM, blind-index search, WooCommerce HPOS order encryption, audit, masking and key rotation.">
 <meta property="og:title" content="Encrypted Fields — Field-level encryption for WordPress">
-<meta property="og:description" content="Encrypt declared fields, keep normal WordPress APIs, search through a blind index. AES-256-GCM, WooCommerce, multisite, WP-CLI.">
+<meta property="og:description" content="Encrypt declared fields, keep normal WordPress APIs, search through a blind index. AES-256-GCM, WooCommerce HPOS, audit log, REST masking, key rotation.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://thiennhant95.github.io/wp-encrypted-fields/">
 <meta property="og:site_name" content="Encrypted Fields">
@@ -31,6 +31,9 @@
 <link rel="alternate" hreflang="x-default" href="https://thiennhant95.github.io/wp-encrypted-fields/">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <link rel="stylesheet" href="assets/landing.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Encrypted Fields","applicationCategory":"SecurityApplication","applicationSubCategory":"WordPress plugin","operatingSystem":"WordPress","softwareVersion":"0.4.0","description":"Field-level encryption for WordPress and WooCommerce with AES-256-GCM, blind-index search, HPOS order encryption (Pro), audit logging, REST masking and key rotation.","url":"https://thiennhant95.github.io/wp-encrypted-fields/","downloadUrl":"https://github.com/thiennhant95/wp-encrypted-fields/releases","license":"https://www.gnu.org/licenses/old-licenses/gpl-2.0.html","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"isAccessibleForFree":true,"sameAs":["https://github.com/thiennhant95/wp-encrypted-fields"]}
+</script>
 </head>
 <body>
 <header>
@@ -40,6 +43,7 @@
       <a href="#why">Why</a>
       <a href="#evidence">DB evidence</a>
       <a href="#features">Features</a>
+      <a href="#pro" class="pro">Pro</a>
       <a href="#usecases">Use cases</a>
       <a href="#install">Install</a>
       <a href="#faq">FAQ</a>
@@ -63,6 +67,7 @@
         </p>
         <div class="cta">
           <a class="btn primary" href="#install">Install</a>
+          <a class="btn" href="#pro">Pro add-on</a>
           <a class="btn" href="https://github.com/thiennhant95/wp-encrypted-fields" target="_blank" rel="noopener">Source on GitHub</a>
           <a class="btn" href="https://github.com/thiennhant95/wp-encrypted-fields/releases/tag/v0.4.0" target="_blank" rel="noopener">Release v0.4.0</a>
         </div>
@@ -146,7 +151,7 @@
         <div class="card"><div class="icon">🔐</div><h3>AES-256-GCM</h3><p>Randomized for text; SIV deterministic for email/login so equality lookups work without exposing plaintext.</p></div>
         <div class="card"><div class="icon">🔎</div><h3>Blind index</h3><p>HMAC-SHA256 full token + trigrams for exact and partial search while the database stores no plaintext.</p></div>
         <div class="card"><div class="icon">👤</div><h3>User token mode</h3><p><code>user_login</code>/<code>user_email</code> store a 55-character token; reversible plaintext lives in encrypted meta.</p></div>
-        <div class="card"><div class="icon">🛒</div><h3>WooCommerce</h3><p>Order meta, address index, customer lookup and order search; HPOS must be off in v1.</p></div>
+        <div class="card"><div class="icon">🛒</div><h3>WooCommerce</h3><p>Order meta, address index, customer lookup and order search. HPOS order meta requires the Pro add-on.</p></div>
         <div class="card"><div class="icon">🧰</div><h3>Operations</h3><p>Scan, migrate, <code>verify --full</code>, reindex, rollback, automatic safety dumps, two-phase key rotation, WP-CLI.</p></div>
       </div>
       <div class="flow">
@@ -155,6 +160,72 @@
         <div class="node"><b>Hooks</b>meta / user / Woo / search</div>
         <div class="arrow">→</div>
         <div class="node"><b>Crypto</b>AES-256-GCM + HMAC blind index</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pro">
+    <div class="wrap">
+      <span class="kicker">Pro add-on</span>
+      <h2>WooCommerce HPOS, audit and control.</h2>
+      <p class="sub">
+        The free core protects posts, users, terms and classic order meta. The Pro add-on
+        adds first-class WooCommerce HPOS support plus the operational tools compliance
+        teams ask for — with a license that never locks your data.
+      </p>
+      <div class="table-wrap">
+        <table class="compare" aria-label="Free and Pro feature comparison">
+          <thead><tr><th scope="col">Capability</th><th scope="col">Free</th><th scope="col">Pro</th></tr></thead>
+          <tbody>
+            <tr><td>Encrypt declared post, user, term and comment fields</td><td class="st yes">✓</td><td class="st yes">✓</td></tr>
+            <tr><td>Blind-index search and tokenized logins</td><td class="st yes">✓</td><td class="st yes">✓</td></tr>
+            <tr><td>Scan, migrate, verify and two-phase rotation (WP-CLI)</td><td class="st yes">✓</td><td class="st yes">✓</td></tr>
+            <tr><td>WooCommerce classic order meta encryption</td><td class="st yes">✓</td><td class="st yes">✓</td></tr>
+            <tr><td>WooCommerce HPOS order meta encryption</td><td class="st no">—</td><td class="st yes">✓</td></tr>
+            <tr><td>Blind-index order search with HPOS</td><td class="st no">—</td><td class="st yes">✓</td></tr>
+            <tr><td>Audit log, dashboard and coverage report</td><td class="st no">—</td><td class="st yes">✓</td></tr>
+            <tr><td>REST masking for support/CS roles</td><td class="st no">—</td><td class="st yes">✓</td></tr>
+            <tr><td>Key rotation assistant (dry run, dashboard, daily cron)</td><td class="st no">—</td><td class="st yes">✓</td></tr>
+            <tr><td>Signed automatic updates and license management</td><td class="st no">—</td><td class="st yes">✓</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="plans">
+        <div class="plan">
+          <div class="tag">Free · GPL-2.0-or-later</div>
+          <h3>Core</h3>
+          <div class="price">$0</div>
+          <p class="blurb">Everything you need to encrypt declared WordPress fields and keep normal APIs working.</p>
+          <ul>
+            <li>AES-256-GCM with randomized and deterministic modes</li>
+            <li>Blind-index search for exact and partial matches</li>
+            <li>User token mode for logins and emails</li>
+            <li>Scan → migrate → verify → rollback via WP-CLI</li>
+            <li>WooCommerce classic order meta + address index</li>
+          </ul>
+          <a class="btn" href="#install">Install the free core</a>
+        </div>
+        <div class="plan featured">
+          <div class="ribbon">For live stores</div>
+          <div class="tag">Pro add-on</div>
+          <h3>Store</h3>
+          <div class="price">Contact <small>for pricing</small></div>
+          <p class="blurb">HPOS encryption and the controls a production WooCommerce store needs.</p>
+          <ul>
+            <li>Encrypt HPOS order meta in <code>wc_orders_meta</code></li>
+            <li>Order search through blind indexes, merged into HPOS queries</li>
+            <li>Dashboard with license, HPOS, coverage and audit</li>
+            <li>Mask PII in REST for roles without the sensitive-data capability</li>
+            <li>Rotation assistant with dry run and daily cron</li>
+            <li>Signed updates; expiry only blocks new writes, never decryption</li>
+          </ul>
+          <a class="btn primary" href="https://github.com/thiennhant95/wp-encrypted-fields/issues/new?title=Pro%20license%20inquiry&amp;body=Store%20URL%3A%0AWordPress%2FWooCommerce%20version%3A%0AFields%20to%20encrypt%3A" target="_blank" rel="noopener">Request Pro</a>
+        </div>
+      </div>
+      <div class="note" style="margin-top:24px">
+        License safety: if a license expires, decryption and reads keep working.
+        Only new HPOS writes are paused until the license is renewed — existing
+        ciphertext is never lost or stranded.
       </div>
     </div>
   </section>
@@ -216,6 +287,7 @@ wp kec verify --full</code></pre>
     <div class="wrap">
       <h2>Verification results</h2>
       <p class="sub">Same test lab: WordPress 7.1.4, PHP 8.1, MySQL 5.7, plugin 0.4.0.</p>
+      <div class="table-wrap">
       <table>
         <thead><tr><th>Area</th><th>Result</th></tr></thead>
         <tbody>
@@ -226,6 +298,7 @@ wp kec verify --full</code></pre>
           <tr><td>Data at rest</td><td>DB dumps contain ciphertext; the key is not in the database; email lookup and auth still work through tokens.</td></tr>
         </tbody>
       </table>
+      </div>
       <div class="chips">
         <span class="chip">WooCommerce</span><span class="chip">CF7 + Flamingo</span><span class="chip">ACF</span>
         <span class="chip">Yoast</span><span class="chip">Rank Math</span><span class="chip">AIOSEO</span>
@@ -239,7 +312,7 @@ wp kec verify --full</code></pre>
       <div class="note" style="margin-top:22px">
         Known limits: <code>post_content</code>/<code>post_title</code> are not encrypted;
         custom tables without an adapter (WP Mail Logging, MailPoet, FluentCRM…) remain plaintext;
-        HPOS is not supported in v1.
+        HPOS order meta requires the licensed Pro add-on.
       </div>
     </div>
   </section>
@@ -254,7 +327,7 @@ wp kec verify --full</code></pre>
       </details>
       <details>
         <summary>Does WooCommerce order search still work?</summary>
-        <p>Yes for declared searchable fields: the plugin removes encrypted columns from WooCommerce's SQL search and merges blind-index results. HPOS must be disabled in v1.</p>
+        <p>Yes for declared searchable fields: the plugin removes encrypted columns from WooCommerce's SQL search and merges blind-index results. With HPOS enabled this requires the licensed Pro add-on.</p>
       </details>
       <details>
         <summary>Do get_user_by(), email_exists() and logins still work?</summary>
@@ -270,7 +343,7 @@ wp kec verify --full</code></pre>
       </details>
       <details>
         <summary>Is it free?</summary>
-        <p>Yes. GPL-2.0-or-later, source and releases on GitHub. There is no paid tier or key escrow.</p>
+        <p>The core plugin is free (GPL-2.0-or-later) with source on GitHub. A separate Pro add-on provides HPOS order encryption, audit logging, coverage reporting, REST masking, key rotation and license-backed updates. Pro is quoted per store — <a href="#pro">request a license</a>. Expiry never blocks decryption; only new HPOS writes pause.</p>
       </details>
     </div>
   </section>
@@ -282,6 +355,7 @@ wp kec verify --full</code></pre>
       <div class="cta" style="justify-content:center">
         <a class="btn primary" href="https://github.com/thiennhant95/wp-encrypted-fields/releases/tag/v0.4.0" target="_blank" rel="noopener">Download v0.4.0</a>
         <a class="btn" href="https://github.com/thiennhant95/wp-encrypted-fields/blob/main/README.md" target="_blank" rel="noopener">Read the docs</a>
+        <a class="btn" href="#pro">Get Pro</a>
       </div>
       <div class="chips" style="justify-content:center;margin-top:18px">
         <span class="chip">GPL-2.0</span><span class="chip">No telemetry</span><span class="chip">Keys stay with you</span>

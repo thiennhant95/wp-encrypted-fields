@@ -4,6 +4,7 @@ namespace EncryptedFields\Integrations\WooCommerce;
 
 use EncryptedFields\Config\Field;
 use EncryptedFields\Config\Registry;
+use EncryptedFields\Migration\Env;
 use EncryptedFields\Plugin;
 use EncryptedFields\User\ColumnStore;
 
@@ -27,12 +28,19 @@ final class Integration
     public function register(): void
     {
         if ($this->isHposEnabled()) {
-            $this->registerHposGuards();
+            if (!$this->hposSupported()) {
+                $this->registerHposGuards();
+            }
         } else {
             $this->registerOrderSearch();
         }
 
         $this->registerCustomerHooks();
+    }
+
+    private function hposSupported(): bool
+    {
+        return Env::hposSupported();
     }
 
     public function isHposEnabled(): bool
@@ -62,7 +70,7 @@ final class Integration
             add_filter('kec_should_encrypt', array($this, 'filterShouldEncrypt'), 10, 4);
         }
 
-        $this->warning('WooCommerce HPOS is enabled; order fields are not encrypted in v1.', array(
+        $this->warning('WooCommerce HPOS is enabled; order-field encryption requires the Encrypted Fields Pro add-on.', array(
             'entity' => 'post',
             'post_type' => 'shop_order',
         ));
@@ -100,7 +108,7 @@ final class Integration
             return;
         }
 
-        $message = 'Encrypted Fields: WooCommerce HPOS is enabled. Order fields are not encrypted in v1; customer and user fields remain protected.';
+        $message = 'Encrypted Fields: WooCommerce HPOS is enabled. Order-field encryption requires the Encrypted Fields Pro add-on; customer and user fields remain protected.';
         if (function_exists('esc_html')) {
             $message = esc_html($message);
         }

@@ -83,7 +83,8 @@ search, and verifies. Promote the new key afterwards.
 - No core patches.
 - No plaintext in persistent object cache.
 - Do not silently store plaintext if encryption fails.
-- HPOS is out of scope for v1.
+- HPOS order meta is handled by the Encrypted Fields Pro add-on; the Free
+  plugin keeps its v1 guards.
 - Scalar strings and serialized arrays/objects stored through meta APIs are
   encrypted (serialized values are encrypted as their serialized string).
 - `post_content` / `post_title` and custom tables are not handled by the meta

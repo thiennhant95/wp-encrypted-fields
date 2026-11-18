@@ -24,14 +24,18 @@ Enabled automatically when `WooCommerce` is loaded.
 
 ### HPOS
 
-HPOS is **not supported in v1**. When HPOS is enabled:
+The Free plugin does **not** encrypt order fields while HPOS is enabled. When
+HPOS is on:
 
 - the integration shows an admin notice;
 - order fields are not encrypted (the plugin refuses to avoid corrupting
   expectations);
 - user/meta features keep working.
 
-Disable HPOS before using order-field encryption.
+Install and license the **Encrypted Fields Pro** add-on to encrypt
+`wc_orders_meta`, keep order search working through the blind index, and get
+audit logging, coverage reporting and REST masking. Without a license, the Free
+guards stay in place and order fields remain plaintext.
 
 ### Known limitation
 

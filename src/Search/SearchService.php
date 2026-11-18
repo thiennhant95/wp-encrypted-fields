@@ -10,7 +10,7 @@ use EncryptedFields\User\ColumnStore;
 
 final class SearchService implements SearchInterface
 {
-    private const ENTITIES = array('user', 'post', 'term', 'comment');
+    private const ENTITIES = array('user', 'post', 'term', 'comment', 'order');
     private const INSERT_CHUNK = 500;
 
     private Plugin $plugin;
@@ -29,6 +29,11 @@ final class SearchService implements SearchInterface
 
         $this->plugin = $plugin;
         $this->wpdb = $wpdb;
+    }
+
+    public static function supports(string $entity): bool
+    {
+        return in_array($entity, self::ENTITIES, true);
     }
 
     public function index(string $entity, int $id): void
@@ -341,6 +346,10 @@ final class SearchService implements SearchInterface
      */
     private function readMeta(string $entity, int $id, string $key)
     {
+        if ('order' === $entity) {
+            return $this->readOrderMeta($id, $key);
+        }
+
         $function = '';
         switch ($entity) {
             case 'user':
@@ -362,6 +371,45 @@ final class SearchService implements SearchInterface
         }
 
         return $function($id, $key, true);
+    }
+
+    /**
+     * Read a single order meta value from the WooCommerce HPOS table.
+     *
+     * @return mixed
+     */
+    private function readOrderMeta(int $id, string $key)
+    {
+        $prefix = $this->tablePrefix();
+        if ('' === $prefix || !is_object($this->wpdb) || !method_exists($this->wpdb, 'get_var') || !method_exists($this->wpdb, 'prepare')) {
+            return null;
+        }
+
+        try {
+            $sql = $this->wpdb->prepare(
+                'SELECT meta_value FROM ' . $prefix . 'wc_orders_meta'
+                . ' WHERE order_id = %d AND meta_key = %s ORDER BY id ASC LIMIT 1',
+                array($id, $key)
+            );
+            $value = $this->wpdb->get_var($sql);
+        } catch (\Throwable $e) {
+            return null;
+        }
+
+        return $value;
+    }
+
+    private function tablePrefix(): string
+    {
+        if (!is_object($this->wpdb)) {
+            return '';
+        }
+
+        if (isset($this->wpdb->prefix) && is_string($this->wpdb->prefix)) {
+            return $this->wpdb->prefix;
+        }
+
+        return '';
     }
 
     /**
@@ -631,6 +679,10 @@ final class SearchService implements SearchInterface
             return 0;
         }
 
+        if ('order' === $entity) {
+            return $this->countOrders();
+        }
+
         $property = '';
         switch ($entity) {
             case 'user':
@@ -661,6 +713,70 @@ final class SearchService implements SearchInterface
         } catch (\Throwable $e) {
             return 0;
         }
+    }
+
+    private function countOrders(): int
+    {
+        $prefix = $this->tablePrefix();
+
+        if ('' === $prefix
+            || !is_object($this->wpdb)
+            || !method_exists($this->wpdb, 'get_var')
+            || !method_exists($this->wpdb, 'prepare')
+        ) {
+            return 0;
+        }
+
+        try {
+            $sql = $this->wpdb->prepare(
+                'SELECT COUNT(*) FROM ' . $prefix . 'wc_orders WHERE type = %s',
+                array('shop_order')
+            );
+
+            return (int) $this->wpdb->get_var($sql);
+        } catch (\Throwable $e) {
+            return 0;
+        }
+    }
+
+    /**
+     * @return int[]
+     */
+    private function fetchOrderIds(int $limit, int $offset): array
+    {
+        $prefix = $this->tablePrefix();
+
+        if ('' === $prefix
+            || !is_object($this->wpdb)
+            || !method_exists($this->wpdb, 'get_col')
+            || !method_exists($this->wpdb, 'prepare')
+        ) {
+            return array();
+        }
+
+        try {
+            $sql = $this->wpdb->prepare(
+                'SELECT id FROM ' . $prefix . 'wc_orders WHERE type = %s ORDER BY id ASC LIMIT %d OFFSET %d',
+                array('shop_order', $limit, $offset)
+            );
+            $ids = $this->wpdb->get_col($sql);
+        } catch (\Throwable $e) {
+            return array();
+        }
+
+        if (!is_array($ids)) {
+            return array();
+        }
+
+        $result = array();
+        foreach ($ids as $id) {
+            $id = (int) $id;
+            if ($id > 0) {
+                $result[] = $id;
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -747,6 +863,10 @@ final class SearchService implements SearchInterface
                     'order' => 'ASC',
                     'status' => 'all',
                 ));
+                break;
+
+            case 'order':
+                $ids = $this->fetchOrderIds($limit, $offset);
                 break;
 
             default:

@@ -6,7 +6,7 @@
 |---|---|
 | PHP | 8.0 – 8.3 |
 | WordPress | 6.4+ (tested through 7.x) |
-| WooCommerce | optional, HPOS disabled |
+| WooCommerce | optional; HPOS order meta requires the Pro add-on |
 | Multisite | supported (per-site meta/search tables; user columns use shared `wp_users`/`wp_usermeta`) |
 | Object cache | supported; plaintext is never written to persistent cache |
 
@@ -41,7 +41,7 @@ WP Job Manager. BuddyPress now passes; it was not counted in the previous
 | Email marketing | Mailchimp for WooCommerce, Klaviyo | Customer emails resolve via WC integration; test sync |
 | Logging / CRM | WP Mail Logging, MailPoet, FluentCRM | Their own tables/options are not encrypted; WP Mail Logging stores recipients, subjects and bodies in plaintext. Avoid for sensitive mail or register a table adapter |
 | Multilingual | WPML, Polylang | None for encryption; search normalization still applies. Polylang two-language test passed for translated posts/meta; KEC search is global while Polylang keeps language filtering |
-| Woo extensions | Subscriptions, Bookings, YITH | Order meta works when HPOS is off |
+| Woo extensions | Subscriptions, Bookings, YITH | Order meta works when HPOS is off; use the Pro add-on for HPOS |
 | Search engines | Relevanssi, ElasticPress, Algolia | Encrypted fields cannot be indexed automatically |
 | Import/export | WP All Import/Export | Export emits ciphertext; importing plaintext requires migration |
 | CRM/helpdesk | FluentCRM, Awesome Support | Test custom user search/export |
@@ -59,11 +59,12 @@ WP Job Manager. BuddyPress now passes; it was not counted in the previous
 7. Does it require HPOS?
 
 If 1–3 or 5 is yes, test it and possibly add an adapter. If 6 is yes, register
-a `TableAdapterInterface`. If 7 is yes, do not use v1 for orders.
+a `TableAdapterInterface`. If 7 is yes, use the Encrypted Fields Pro add-on for
+orders; the Free plugin refuses order encryption while HPOS is enabled.
 
-## Not supported in v1
+## Not supported in the Free plugin
 
-- WooCommerce HPOS.
+- WooCommerce HPOS order meta (available in the Pro add-on).
 - Encrypting `wp_options` / API keys.
 - Encrypting `post_content` / `post_title` (for example Flamingo stores a copy
   of inbound form values there even when its meta is encrypted).

@@ -34,6 +34,13 @@ function add_filter($tag, $callback, $priority = 10, $accepted_args = 1)
     );
 }
 
+if (!function_exists('apply_filters')) {
+    function apply_filters($tag, $value, ...$args)
+    {
+        return kec_test_apply_filters($tag, $value, ...$args);
+    }
+}
+
 function kec_test_apply_filters($tag, $value, ...$args)
 {
     if (empty($GLOBALS['kec_test_filters'][$tag])) {
@@ -186,6 +193,7 @@ require_once dirname(__DIR__) . '/src/Contracts/SearchInterface.php';
 require_once dirname(__DIR__) . '/src/Support/Logger.php';
 require_once dirname(__DIR__) . '/src/Plugin.php';
 require_once dirname(__DIR__) . '/src/User/ColumnStore.php';
+require_once dirname(__DIR__) . '/src/Migration/Env.php';
 require_once dirname(__DIR__) . '/src/Integrations/WooCommerce/CustomerLookupSchema.php';
 require_once dirname(__DIR__) . '/src/Integrations/WooCommerce/Integration.php';
 require_once dirname(__DIR__) . '/src/Integrations/SiteGuard/Integration.php';
@@ -344,6 +352,23 @@ kec_test_run('HPOS enabled: notice + should_encrypt guard, user fields untouched
 
     $logs = isset($GLOBALS['kec_test_options']['kec_logs']) ? $GLOBALS['kec_test_options']['kec_logs'] : array();
     kec_test_assert_true(is_array($logs) && count($logs) > 0, 'HPOS warning was not logged.');
+});
+
+kec_test_run('HPOS supported: licensed add-on removes v1 guards', function () {
+    kec_test_reset_options();
+    kec_test_reset_hooks();
+    $GLOBALS['kec_test_options']['woocommerce_custom_orders_table_enabled'] = 'yes';
+
+    add_filter('kec_hpos_supported', function ($supported) {
+        return true;
+    }, 10, 1);
+
+    $plugin = kec_test_plugin();
+    $integration = new WooIntegration($plugin);
+    $integration->register();
+
+    kec_test_assert_same(false, kec_test_has_action('admin_notices'), 'No HPOS notice is expected when supported.');
+    kec_test_assert_same(false, kec_test_has_filter('kec_should_encrypt'), 'No v1 order guard is expected when supported.');
 });
 
 kec_test_run('HPOS off: order search filters use fake search service', function () {

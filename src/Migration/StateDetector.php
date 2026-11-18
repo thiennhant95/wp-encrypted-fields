@@ -67,10 +67,10 @@ final class StateDetector
         }
 
         $warnings = array();
-        if (Env::hposEnabled()) {
+        if (Env::hposEnabled() && !Env::hposSupported()) {
             $warnings[] = array(
                 'code' => 'hpos_enabled',
-                'message' => 'WooCommerce HPOS is enabled. Order fields must not be encrypted in v1.',
+                'message' => 'WooCommerce HPOS is enabled. Order fields must not be encrypted until a licensed HPOS add-on is active.',
             );
         }
 

@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Encrypted Fields — WordPress &amp; WooCommerce のフィールド単位暗号化</title>
-<meta name="description" content="WordPress と WooCommerce 向けのレジストリ駆動フィールド単位暗号化。AES-256-GCM、ブラインドインデックス検索、ユーザートークンモード、WP-CLI マイグレーションとキーローテーション。">
+<meta name="description" content="WordPress と WooCommerce 向けのレジストリ駆動フィールド単位暗号化。AES-256-GCM、ブラインドインデックス検索、WooCommerce HPOS 注文暗号化、監査、マスキング、キーローテーション。">
 <meta property="og:title" content="Encrypted Fields — WordPress のフィールド単位暗号化">
-<meta property="og:description" content="宣言したフィールドを暗号化し、通常の WordPress API を維持。ブラインドインデックスで検索。AES-256-GCM、WooCommerce、マルチサイト、WP-CLI。">
+<meta property="og:description" content="宣言したフィールドを暗号化し、通常の WordPress API を維持。ブラインドインデックスで検索。AES-256-GCM、WooCommerce HPOS 注文暗号化、監査、マスキング、キーローテーション。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://thiennhant95.github.io/wp-encrypted-fields/ja/">
 <meta property="og:site_name" content="Encrypted Fields">
@@ -31,6 +31,9 @@
 <link rel="alternate" hreflang="x-default" href="https://thiennhant95.github.io/wp-encrypted-fields/">
 <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
 <link rel="stylesheet" href="../assets/landing.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Encrypted Fields","applicationCategory":"SecurityApplication","applicationSubCategory":"WordPress plugin","operatingSystem":"WordPress","softwareVersion":"0.4.0","description":"AES-256-GCM、ブラインドインデックス検索、HPOS 注文暗号化（Pro）、監査ログ、REST マスキング、キーローテーションを備えた WordPress / WooCommerce 向けフィールド単位暗号化。","url":"https://thiennhant95.github.io/wp-encrypted-fields/ja/","downloadUrl":"https://github.com/thiennhant95/wp-encrypted-fields/releases","license":"https://www.gnu.org/licenses/old-licenses/gpl-2.0.html","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"isAccessibleForFree":true,"sameAs":["https://github.com/thiennhant95/wp-encrypted-fields"],"inLanguage":"ja"}
+</script>
 </head>
 <body>
 <header>
@@ -40,6 +43,7 @@
       <a href="#why">課題</a>
       <a href="#evidence">DB エビデンス</a>
       <a href="#features">機能</a>
+      <a href="#pro" class="pro">Pro</a>
       <a href="#usecases">ユースケース</a>
       <a href="#install">インストール</a>
       <a href="#faq">FAQ</a>
@@ -63,6 +67,7 @@
         </p>
         <div class="cta">
           <a class="btn primary" href="#install">インストール</a>
+          <a class="btn" href="#pro">Pro アドオン</a>
           <a class="btn" href="https://github.com/thiennhant95/wp-encrypted-fields" target="_blank" rel="noopener">GitHub のソース</a>
           <a class="btn" href="https://github.com/thiennhant95/wp-encrypted-fields/releases/tag/v0.4.0" target="_blank" rel="noopener">v0.4.0 をリリース</a>
         </div>
@@ -146,7 +151,7 @@
         <div class="card"><div class="icon">🔐</div><h3>AES-256-GCM</h3><p>テキストはランダム化、メール/ログインは SIV 決定論的。等価検索が平文を露出せずに機能します。</p></div>
         <div class="card"><div class="icon">🔎</div><h3>ブラインドインデックス</h3><p>HMAC-SHA256 の完全トークン + トライグラムで、DB に平文を保存せず完全一致・部分一致検索。</p></div>
         <div class="card"><div class="icon">👤</div><h3>ユーザートークンモード</h3><p><code>user_login</code>/<code>user_email</code> は 55 文字のトークンを保存し、復元可能な平文は暗号化メタに。</p></div>
-        <div class="card"><div class="icon">🛒</div><h3>WooCommerce</h3><p>注文メタ、住所インデックス、顧客ルックアップ、注文検索。v1 では HPOS をオフにする必要があります。</p></div>
+        <div class="card"><div class="icon">🛒</div><h3>WooCommerce</h3><p>注文メタ、住所インデックス、顧客ルックアップ、注文検索。HPOS の注文メタには Pro アドオンが必要です。</p></div>
         <div class="card"><div class="icon">🧰</div><h3>運用</h3><p>スキャン、移行、<code>verify --full</code>、再インデックス、ロールバック、自動安全ダンプ、2 フェーズのキーローテーション、WP-CLI。</p></div>
       </div>
       <div class="flow">
@@ -155,6 +160,71 @@
         <div class="node"><b>フック</b>メタ / ユーザー / Woo / 検索</div>
         <div class="arrow">→</div>
         <div class="node"><b>暗号</b>AES-256-GCM + HMAC ブラインドインデックス</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pro">
+    <div class="wrap">
+      <span class="kicker">Pro アドオン</span>
+      <h2>WooCommerce HPOS、監査、そして統制。</h2>
+      <p class="sub">
+        無料コアは投稿・ユーザー・ターム・従来の注文メタを保護します。Pro アドオンは
+        WooCommerce HPOS の完全サポートと、コンプライアンス担当が求める運用ツールを追加します。
+        ライセンスが切れてもデータはロックされません。
+      </p>
+      <div class="table-wrap">
+        <table class="compare" aria-label="無料版と Pro の機能比較">
+          <thead><tr><th scope="col">機能</th><th scope="col">無料</th><th scope="col">Pro</th></tr></thead>
+          <tbody>
+            <tr><td>宣言した投稿・ユーザー・ターム・コメントフィールドの暗号化</td><td class="st yes">✓</td><td class="st yes">✓</td></tr>
+            <tr><td>ブラインドインデックス検索とトークン化ログイン</td><td class="st yes">✓</td><td class="st yes">✓</td></tr>
+            <tr><td>スキャン・移行・検証・2 段階キーローテーション（WP-CLI）</td><td class="st yes">✓</td><td class="st yes">✓</td></tr>
+            <tr><td>WooCommerce 従来の注文メタ暗号化</td><td class="st yes">✓</td><td class="st yes">✓</td></tr>
+            <tr><td>WooCommerce HPOS 注文メタ暗号化</td><td class="st no">—</td><td class="st yes">✓</td></tr>
+            <tr><td>HPOS でのブラインドインデックス注文検索</td><td class="st no">—</td><td class="st yes">✓</td></tr>
+            <tr><td>監査ログ、ダッシュボード、カバレッジレポート</td><td class="st no">—</td><td class="st yes">✓</td></tr>
+            <tr><td>サポート/CS ロール向け REST マスキング</td><td class="st no">—</td><td class="st yes">✓</td></tr>
+            <tr><td>キーローテーション支援（ドライラン、ダッシュボード、日次 cron）</td><td class="st no">—</td><td class="st yes">✓</td></tr>
+            <tr><td>署名付き自動更新とライセンス管理</td><td class="st no">—</td><td class="st yes">✓</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="plans">
+        <div class="plan">
+          <div class="tag">無料 · GPL-2.0-or-later</div>
+          <h3>Core</h3>
+          <div class="price">$0</div>
+          <p class="blurb">宣言した WordPress フィールドを暗号化し、通常の API を維持するためのすべて。</p>
+          <ul>
+            <li>AES-256-GCM（ランダム化 + 決定論モード）</li>
+            <li>完全一致・部分一致のブラインドインデックス検索</li>
+            <li>ログインとメールのユーザートークンモード</li>
+            <li>WP-CLI でスキャン → 移行 → 検証 → ロールバック</li>
+            <li>WooCommerce 従来の注文メタ + 住所インデックス</li>
+          </ul>
+          <a class="btn" href="#install">無料コアをインストール</a>
+        </div>
+        <div class="plan featured">
+          <div class="ribbon">稼働中のストア向け</div>
+          <div class="tag">Pro アドオン</div>
+          <h3>Store</h3>
+          <div class="price">お問い合わせ <small>価格</small></div>
+          <p class="blurb">本番 WooCommerce ストアに必要な HPOS 暗号化と統制。</p>
+          <ul>
+            <li><code>wc_orders_meta</code> の HPOS 注文メタを暗号化</li>
+            <li>ブラインドインデックスによる注文検索を HPOS クエリに統合</li>
+            <li>ライセンス、HPOS、カバレッジ、監査のダッシュボード</li>
+            <li>機密データ権限のないロール向け REST マスキング</li>
+            <li>ドライランと日次 cron を備えたローテーション支援</li>
+            <li>署名付き更新。期限切れでも復号は止まらず、新規書き込みのみ停止</li>
+          </ul>
+          <a class="btn primary" href="https://github.com/thiennhant95/wp-encrypted-fields/issues/new?title=Pro%20%E3%83%A9%E3%82%A4%E3%82%BB%E3%83%B3%E3%82%B9%E3%81%AE%E3%81%8A%E5%95%8F%E3%81%84%E5%90%88%E3%82%8F%E3%81%9B&amp;body=%E3%82%B5%E3%82%A4%E3%83%88URL%3A%0AWordPress%2FWooCommerce%20%E3%83%90%E3%83%BC%E3%82%B8%E3%83%A7%E3%83%B3%3A%0A%E6%9A%97%E5%8F%B7%E5%8C%96%E3%81%99%E3%82%8B%E3%83%95%E3%82%A3%E3%83%BC%E3%83%AB%E3%83%89%3A" target="_blank" rel="noopener">Pro を申し込む</a>
+        </div>
+      </div>
+      <div class="note" style="margin-top:24px">
+        ライセンスの安全性: 期限が切れても復号と読み取りは動作し続けます。新しい HPOS
+        書き込みだけが更新まで停止し、既存の暗号文が失われることはありません。
       </div>
     </div>
   </section>
@@ -216,6 +286,7 @@ wp kec verify --full</code></pre>
     <div class="wrap">
       <h2>検証結果</h2>
       <p class="sub">同じテスト環境: WordPress 7.1.4、PHP 8.1、MySQL 5.7、プラグイン 0.4.0。</p>
+      <div class="table-wrap">
       <table>
         <thead><tr><th>項目</th><th>結果</th></tr></thead>
         <tbody>
@@ -226,6 +297,7 @@ wp kec verify --full</code></pre>
           <tr><td>保存時データ</td><td>DB ダンプは暗号文。キーは DB にない。メール検索と認証はトークン経由で動作。</td></tr>
         </tbody>
       </table>
+      </div>
       <div class="chips">
         <span class="chip">WooCommerce</span><span class="chip">CF7 + Flamingo</span><span class="chip">ACF</span>
         <span class="chip">Yoast</span><span class="chip">Rank Math</span><span class="chip">AIOSEO</span>
@@ -239,7 +311,7 @@ wp kec verify --full</code></pre>
       <div class="note" style="margin-top:22px">
         既知の制限: <code>post_content</code>/<code>post_title</code> は暗号化されません。
         アダプターのないカスタムテーブル（WP Mail Logging、MailPoet、FluentCRM…）は平文のままです。
-        v1 は HPOS 非対応。
+        HPOS の注文メタにはライセンス済み Pro アドオンが必要です。
       </div>
     </div>
   </section>
@@ -254,7 +326,7 @@ wp kec verify --full</code></pre>
       </details>
       <details>
         <summary>WooCommerce の注文検索はまだ動きますか？</summary>
-        <p>はい、宣言した検索可能フィールドについて。プラグインは WooCommerce の SQL 検索から暗号化カラムを除外し、ブラインドインデックス結果をマージします。v1 では HPOS を無効にする必要があります。</p>
+        <p>はい、宣言した検索可能フィールドについて。プラグインは WooCommerce の SQL 検索から暗号化カラムを除外し、ブラインドインデックス結果をマージします。HPOS が有効な場合はライセンス済み Pro アドオンが必要です。</p>
       </details>
       <details>
         <summary>get_user_by()、email_exists()、ログインは動きますか？</summary>
@@ -270,7 +342,7 @@ wp kec verify --full</code></pre>
       </details>
       <details>
         <summary>無料ですか？</summary>
-        <p>はい。GPL-2.0-or-later、ソースとリリースは GitHub。有料プランやキー預託はありません。</p>
+        <p>コアプラグインは無料（GPL-2.0-or-later）で、ソースは GitHub にあります。別途 Pro アドオンが HPOS 注文メタ暗号化、監査ログ、カバレッジレポート、REST マスキング、キーローテーション、ライセンス連動アップデートを提供します。価格はサイトごとの見積もりです。<a href="#pro">Pro</a> からお問い合わせください。ライセンス切れでも復号は止まらず、新規 HPOS 書き込みのみ一時停止します。</p>
       </details>
     </div>
   </section>
@@ -282,6 +354,7 @@ wp kec verify --full</code></pre>
       <div class="cta" style="justify-content:center">
         <a class="btn primary" href="https://github.com/thiennhant95/wp-encrypted-fields/releases/tag/v0.4.0" target="_blank" rel="noopener">v0.4.0 をダウンロード</a>
         <a class="btn" href="https://github.com/thiennhant95/wp-encrypted-fields/blob/main/README.md" target="_blank" rel="noopener">ドキュメントを読む</a>
+        <a class="btn" href="#pro">Pro を入手</a>
       </div>
       <div class="chips" style="justify-content:center;margin-top:18px">
         <span class="chip">GPL-2.0</span><span class="chip">テレメトリーなし</span><span class="chip">キーはあなたのもの</span>

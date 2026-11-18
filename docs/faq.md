@@ -41,7 +41,9 @@ be read.
 
 ### Does it work with HPOS?
 
-No, not in v1. Disable HPOS before enabling order-field encryption.
+The Free plugin does not encrypt order fields while HPOS is enabled. Install
+and license the Encrypted Fields Pro add-on to encrypt `wc_orders_meta`, keep
+order search working, and record an audit trail.
 
 ### Does it work with multisite?
 

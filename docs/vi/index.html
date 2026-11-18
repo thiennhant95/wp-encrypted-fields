@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Encrypted Fields — Field-level encryption cho WordPress &amp; WooCommerce</title>
-<meta name="description" content="Registry-driven field-level encryption cho WordPress và WooCommerce. AES-256-GCM, blind-index search, user token mode, WP-CLI migration và key rotation.">
+<meta name="description" content="Mã hoá field-level cho WordPress và WooCommerce. AES-256-GCM, blind-index search, mã hoá order meta WooCommerce HPOS, audit, masking và rotation key.">
 <meta property="og:title" content="Encrypted Fields — Field-level encryption cho WordPress">
-<meta property="og:description" content="Mã hoá field-level, giữ nguyên API WordPress, tìm kiếm qua blind index. AES-256-GCM, WooCommerce, multisite, WP-CLI.">
+<meta property="og:description" content="Mã hoá field-level, giữ nguyên API WordPress, tìm kiếm qua blind index. AES-256-GCM, mã hoá order WooCommerce HPOS, audit log, masking REST, rotation key.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://thiennhant95.github.io/wp-encrypted-fields/vi/">
 <meta property="og:site_name" content="Encrypted Fields">
@@ -31,6 +31,9 @@
 <link rel="alternate" hreflang="x-default" href="https://thiennhant95.github.io/wp-encrypted-fields/">
 <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
 <link rel="stylesheet" href="../assets/landing.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Encrypted Fields","applicationCategory":"SecurityApplication","applicationSubCategory":"WordPress plugin","operatingSystem":"WordPress","softwareVersion":"0.4.0","description":"Mã hoá field-level cho WordPress và WooCommerce với AES-256-GCM, blind-index search, mã hoá order HPOS (Pro), audit log, masking REST và rotation key.","url":"https://thiennhant95.github.io/wp-encrypted-fields/vi/","downloadUrl":"https://github.com/thiennhant95/wp-encrypted-fields/releases","license":"https://www.gnu.org/licenses/old-licenses/gpl-2.0.html","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"isAccessibleForFree":true,"sameAs":["https://github.com/thiennhant95/wp-encrypted-fields"],"inLanguage":"vi"}
+</script>
 </head>
 <body>
 <header>
@@ -40,6 +43,7 @@
       <a href="#why">Vì sao</a>
       <a href="#evidence">Bằng chứng DB</a>
       <a href="#features">Tính năng</a>
+      <a href="#pro" class="pro">Pro</a>
       <a href="#usecases">Dùng cho ai</a>
       <a href="#install">Cài đặt</a>
       <a href="#faq">FAQ</a>
@@ -63,6 +67,7 @@
         </p>
         <div class="cta">
           <a class="btn primary" href="#install">Cài đặt</a>
+          <a class="btn" href="#pro">Add-on Pro</a>
           <a class="btn" href="https://github.com/thiennhant95/wp-encrypted-fields" target="_blank" rel="noopener">Mã nguồn GitHub</a>
           <a class="btn" href="https://github.com/thiennhant95/wp-encrypted-fields/releases/tag/v0.4.0" target="_blank" rel="noopener">Release v0.4.0</a>
         </div>
@@ -146,7 +151,7 @@
         <div class="card"><div class="icon">🔐</div><h3>AES-256-GCM</h3><p>Randomized cho text; SIV deterministic cho email/login để so sánh bằng mà không lộ plaintext.</p></div>
         <div class="card"><div class="icon">🔎</div><h3>Blind index</h3><p>HMAC-SHA256 full token + trigram, tìm chính xác và tìm một phần mà DB không lưu plaintext.</p></div>
         <div class="card"><div class="icon">👤</div><h3>User token mode</h3><p><code>user_login</code>/<code>user_email</code> lưu token 55 ký tự; plaintext reversible trong encrypted meta.</p></div>
-        <div class="card"><div class="icon">🛒</div><h3>WooCommerce</h3><p>Order meta, address index, customer lookup, order search; HPOS phải tắt ở v1.</p></div>
+        <div class="card"><div class="icon">🛒</div><h3>WooCommerce</h3><p>Order meta, address index, customer lookup, order search. HPOS cần add-on Pro.</p></div>
         <div class="card"><div class="icon">🧰</div><h3>Vận hành</h3><p>Scan, migrate, verify <code>--full</code>, reindex, rollback, safety dump tự động, rotate key 2 pha, WP-CLI.</p></div>
       </div>
       <div class="flow">
@@ -155,6 +160,71 @@
         <div class="node"><b>Hooks</b>meta / user / Woo / search</div>
         <div class="arrow">→</div>
         <div class="node"><b>Crypto</b>AES-256-GCM + HMAC blind index</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pro">
+    <div class="wrap">
+      <span class="kicker">Add-on Pro</span>
+      <h2>WooCommerce HPOS, audit và kiểm soát.</h2>
+      <p class="sub">
+        Core miễn phí bảo vệ post, user, term và order meta cổ điển. Add-on Pro bổ sung
+        hỗ trợ WooCommerce HPOS đầy đủ cùng các công cụ vận hành mà đội compliance cần —
+        với license không bao giờ khoá dữ liệu của bạn.
+      </p>
+      <div class="table-wrap">
+        <table class="compare" aria-label="So sánh tính năng Miễn phí và Pro">
+          <thead><tr><th scope="col">Khả năng</th><th scope="col">Miễn phí</th><th scope="col">Pro</th></tr></thead>
+          <tbody>
+            <tr><td>Mã hoá field post, user, term và comment đã khai báo</td><td class="st yes">✓</td><td class="st yes">✓</td></tr>
+            <tr><td>Tìm kiếm blind-index và login token</td><td class="st yes">✓</td><td class="st yes">✓</td></tr>
+            <tr><td>Scan, migrate, verify và rotation 2 pha (WP-CLI)</td><td class="st yes">✓</td><td class="st yes">✓</td></tr>
+            <tr><td>Mã hoá order meta WooCommerce cổ điển</td><td class="st yes">✓</td><td class="st yes">✓</td></tr>
+            <tr><td>Mã hoá order meta WooCommerce HPOS</td><td class="st no">—</td><td class="st yes">✓</td></tr>
+            <tr><td>Tìm kiếm order blind-index với HPOS</td><td class="st no">—</td><td class="st yes">✓</td></tr>
+            <tr><td>Audit log, dashboard và báo cáo coverage</td><td class="st no">—</td><td class="st yes">✓</td></tr>
+            <tr><td>Masking PII trên REST cho role support/CS</td><td class="st no">—</td><td class="st yes">✓</td></tr>
+            <tr><td>Trợ lý rotation (dry run, dashboard, cron hằng ngày)</td><td class="st no">—</td><td class="st yes">✓</td></tr>
+            <tr><td>Auto-update có chữ ký và quản lý license</td><td class="st no">—</td><td class="st yes">✓</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="plans">
+        <div class="plan">
+          <div class="tag">Miễn phí · GPL-2.0-or-later</div>
+          <h3>Core</h3>
+          <div class="price">$0</div>
+          <p class="blurb">Mọi thứ cần để mã hoá field WordPress đã khai báo và giữ API hoạt động bình thường.</p>
+          <ul>
+            <li>AES-256-GCM với chế độ randomized và deterministic</li>
+            <li>Blind-index search chính xác và một phần</li>
+            <li>User token mode cho login và email</li>
+            <li>Scan → migrate → verify → rollback qua WP-CLI</li>
+            <li>WooCommerce order meta cổ điển + address index</li>
+          </ul>
+          <a class="btn" href="#install">Cài core miễn phí</a>
+        </div>
+        <div class="plan featured">
+          <div class="ribbon">Cho shop đang vận hành</div>
+          <div class="tag">Add-on Pro</div>
+          <h3>Store</h3>
+          <div class="price">Liên hệ <small>để báo giá</small></div>
+          <p class="blurb">Mã hoá HPOS và các kiểm soát mà shop WooCommerce production cần.</p>
+          <ul>
+            <li>Mã hoá order meta HPOS trong <code>wc_orders_meta</code></li>
+            <li>Order search qua blind index, merge vào truy vấn HPOS</li>
+            <li>Dashboard license, HPOS, coverage và audit</li>
+            <li>Mask PII trên REST cho role thiếu capability dữ liệu nhạy cảm</li>
+            <li>Trợ lý rotation với dry run và cron hằng ngày</li>
+            <li>Update có chữ ký; hết hạn chỉ chặn ghi mới, không chặn decrypt</li>
+          </ul>
+          <a class="btn primary" href="https://github.com/thiennhant95/wp-encrypted-fields/issues/new?title=Y%C3%AAu%20c%E1%BA%A7u%20license%20Pro&amp;body=URL%20site%3A%0APhi%C3%AAn%20b%E1%BA%A3n%20WordPress%2FWooCommerce%3A%0AField%20c%E1%BA%A7n%20m%C3%A3%20ho%C3%A1%3A" target="_blank" rel="noopener">Yêu cầu Pro</a>
+        </div>
+      </div>
+      <div class="note" style="margin-top:24px">
+        An toàn license: khi license hết hạn, decrypt và đọc vẫn hoạt động. Chỉ ghi HPOS
+        mới bị tạm dừng cho đến khi gia hạn — ciphertext hiện có không bao giờ mất hoặc bị kẹt.
       </div>
     </div>
   </section>
@@ -216,6 +286,7 @@ wp kec verify --full</code></pre>
     <div class="wrap">
       <h2>Kết quả kiểm chứng</h2>
       <p class="sub">Cùng một test lab: WordPress 7.1.4, PHP 8.1, MySQL 5.7, plugin 0.4.0.</p>
+      <div class="table-wrap">
       <table>
         <thead><tr><th>Hạng mục</th><th>Kết quả</th></tr></thead>
         <tbody>
@@ -226,6 +297,7 @@ wp kec verify --full</code></pre>
           <tr><td>Bảo mật dữ liệu</td><td>DB dump chứa ciphertext; key không nằm trong DB; email lookup/auth vẫn hoạt động qua token.</td></tr>
         </tbody>
       </table>
+      </div>
       <div class="chips">
         <span class="chip">WooCommerce</span><span class="chip">CF7 + Flamingo</span><span class="chip">ACF</span>
         <span class="chip">Yoast</span><span class="chip">Rank Math</span><span class="chip">AIOSEO</span>
@@ -239,7 +311,7 @@ wp kec verify --full</code></pre>
       <div class="note" style="margin-top:22px">
         Giới hạn đã biết: <code>post_content</code>/<code>post_title</code> không được mã hoá;
         custom table không có adapter (WP Mail Logging, MailPoet, FluentCRM…) vẫn plaintext;
-        HPOS chưa hỗ trợ ở v1.
+        HPOS order meta cần add-on Pro có license.
       </div>
     </div>
   </section>
@@ -254,7 +326,7 @@ wp kec verify --full</code></pre>
       </details>
       <details>
         <summary>Order search của WooCommerce còn chạy không?</summary>
-        <p>Có với field searchable đã khai báo: plugin loại encrypted column khỏi SQL search của WooCommerce và merge kết quả blind index. HPOS phải tắt ở v1.</p>
+        <p>Có với field searchable đã khai báo: plugin loại encrypted column khỏi SQL search của WooCommerce và merge kết quả blind index. Khi HPOS bật, cần add-on Pro có license.</p>
       </details>
       <details>
         <summary>get_user_by(), email_exists() và login còn hoạt động không?</summary>
@@ -270,7 +342,7 @@ wp kec verify --full</code></pre>
       </details>
       <details>
         <summary>Có miễn phí không?</summary>
-        <p>Có. GPL-2.0-or-later, source và release trên GitHub. Không có bản trả phí hay key escrow.</p>
+        <p>Plugin core miễn phí (GPL-2.0-or-later), source trên GitHub. Add-on Pro riêng cung cấp mã hoá order meta HPOS, audit log, báo cáo coverage, masking REST, key rotation và update theo license. Giá Pro báo theo từng site — gửi yêu cầu qua mục <a href="#pro">Pro</a>. License hết hạn không chặn decrypt, chỉ tạm dừng ghi HPOS mới.</p>
       </details>
     </div>
   </section>
@@ -282,6 +354,7 @@ wp kec verify --full</code></pre>
       <div class="cta" style="justify-content:center">
         <a class="btn primary" href="https://github.com/thiennhant95/wp-encrypted-fields/releases/tag/v0.4.0" target="_blank" rel="noopener">Tải v0.4.0</a>
         <a class="btn" href="https://github.com/thiennhant95/wp-encrypted-fields/blob/main/README.md" target="_blank" rel="noopener">Đọc tài liệu</a>
+        <a class="btn" href="#pro">Nhận Pro</a>
       </div>
       <div class="chips" style="justify-content:center;margin-top:18px">
         <span class="chip">GPL-2.0</span><span class="chip">Không telemetry</span><span class="chip">Key thuộc về bạn</span>

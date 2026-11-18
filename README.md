@@ -35,7 +35,8 @@ database; no core or third-party plugin patches are required.
 - Registry can be defined in `wp-config.php`, a config file, a filter, or the
   admin UI; unlisted fields are never encrypted (default deny).
 - Optional WooCommerce integration (order meta, order search, analytics
-  customer lookup, customer objects). HPOS must be disabled in v1.
+  customer lookup, customer objects). With HPOS enabled, order-meta
+  encryption requires the Encrypted Fields Pro add-on.
 - Optional SiteGuard integration.
 - Key rotation via a safe two-phase `KEC_KEY_NEXT`.
 - Setup wizard for new and existing sites, with a mandatory backup gate.
@@ -137,7 +138,9 @@ See [docs/security.md](docs/security.md) and [SECURITY.md](SECURITY.md).
 
 ## Known limitations (v1)
 
-- WooCommerce HPOS is not supported; order encryption is refused when HPOS is on.
+- WooCommerce HPOS is not supported in the Free plugin; order encryption is
+  refused when HPOS is on. Use the Encrypted Fields Pro add-on for
+  `wc_orders_meta` encryption, order search, audit and masking.
 - `WP_User` objects read outside supported hooks expose tokens, not plaintext;
   use `kec_user_login()`, `kec_user_email()` or `ColumnStore`.
 - `wp_options`, `post_content` / `post_title`, comments/reviews, order notes

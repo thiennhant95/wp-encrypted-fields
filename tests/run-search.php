@@ -232,6 +232,9 @@ namespace {
         public array $colResults = array();
         public int $colCalls = 0;
         public array $counts = array('users' => 0, 'posts' => 0, 'terms' => 0, 'comments' => 0);
+        public $orderMetaValue = null;
+        public array $orderIds = array();
+        public int $orderCount = 0;
 
         public function prepare($query, ...$args)
         {
@@ -267,11 +270,24 @@ namespace {
         {
             $this->queries[] = $sql;
             $this->colCalls++;
+
+            if (false !== strpos($sql, 'wc_orders')) {
+                return $this->orderIds;
+            }
+
             return $this->colResults;
         }
 
         public function get_var($sql)
         {
+            if (false !== strpos($sql, 'wc_orders_meta')) {
+                return $this->orderMetaValue;
+            }
+
+            if (false !== strpos($sql, 'wc_orders')) {
+                return $this->orderCount;
+            }
+
             foreach (array('users', 'posts', 'terms', 'comments') as $key) {
                 if (false !== strpos($sql, 'wp_' . $key)) {
                     return $this->counts[$key] ?? 0;
@@ -490,6 +506,42 @@ namespace {
 
     same(2, $indexed, 'reindex returns number of indexed entities');
     same(array(2, 2), end($progress), 'reindex progress reports done/total');
+
+    check(SearchService::supports('order'), 'search supports order entity');
+    check(!SearchService::supports('custom'), 'search rejects unknown entity');
+
+    $orderPlugin = make_plugin(array(
+        'order' => array(
+            'meta' => array(
+                '_billing_email' => array('type' => 'email', 'search' => true),
+            ),
+        ),
+    ));
+    $orderSearch = new SearchService($orderPlugin);
+    $wpdb->orderMetaValue = 'Order Alice';
+    $wpdb->queries = array();
+
+    $orderSearch->index('order', 55);
+
+    check(count(array_filter($wpdb->queries, static function ($sql) {
+        return 0 === strpos($sql, 'INSERT IGNORE INTO wp_kec_search_index')
+            && false !== strpos($sql, "('order', 55, '_billing_email'");
+    })) > 0, 'order index reads wc_orders_meta and stores entity rows');
+
+    $wpdb->orderIds = array(55, 56);
+    $wpdb->orderCount = 2;
+    $wpdb->queries = array();
+    $orderProgress = array();
+
+    $orderIndexed = $orderSearch->reindex('order', 10, static function ($done, $total) use (&$orderProgress) {
+        $orderProgress[] = array($done, $total);
+    });
+
+    same(2, $orderIndexed, 'order reindex fetches ids from wc_orders');
+    same(array(2, 2), end($orderProgress), 'order reindex reports progress');
+    check(count(array_filter($wpdb->queries, static function ($sql) {
+        return false !== strpos($sql, 'FROM wp_wc_orders WHERE type = ') && false !== strpos($sql, 'LIMIT 10');
+    })) > 0, 'order fetch queries wc_orders with limit');
 
     $GLOBALS['__actions'] = array();
     $hooks = new Hooks($plugin);

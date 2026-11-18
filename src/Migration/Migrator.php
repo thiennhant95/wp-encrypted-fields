@@ -4,6 +4,7 @@ namespace EncryptedFields\Migration;
 
 use EncryptedFields\Config\Field;
 use EncryptedFields\Plugin;
+use EncryptedFields\Search\SearchService;
 use EncryptedFields\User\ColumnStore;
 
 /**
@@ -70,10 +71,10 @@ final class Migrator
             }
         }
 
-        if (Env::hposEnabled() && ('post' === $entity || '' === $entity)) {
+        if (Env::hposEnabled() && !Env::hposSupported() && ('post' === $entity || '' === $entity)) {
             $warnings[] = array(
                 'code' => 'hpos_enabled',
-                'message' => 'WooCommerce HPOS is enabled; order fields are blocked in v1.',
+                'message' => 'WooCommerce HPOS is enabled; order fields are blocked until a licensed HPOS add-on is active.',
             );
         }
 
@@ -165,11 +166,11 @@ final class Migrator
             );
         }
 
-        if (Env::hposEnabled() && ('post' === $filters['entity'] || '' === $filters['entity'])) {
+        if (Env::hposEnabled() && !Env::hposSupported() && ('post' === $filters['entity'] || '' === $filters['entity'])) {
             return array(
                 'ok' => false,
                 'error' => 'hpos_enabled',
-                'message' => 'HPOS is enabled; order meta migration is blocked in v1.',
+                'message' => 'HPOS is enabled; order meta migration is blocked until a licensed HPOS add-on is active.',
                 'migrated' => 0,
                 'errors' => array(),
             );
@@ -522,7 +523,7 @@ final class Migrator
             try {
                 foreach ($this->plugin->registry()->all() as $entityFields) {
                     foreach ($entityFields as $field) {
-                        if ($field instanceof Field && $field->isSearchable()) {
+                        if ($field instanceof Field && $field->isSearchable() && SearchService::supports($field->entity())) {
                             $searchable++;
                         }
                     }

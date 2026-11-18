@@ -127,7 +127,7 @@ final class Commands
 
         if (Env::hposEnabled() && isset($registry['post'])) {
             unset($registry['post']);
-            \WP_CLI::warning('HPOS is enabled; post/order fields were removed.');
+            \WP_CLI::warning('HPOS is enabled; post/order fields were removed. Order-field encryption requires the Encrypted Fields Pro add-on.');
         }
 
         $this->plugin->updateOption('kec_field_registry', $registry);

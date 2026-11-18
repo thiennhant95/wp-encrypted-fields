@@ -96,8 +96,9 @@ If the registry is empty the plugin does nothing.
 The wizard blocks migration until the backup is acknowledged.
 
 After upgrading the plugin, run `wp kec verify --full` and
-`wp kec scan` to confirm the registry still matches the stored data. HPOS must
-remain disabled for WooCommerce order encryption in v1.
+`wp kec scan` to confirm the registry still matches the stored data. For
+WooCommerce order encryption with HPOS enabled, install and license the
+Encrypted Fields Pro add-on; the Free plugin keeps its guards.
 
 ## Deactivation and uninstall
 

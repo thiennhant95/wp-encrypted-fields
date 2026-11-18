@@ -131,7 +131,7 @@ for every site so each site's user search index is populated.
 
 ## Go-live checklist
 
-1. HPOS is disabled.
+1. HPOS is disabled, or the licensed Pro add-on is active for HPOS order meta.
 2. `KEC_KEY` / `KEC_KEY_FILE` is outside the database and outside the repo.
 3. Sensitive Woo fields include `_billing_address_index` and
    `_shipping_address_index`.
