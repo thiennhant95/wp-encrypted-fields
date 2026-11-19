@@ -217,15 +217,16 @@
             <li>Dashboard with license, HPOS, coverage and audit</li>
             <li>Mask PII in REST for roles without the sensitive-data capability</li>
             <li>Rotation assistant with dry run and daily cron</li>
-            <li>Ed25519-signed updates; expiry only blocks new writes, never decryption</li>
+            <li>Ed25519-signed updates; expiry stops new HPOS encryption, never decryption</li>
           </ul>
           <a class="btn primary" href="https://github.com/thiennhant95/wp-encrypted-fields/issues/new?title=Pro%20license%20inquiry&amp;body=Store%20URL%3A%0AWordPress%2FWooCommerce%20version%3A%0AFields%20to%20encrypt%3A" target="_blank" rel="noopener">Request Pro</a>
         </div>
       </div>
       <div class="note" style="margin-top:24px">
         License safety: if a license expires, decryption and reads keep working.
-        Only new HPOS writes are paused until the license is renewed — existing
-        ciphertext is never lost or stranded.
+        New HPOS fields are not encrypted until renewal, and the Free fallback
+        may store new values as plaintext — existing ciphertext is never lost or
+        stranded.
       </div>
     </div>
   </section>
@@ -343,7 +344,7 @@ wp kec verify --full</code></pre>
       </details>
       <details>
         <summary>Is it free?</summary>
-        <p>The core plugin is free (GPL-2.0-or-later) with source on GitHub. A separate Pro add-on provides HPOS order encryption, audit logging, coverage reporting, REST masking, key rotation and license-backed updates. Pro is quoted per store — <a href="#pro">request a license</a>. Expiry never blocks decryption; only new HPOS writes pause.</p>
+        <p>The core plugin is free (GPL-2.0-or-later) with source on GitHub. A separate Pro add-on provides HPOS order encryption, audit logging, coverage reporting, REST masking, key rotation and license-backed updates. Pro is quoted per store — <a href="#pro">request a license</a>. Expiry never blocks decryption; new HPOS fields require an active license, and the Free fallback may store new values as plaintext until renewal.</p>
       </details>
       <details>
         <summary>What is required to activate Pro?</summary>

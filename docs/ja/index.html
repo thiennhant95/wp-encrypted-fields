@@ -217,14 +217,15 @@
             <li>ライセンス、HPOS、カバレッジ、監査のダッシュボード</li>
             <li>機密データ権限のないロール向け REST マスキング</li>
             <li>ドライランと日次 cron を備えたローテーション支援</li>
-            <li>Ed25519 署名付き更新。期限切れでも復号は止まらず、新規書き込みのみ停止</li>
+            <li>Ed25519 署名付き更新。期限切れでも復号は止まらず、新規 HPOS 暗号化のみ停止</li>
           </ul>
           <a class="btn primary" href="https://github.com/thiennhant95/wp-encrypted-fields/issues/new?title=Pro%20%E3%83%A9%E3%82%A4%E3%82%BB%E3%83%B3%E3%82%B9%E3%81%AE%E3%81%8A%E5%95%8F%E3%81%84%E5%90%88%E3%82%8F%E3%81%9B&amp;body=%E3%82%B5%E3%82%A4%E3%83%88URL%3A%0AWordPress%2FWooCommerce%20%E3%83%90%E3%83%BC%E3%82%B8%E3%83%A7%E3%83%B3%3A%0A%E6%9A%97%E5%8F%B7%E5%8C%96%E3%81%99%E3%82%8B%E3%83%95%E3%82%A3%E3%83%BC%E3%83%AB%E3%83%89%3A" target="_blank" rel="noopener">Pro を申し込む</a>
         </div>
       </div>
       <div class="note" style="margin-top:24px">
         ライセンスの安全性: 期限が切れても復号と読み取りは動作し続けます。新しい HPOS
-        書き込みだけが更新まで停止し、既存の暗号文が失われることはありません。
+        フィールドは更新まで暗号化されず、Free のフォールバックが平文を保存する場合が
+        あります。既存の暗号文が失われることはありません。
       </div>
     </div>
   </section>
@@ -342,7 +343,7 @@ wp kec verify --full</code></pre>
       </details>
       <details>
         <summary>無料ですか？</summary>
-        <p>コアプラグインは無料（GPL-2.0-or-later）で、ソースは GitHub にあります。別途 Pro アドオンが HPOS 注文メタ暗号化、監査ログ、カバレッジレポート、REST マスキング、キーローテーション、ライセンス連動アップデートを提供します。価格はサイトごとの見積もりです。<a href="#pro">Pro</a> からお問い合わせください。ライセンス切れでも復号は止まらず、新規 HPOS 書き込みのみ一時停止します。</p>
+        <p>コアプラグインは無料（GPL-2.0-or-later）で、ソースは GitHub にあります。別途 Pro アドオンが HPOS 注文メタ暗号化、監査ログ、カバレッジレポート、REST マスキング、キーローテーション、ライセンス連動アップデートを提供します。価格はサイトごとの見積もりです。<a href="#pro">Pro</a> からお問い合わせください。ライセンス切れでも復号は止まらず、新規 HPOS フィールドには有効なライセンスが必要です。更新までは Free のフォールバックが平文を保存する場合があります。</p>
       </details>
       <details>
         <summary>Pro の有効化に必要なものは？</summary>

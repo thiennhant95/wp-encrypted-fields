@@ -217,14 +217,15 @@
             <li>Dashboard license, HPOS, coverage và audit</li>
             <li>Mask PII trên REST cho role thiếu capability dữ liệu nhạy cảm</li>
             <li>Trợ lý rotation với dry run và cron hằng ngày</li>
-            <li>Update ký Ed25519; hết hạn chỉ chặn ghi mới, không chặn decrypt</li>
+            <li>Update ký Ed25519; hết hạn dừng mã hoá HPOS mới, không chặn decrypt</li>
           </ul>
           <a class="btn primary" href="https://github.com/thiennhant95/wp-encrypted-fields/issues/new?title=Y%C3%AAu%20c%E1%BA%A7u%20license%20Pro&amp;body=URL%20site%3A%0APhi%C3%AAn%20b%E1%BA%A3n%20WordPress%2FWooCommerce%3A%0AField%20c%E1%BA%A7n%20m%C3%A3%20ho%C3%A1%3A" target="_blank" rel="noopener">Yêu cầu Pro</a>
         </div>
       </div>
       <div class="note" style="margin-top:24px">
-        An toàn license: khi license hết hạn, decrypt và đọc vẫn hoạt động. Chỉ ghi HPOS
-        mới bị tạm dừng cho đến khi gia hạn — ciphertext hiện có không bao giờ mất hoặc bị kẹt.
+        An toàn license: khi license hết hạn, decrypt và đọc vẫn hoạt động. Field HPOS
+        mới không được mã hoá cho đến khi gia hạn, và fallback của bản Free có thể lưu
+        plaintext — ciphertext hiện có không bao giờ mất hoặc bị kẹt.
       </div>
     </div>
   </section>
@@ -342,7 +343,7 @@ wp kec verify --full</code></pre>
       </details>
       <details>
         <summary>Có miễn phí không?</summary>
-        <p>Plugin core miễn phí (GPL-2.0-or-later), source trên GitHub. Add-on Pro riêng cung cấp mã hoá order meta HPOS, audit log, báo cáo coverage, masking REST, key rotation và update theo license. Giá Pro báo theo từng site — gửi yêu cầu qua mục <a href="#pro">Pro</a>. License hết hạn không chặn decrypt, chỉ tạm dừng ghi HPOS mới.</p>
+        <p>Plugin core miễn phí (GPL-2.0-or-later), source trên GitHub. Add-on Pro riêng cung cấp mã hoá order meta HPOS, audit log, báo cáo coverage, masking REST, key rotation và update theo license. Giá Pro báo theo từng site — gửi yêu cầu qua mục <a href="#pro">Pro</a>. License hết hạn không chặn decrypt; field HPOS mới cần license active, fallback của bản Free có thể lưu plaintext cho đến khi gia hạn.</p>
       </details>
       <details>
         <summary>Cần gì để kích hoạt Pro?</summary>
