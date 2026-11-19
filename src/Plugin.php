@@ -21,6 +21,7 @@ final class Plugin
     private ?SearchInterface $search = null;
     private array $tableAdapters = array();
     private bool $booted = false;
+    private bool $refreshing = false;
 
     public static function instance(): self
     {
@@ -43,23 +44,63 @@ final class Plugin
         }
 
         $this->booted = true;
-        require_once __DIR__ . '/Support/Functions.php';
-        $this->logger = new Logger();
-        $this->registry = Registry::fromSources();
+        $this->refreshing = true;
 
-        if (!class_exists(KeyManager::class) || !class_exists(Encryptor::class)) {
+        try {
+            require_once __DIR__ . '/Support/Functions.php';
+            $this->logger = new Logger();
+            $this->registry = new Registry(array());
+            $this->registry = Registry::fromSources();
+
+            if (!class_exists(KeyManager::class) || !class_exists(Encryptor::class)) {
+                return;
+            }
+
+            $this->keys = new KeyManager();
+            $this->crypto = new Encryptor($this->keys);
+
+            if (class_exists(\EncryptedFields\Search\SearchService::class)) {
+                $this->search = new \EncryptedFields\Search\SearchService($this);
+            }
+
+            $this->tableAdapters = (array) apply_filters('kec_table_adapters', array());
+            $this->registerModules();
+        } finally {
+            $this->refreshing = false;
+        }
+
+        if (function_exists('add_action')) {
+            add_action('after_setup_theme', array($this, 'refreshExtensions'), 99);
+        }
+    }
+
+    /**
+     * Rebuild registry and table adapters after the theme has loaded.
+     *
+     * Plugins boot on plugins_loaded, which runs before the active theme's
+     * functions.php. This late refresh lets themes and mu-plugins register
+     * fields and adapters with normal add_filter() calls.
+     */
+    public function refreshExtensions(): void
+    {
+        if (!$this->booted) {
+            $this->init();
+
             return;
         }
 
-        $this->keys = new KeyManager();
-        $this->crypto = new Encryptor($this->keys);
-
-        if (class_exists(\EncryptedFields\Search\SearchService::class)) {
-            $this->search = new \EncryptedFields\Search\SearchService($this);
+        if ($this->refreshing) {
+            return;
         }
 
-        $this->tableAdapters = (array) apply_filters('kec_table_adapters', array());
-        $this->registerModules();
+        $this->refreshing = true;
+
+        try {
+            $this->registry = Registry::fromSources();
+            $this->tableAdapters = (array) apply_filters('kec_table_adapters', array());
+        } finally {
+            $this->refreshing = false;
+        }
     }
 
     private function registerModules(): void

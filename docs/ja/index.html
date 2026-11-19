@@ -186,7 +186,7 @@
             <tr><td>監査ログ、ダッシュボード、カバレッジレポート</td><td class="st no">—</td><td class="st yes">✓</td></tr>
             <tr><td>サポート/CS ロール向け REST マスキング</td><td class="st no">—</td><td class="st yes">✓</td></tr>
             <tr><td>キーローテーション支援（ドライラン、ダッシュボード、日次 cron）</td><td class="st no">—</td><td class="st yes">✓</td></tr>
-            <tr><td>署名付き自動更新とライセンス管理</td><td class="st no">—</td><td class="st yes">✓</td></tr>
+            <tr><td>Ed25519 署名付き自動更新とライセンス管理</td><td class="st no">—</td><td class="st yes">✓</td></tr>
           </tbody>
         </table>
       </div>
@@ -217,7 +217,7 @@
             <li>ライセンス、HPOS、カバレッジ、監査のダッシュボード</li>
             <li>機密データ権限のないロール向け REST マスキング</li>
             <li>ドライランと日次 cron を備えたローテーション支援</li>
-            <li>署名付き更新。期限切れでも復号は止まらず、新規書き込みのみ停止</li>
+            <li>Ed25519 署名付き更新。期限切れでも復号は止まらず、新規書き込みのみ停止</li>
           </ul>
           <a class="btn primary" href="https://github.com/thiennhant95/wp-encrypted-fields/issues/new?title=Pro%20%E3%83%A9%E3%82%A4%E3%82%BB%E3%83%B3%E3%82%B9%E3%81%AE%E3%81%8A%E5%95%8F%E3%81%84%E5%90%88%E3%82%8F%E3%81%9B&amp;body=%E3%82%B5%E3%82%A4%E3%83%88URL%3A%0AWordPress%2FWooCommerce%20%E3%83%90%E3%83%BC%E3%82%B8%E3%83%A7%E3%83%B3%3A%0A%E6%9A%97%E5%8F%B7%E5%8C%96%E3%81%99%E3%82%8B%E3%83%95%E3%82%A3%E3%83%BC%E3%83%AB%E3%83%89%3A" target="_blank" rel="noopener">Pro を申し込む</a>
         </div>
@@ -343,6 +343,10 @@ wp kec verify --full</code></pre>
       <details>
         <summary>無料ですか？</summary>
         <p>コアプラグインは無料（GPL-2.0-or-later）で、ソースは GitHub にあります。別途 Pro アドオンが HPOS 注文メタ暗号化、監査ログ、カバレッジレポート、REST マスキング、キーローテーション、ライセンス連動アップデートを提供します。価格はサイトごとの見積もりです。<a href="#pro">Pro</a> からお問い合わせください。ライセンス切れでも復号は止まらず、新規 HPOS 書き込みのみ一時停止します。</p>
+      </details>
+      <details>
+        <summary>Pro の有効化に必要なものは？</summary>
+        <p>PHP の <code>sodium</code> 拡張、<code>KEC_PRO_LICENSE_SERVER</code> のライセンスエンドポイント、<code>KEC_PRO_LICENSE_PUBLIC_KEY</code> に固定した公開鍵、ストアのドメインに紐づくライセンスキーが必要です。有効化とアップデートは Ed25519 署名のため、キーが漏れても偽造できません。</p>
       </details>
     </div>
   </section>

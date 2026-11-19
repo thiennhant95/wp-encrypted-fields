@@ -29,6 +29,8 @@ Features:
 * WP-CLI migration, full verification, reindex and two-phase key rotation.
 * Serialized array/object meta encryption for declared fields.
 * WooCommerce customer-lookup column widening and order address-index guidance.
+* Theme/mu-plugin extension API for registry filters, value helpers and
+  custom-table adapters.
 * No core or third-party plugin patches.
 
 == Installation ==
@@ -62,6 +64,10 @@ In `wp-config.php`, environment, or a key file outside the web root. Database
 storage is disabled by default.
 
 == Changelog ==
+
+= Unreleased =
+* Theme/mu-plugin extension API: late registry filters, value helpers and a
+  runtime wrapper for custom-table adapters.
 
 = 0.4.0 =
 * Renamed the vendor-prefixed PHP namespace to `EncryptedFields`.

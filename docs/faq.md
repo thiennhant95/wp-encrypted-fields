@@ -45,6 +45,20 @@ The Free plugin does not encrypt order fields while HPOS is enabled. Install
 and license the Encrypted Fields Pro add-on to encrypt `wc_orders_meta`, keep
 order search working, and record an audit trail.
 
+### Can I encrypt custom tables or third-party plugin data?
+
+Yes, when you control the integration path: register a table adapter and route
+its reads/writes through `kec_custom_table()`. The plugin cannot intercept
+arbitrary SQL from another plugin, so hook that plugin's own read/save path.
+See [extending.md](extending.md).
+
+### Can I register fields from my theme?
+
+Yes, but prefer an mu-plugin for data-protecting filters so a theme switch does
+not remove encryption. Theme filters must be added at file scope; the plugin
+refreshes the registry and adapters on `after_setup_theme` priority 99. See
+[extending.md](extending.md).
+
 ### Does it work with multisite?
 
 Yes. Keys and index tables are per site unless you define a network-level key.

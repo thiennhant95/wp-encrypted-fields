@@ -6,6 +6,16 @@ All notable changes to this project are documented here.
 
 ### Added
 
+- Theme/mu-plugin extension API: `kec_field_registry` and
+  `kec_table_adapters` filters added from a theme are applied after
+  `after_setup_theme`; other plugins can still register on `plugins_loaded`.
+- Public helpers: `kec_plugin()`, `kec_field()`, `kec_encrypt_value()`,
+  `kec_decrypt_value()`, `kec_is_encrypted()`, `kec_blind_index()` and
+  `kec_custom_table()`.
+- Runtime `EncryptedTable` wrapper for registered table adapters with
+  `read()`, `write()`, `encryptRow()`, `decryptRow()` and `blindIndex()`.
+- `tests/run-extensions.php` covering late registration, helpers, blind
+  indexes and custom-table encryption.
 - Japanese landing page at `/ja/` with matching hreflang, Open Graph
   metadata, language switcher and sitemap entry.
 

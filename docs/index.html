@@ -186,7 +186,7 @@
             <tr><td>Audit log, dashboard and coverage report</td><td class="st no">—</td><td class="st yes">✓</td></tr>
             <tr><td>REST masking for support/CS roles</td><td class="st no">—</td><td class="st yes">✓</td></tr>
             <tr><td>Key rotation assistant (dry run, dashboard, daily cron)</td><td class="st no">—</td><td class="st yes">✓</td></tr>
-            <tr><td>Signed automatic updates and license management</td><td class="st no">—</td><td class="st yes">✓</td></tr>
+            <tr><td>Ed25519-signed updates and license management</td><td class="st no">—</td><td class="st yes">✓</td></tr>
           </tbody>
         </table>
       </div>
@@ -217,7 +217,7 @@
             <li>Dashboard with license, HPOS, coverage and audit</li>
             <li>Mask PII in REST for roles without the sensitive-data capability</li>
             <li>Rotation assistant with dry run and daily cron</li>
-            <li>Signed updates; expiry only blocks new writes, never decryption</li>
+            <li>Ed25519-signed updates; expiry only blocks new writes, never decryption</li>
           </ul>
           <a class="btn primary" href="https://github.com/thiennhant95/wp-encrypted-fields/issues/new?title=Pro%20license%20inquiry&amp;body=Store%20URL%3A%0AWordPress%2FWooCommerce%20version%3A%0AFields%20to%20encrypt%3A" target="_blank" rel="noopener">Request Pro</a>
         </div>
@@ -344,6 +344,10 @@ wp kec verify --full</code></pre>
       <details>
         <summary>Is it free?</summary>
         <p>The core plugin is free (GPL-2.0-or-later) with source on GitHub. A separate Pro add-on provides HPOS order encryption, audit logging, coverage reporting, REST masking, key rotation and license-backed updates. Pro is quoted per store — <a href="#pro">request a license</a>. Expiry never blocks decryption; only new HPOS writes pause.</p>
+      </details>
+      <details>
+        <summary>What is required to activate Pro?</summary>
+        <p>Pro needs the PHP <code>sodium</code> extension, the license endpoint in <code>KEC_PRO_LICENSE_SERVER</code>, the pinned public key in <code>KEC_PRO_LICENSE_PUBLIC_KEY</code>, and a key bound to your store domain. Activations and updates are Ed25519-signed, so a leaked license key cannot forge them.</p>
       </details>
     </div>
   </section>

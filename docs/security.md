@@ -35,7 +35,9 @@ The plugin protects data at rest when the database or a backup leaks.
 - Serialized arrays/objects in declared meta fields are serialized, encrypted
   and unserialized after decryption.
 - `post_content`, `post_title`, `wp_options` and custom tables without an
-  adapter are not encrypted by the meta layer.
+  adapter are not encrypted by the meta layer. See
+  [extending.md](extending.md) to register a table adapter and use the runtime
+  wrapper.
 - The WooCommerce customer lookup migration widens short columns so ciphertext
   is not truncated; `_billing_address_index` / `_shipping_address_index` must be
   declared to avoid plaintext name/email/phone copies.

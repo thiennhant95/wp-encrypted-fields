@@ -75,7 +75,8 @@ Choose one source:
 3. Option `kec_field_registry` (saved from the admin UI).
 4. `kec_field_registry` filter for final adjustments.
 
-If the registry is empty the plugin does nothing.
+If the registry is empty the plugin does nothing. See
+[extending.md](extending.md) for theme/mu-plugin filters and custom tables.
 
 ## Fresh site
 

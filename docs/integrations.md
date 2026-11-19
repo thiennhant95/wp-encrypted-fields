@@ -98,9 +98,25 @@ interface TableAdapterInterface
 }
 ```
 
-Adapters are optional and are used by `wp kec migrate --table=...`.
+Adapters are used by `wp kec migrate --table=...` and by the runtime wrapper:
+
+```php
+$leads = kec_custom_table('my_table');
+$row = $leads->read(42);
+$leads->write(42, ['email' => $email, 'phone' => $phone]);
+```
+
+`read()` decrypts and `write()` encrypts every column returned by
+`columns()`. The plugin cannot intercept another plugin's raw SQL, so hook
+that plugin's own read/save filters and use `decryptRow()` / `encryptRow()`.
+Add a dedicated blind-index column and write `$leads->blindIndex('email',
+$email)` beside the ciphertext if you need lookups.
+
 `table()` and `primaryKey()` are required and validated as plain SQL
 identifiers; `write()` must return `true` only when all values were stored.
+
+See [extending.md](extending.md) for theme/mu-plugin timing, examples and the
+full helper API.
 
 ## Popular plugin compatibility
 

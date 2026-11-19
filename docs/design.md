@@ -21,6 +21,8 @@
 | `Admin` | Settings, setup wizard, health/status |
 | `Cli` | WP-CLI commands |
 | `Migration` | Scan, migrate, verify, rollback, auxiliary tables |
+| `Table` | Runtime encrypt/decrypt wrapper for table adapters |
+| `Support` | Public helpers and logging |
 | `Integrations` | WooCommerce, SiteGuard, legacy preset |
 
 ## Read path

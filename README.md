@@ -34,6 +34,8 @@ database; no core or third-party plugin patches are required.
 - Password-reset messages resolve token values.
 - Registry can be defined in `wp-config.php`, a config file, a filter, or the
   admin UI; unlisted fields are never encrypted (default deny).
+- Theme/mu-plugin extension API: late registry filters, value helpers and a
+  runtime wrapper for registered custom-table adapters.
 - Optional WooCommerce integration (order meta, order search, analytics
   customer lookup, customer objects). With HPOS enabled, order-meta
   encryption requires the Encrypted Fields Pro add-on.
@@ -169,6 +171,7 @@ The test scripts are standalone and need no database. Composer is optional.
 - [Migration](docs/migration.md)
 - [Search](docs/search.md)
 - [Integrations](docs/integrations.md)
+- [Extending](docs/extending.md)
 - [Compatibility](docs/compatibility.md)
 - [Security](docs/security.md)
 - [Design](docs/design.md)

@@ -48,9 +48,17 @@ Without it, rotating the master key requires re-tokenizing all users.
 - WooCommerce order search through the order index
 - Exact and partial search for fields marked `search => true`
 
+## Custom tables
+
+Table adapters do not maintain `kec_search_index` automatically. For an
+encrypted custom-table column, store a `kec_blind_index()` token in a dedicated
+`*_bidx` column and query that column for exact matches. See
+[extending.md](extending.md#blind-indexes-for-custom-tables).
+
 ## What does not work automatically
 
 - `LIKE` directly on encrypted columns (use the index).
+- Search indexes for custom tables unless the integration writes them.
 - Queries with table aliases on `wp_users` (skipped to avoid false positives).
 - External search engines. Index plaintext out of band or exclude encrypted
   fields.

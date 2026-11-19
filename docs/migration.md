@@ -111,7 +111,10 @@ See [CLI rotation](cli.md#two-phase-rotation).
 ## After an import or raw SQL write
 
 Plugins that write directly to meta/custom tables (for example WP All Import)
-can bypass the meta hooks. After every import or SQL sync:
+can bypass the meta hooks. The runtime wrapper only helps when the integration
+uses it; it does not intercept arbitrary SQL. See
+[extending.md](extending.md) for custom-table write paths. After every import
+or SQL sync:
 
 ```bash
 wp kec scan

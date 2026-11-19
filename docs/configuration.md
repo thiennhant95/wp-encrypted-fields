@@ -60,7 +60,9 @@ Accepted `cipher` values are `sb`, `det`, `deterministic`, `siv`, `secretbox`,
 
 Serialized arrays/objects in a declared meta field are serialized, encrypted
 and unserialized again on read. `post_content`, `post_title`, `wp_options` and
-custom tables without an adapter are not covered by the meta layer.
+custom tables without an adapter are not covered by the meta layer. Register a
+table adapter and use its runtime wrapper for custom tables; see
+[extending.md](extending.md).
 
 ## Constants
 

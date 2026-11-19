@@ -59,8 +59,10 @@ WP Job Manager. BuddyPress now passes; it was not counted in the previous
 7. Does it require HPOS?
 
 If 1–3 or 5 is yes, test it and possibly add an adapter. If 6 is yes, register
-a `TableAdapterInterface`. If 7 is yes, use the Encrypted Fields Pro add-on for
-orders; the Free plugin refuses order encryption while HPOS is enabled.
+a `TableAdapterInterface`; see [extending.md](extending.md) for the adapter,
+runtime wrapper and theme/mu-plugin timing. If 7 is yes, use the Encrypted
+Fields Pro add-on for orders; the Free plugin refuses order encryption while
+HPOS is enabled.
 
 ## Not supported in the Free plugin
 
