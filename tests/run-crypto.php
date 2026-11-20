@@ -91,7 +91,7 @@ $loginField = new Field('user', 'user_login', 'login');
 
 // Key manager basics.
 check('config' === $keys->keySource(), 'key source is config');
-check(8 === strlen($keys->currentKeyId()), 'key_id is 8 characters');
+check(16 === strlen($keys->currentKeyId()), 'key_id is 16 characters');
 check(32 === strlen((string) $keys->keyFor($keys->currentKeyId())), 'current key is 32 bytes');
 check(32 === strlen($keys->derive('enc', 'user:user_email')), 'derived key is 32 bytes');
 check($keys->derive('enc', 'user:user_email') !== $keys->derive('mac', 'user:user_email'), 'purpose separation');

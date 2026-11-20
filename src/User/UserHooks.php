@@ -22,10 +22,11 @@ final class UserHooks
 
     private static ?Plugin $staticPlugin = null;
 
-    /** @var array<string, string> */
-    private static array $pending = array();
+    /** @var array<int, array<string, string>> */
+    private static array $pendingStack = array();
 
-    private static ?string $pendingEmail = null;
+    /** @var array<int, string|null> */
+    private static array $pendingEmails = array();
 
     public function __construct(Plugin $plugin)
     {
@@ -69,32 +70,32 @@ final class UserHooks
     public function filterPreUserEmail($email)
     {
         if (!is_string($email) || '' === trim($email)) {
-            self::$pendingEmail = null;
+            self::$pendingEmails[] = null;
 
             return $email;
         }
 
         $store = $this->store();
         if (null === $store || !$this->hasUserColumns()) {
-            self::$pendingEmail = null;
+            self::$pendingEmails[] = null;
 
             return $email;
         }
 
         if ($store->isToken($email, ColumnStore::EMAIL)) {
-            self::$pendingEmail = null;
+            self::$pendingEmails[] = null;
 
             return $email;
         }
 
         $token = $store->lookupToken($email, ColumnStore::EMAIL);
         if (is_string($token) && '' !== $token) {
-            self::$pendingEmail = trim($email);
+            self::$pendingEmails[] = trim($email);
 
             return $token;
         }
 
-        self::$pendingEmail = null;
+        self::$pendingEmails[] = null;
 
         return $email;
     }
@@ -111,7 +112,14 @@ final class UserHooks
      */
     public function filterPreInsert($data, $update = 0, $userId = 0)
     {
+        $pendingEmail = null;
+        if (!empty(self::$pendingEmails)) {
+            $pendingEmail = array_pop(self::$pendingEmails);
+        }
+
         if (!is_array($data)) {
+            self::$pendingStack[] = array();
+
             return $data;
         }
 
@@ -119,6 +127,8 @@ final class UserHooks
         $store = $this->store();
 
         if (null === $store) {
+            self::$pendingStack[] = array();
+
             return $data;
         }
 
@@ -128,8 +138,7 @@ final class UserHooks
             $userId = (int) $data['ID'];
         }
 
-        $pendingEmail = self::$pendingEmail;
-        self::$pendingEmail = null;
+        $pending = array();
 
         $targets = array(
             'user_login' => ColumnStore::LOGIN,
@@ -149,7 +158,7 @@ final class UserHooks
 
                 if (is_string($token) && '' !== $token) {
                     $data[$key] = $token;
-                    self::$pending[$name] = $pendingEmail;
+                    $pending[$name] = $pendingEmail;
                     continue;
                 }
             }
@@ -168,7 +177,7 @@ final class UserHooks
 
                         if (is_string($token) && '' !== $token) {
                             $data[$key] = $token;
-                            self::$pending[$name] = $plain;
+                            $pending[$name] = $plain;
                         }
                     }
                 }
@@ -184,11 +193,13 @@ final class UserHooks
             $plain = $this->plainForMeta($store, $value, $name, (int) $userId);
 
             if (null !== $plain && '' !== $plain && !$store->isToken($plain, $name)) {
-                self::$pending[$name] = $plain;
+                $pending[$name] = $plain;
             }
 
             $data[$key] = $token;
         }
+
+        self::$pendingStack[] = $pending;
 
         return $data;
     }
@@ -205,7 +216,12 @@ final class UserHooks
      */
     public function filterInsertUserMeta($meta, $user = null, $update = false)
     {
-        if (!is_array($meta) || array() === self::$pending) {
+        $pending = array();
+        if (!empty(self::$pendingStack)) {
+            $pending = array_pop(self::$pendingStack);
+        }
+
+        if (!is_array($meta) || !is_array($pending) || array() === $pending) {
             return $meta;
         }
 
@@ -215,17 +231,15 @@ final class UserHooks
         }
 
         foreach (array(ColumnStore::LOGIN, ColumnStore::EMAIL) as $name) {
-            if (!array_key_exists($name, self::$pending)) {
+            if (!array_key_exists($name, $pending)) {
                 continue;
             }
 
-            $plain = self::$pending[$name];
+            $plain = $pending[$name];
             if (is_string($plain) && '' !== $plain) {
                 $meta[$store->metaKey($name)] = $plain;
             }
         }
-
-        self::$pending = array();
 
         return $meta;
     }

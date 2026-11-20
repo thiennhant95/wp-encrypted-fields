@@ -66,6 +66,14 @@ final class MetaWriteGuard
             return $query;
         }
 
+        if (preg_match('/^\\s*(INSERT|REPLACE)\\s+INTO\\s+`?([A-Za-z0-9_$]+)`?/i', $query, $matches)) {
+            if (null !== $this->tableTarget($matches[2])) {
+                $this->logWarning('Raw INSERT/REPLACE into an encrypted meta table bypasses encryption.', array(
+                    'table' => $matches[2],
+                ));
+            }
+        }
+
         try {
             return $this->rewrite($query);
         } catch (\Throwable $e) {
@@ -146,6 +154,8 @@ final class MetaWriteGuard
         }
 
         $escaped = function_exists('esc_sql') ? esc_sql($ciphertext) : addslashes($ciphertext);
+
+        MetaCache::clear();
 
         return substr($sql, 0, $parsed['literal_offset'])
             . $escaped

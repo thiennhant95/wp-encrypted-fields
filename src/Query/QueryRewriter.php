@@ -112,7 +112,7 @@ final class QueryRewriter
                 return $match[0];
             }
 
-            $plain = $this->parseLiteral($match[2]);
+            $plain = $this->parseLiteral($match[2], (string) $name);
             if (null === $plain) {
                 return $match[0];
             }
@@ -170,7 +170,7 @@ final class QueryRewriter
                     continue;
                 }
 
-                $plain = $this->parseLiteral($trimmed);
+                $plain = $this->parseLiteral($trimmed, (string) $name);
 
                 if (null === $plain) {
                     $newItems[] = $trimmed;
@@ -420,7 +420,7 @@ final class QueryRewriter
         return $wpdb->users;
     }
 
-    private function parseLiteral(string $literal): ?string
+    private function parseLiteral(string $literal, string $name = ''): ?string
     {
         $literal = trim($literal);
         if ('' === $literal) {
@@ -435,6 +435,14 @@ final class QueryRewriter
             }
 
             if (!preg_match('/^[A-Za-z0-9_.@+\-]+$/', $literal)) {
+                return null;
+            }
+
+            if (ColumnStore::EMAIL === $name && false === strpos($literal, '@')) {
+                return null;
+            }
+
+            if (ColumnStore::LOGIN === $name && preg_match('/^\d+$/', $literal)) {
                 return null;
             }
 

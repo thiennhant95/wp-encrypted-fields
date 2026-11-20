@@ -20,6 +20,8 @@ final class Migrator
     private ?ColumnStore $columns = null;
     private string $lockToken = '';
 
+    private bool $dbLock = false;
+
     public function __construct(Plugin $plugin, ?object $db = null)
     {
         $this->plugin = $plugin;
@@ -735,6 +737,17 @@ final class Migrator
 
     public function acquireLock(): string
     {
+        global $wpdb;
+
+        if (isset($wpdb) && is_object($wpdb) && method_exists($wpdb, 'get_var')) {
+            $result = $wpdb->get_var("SELECT GET_LOCK('kec_migration', 0)");
+            if (1 === $result || '1' === $result) {
+                $this->dbLock = true;
+            } elseif (0 === $result || '0' === $result) {
+                return '';
+            }
+        }
+
         $existing = $this->plugin->option(self::LOCK_OPTION);
         if (is_array($existing) && !empty($existing['token'])) {
             $expires = isset($existing['expires']) ? (int) $existing['expires'] : 0;
@@ -786,6 +799,11 @@ final class Migrator
             if (is_array($existing) && isset($existing['token']) && $existing['token'] !== $token) {
                 return;
             }
+        }
+
+        if ($this->dbLock && isset($GLOBALS['wpdb']) && is_object($GLOBALS['wpdb']) && method_exists($GLOBALS['wpdb'], 'get_var')) {
+            $GLOBALS['wpdb']->get_var("SELECT RELEASE_LOCK('kec_migration')");
+            $this->dbLock = false;
         }
 
         $this->plugin->deleteOption(self::LOCK_OPTION);

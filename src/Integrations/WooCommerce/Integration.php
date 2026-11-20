@@ -91,10 +91,6 @@ final class Integration
             return $should;
         }
 
-        if (is_string($key) && 0 === strpos($key, '_')) {
-            return false;
-        }
-
         if (is_array($context) && isset($context['post_type']) && 'shop_order' === $context['post_type']) {
             return false;
         }

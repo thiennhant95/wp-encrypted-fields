@@ -326,7 +326,7 @@ final class KeyManager
 
     private static function keyIdFor(string $binary): string
     {
-        return substr(hash('sha256', $binary), 0, 8);
+        return substr(hash('sha256', $binary), 0, 16);
     }
 
     /**
